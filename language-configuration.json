@@ -1,0 +1,28 @@
+{
+    "comments": {
+        "lineComment": "#"
+    },
+    "brackets": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["<", ">"]
+    ],
+    "autoClosingPairs": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["\"", "\""],
+        ["'", "'"]
+    ],
+    "folding": {
+        "markers": {
+            "start": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+",
+            "end": "^\\s*(\\#{3,}.*?)?\\s*$"
+        },
+        "script": {
+            "start": "^\\s*{{\\s*$",
+            "end": "^\\s*}}\\s*$"
+        }
+    }
+}
