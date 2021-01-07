@@ -1,18 +1,22 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi } from 'httpyac';
-import { APP_NAME } from '../config';
+import { httpFileStore, HttpRegion, HttpFile, httpYacApi, utils } from 'httpyac';
+import { APP_NAME, getConfigSetting, RESPONSE_VIEW_PRESERVE_FOCUS, RESPONSE_VIEW_PREVIEW } from '../config';
 import { errorHandler } from './errorHandler';
+import { extension } from 'mime-types';
+import { promises as fs } from 'fs';
 
 interface CommandData{
   httpRegion: HttpRegion;
   httpFile: HttpFile
 }
-const commands = {
+export const commands = {
   send: `${APP_NAME}.send`,
   resend: `${APP_NAME}.resend`,
   sendAll:`${APP_NAME}.sendall`,
   clearAll:`${APP_NAME}.clearall`,
   show: `${APP_NAME}.show`,
+  openHeaders: `${APP_NAME}.openHeaders`,
+  save: `${APP_NAME}.save`
 };
 
 export class RequestCommandsController implements vscode.CodeLensProvider {
@@ -28,6 +32,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.sendAll, this.sendAll, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
       vscode.commands.registerCommand(commands.show, this.show, this),
+      vscode.commands.registerCommand(commands.save, this.show, this),
+      vscode.commands.registerCommand(commands.openHeaders, this.openHeaders, this),
 			vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
     ];
   }
@@ -70,6 +76,18 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             command: commands.show,
             arguments: args,
             title: 'show'
+          }));
+
+          result.push(new vscode.CodeLens(range, {
+            command: commands.save,
+            arguments: args,
+            title: 'save'
+          }));
+
+          result.push(new vscode.CodeLens(range, {
+            command: commands.openHeaders,
+            arguments: args,
+            title: 'show headers'
           }));
         }
       }
@@ -133,7 +151,50 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     }
   }
 
-  private async getCurrentHttpRegion(doc: vscode.TextDocument | undefined, line: number | undefined) {
+  @errorHandler()
+  async openHeaders(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) {
+    if (document) {
+      let httpRegion: HttpRegion | undefined;
+      if (utils.isHttpRegion(document)) {
+        httpRegion = document;
+      } else {
+        const parsedDocument = await this.getCurrentHttpRegion(document, line);
+        if (parsedDocument) {
+          httpRegion = parsedDocument.httpRegion;
+        }
+      }
+
+      if (httpRegion) {
+        const content = utils.toMarkdown(httpRegion);
+        const document = await vscode.workspace.openTextDocument({ language: 'markdown', content });
+        await vscode.window.showTextDocument(document, {
+          viewColumn: vscode.ViewColumn.Active,
+          preserveFocus: getConfigSetting<boolean>(RESPONSE_VIEW_PRESERVE_FOCUS),
+          preview: getConfigSetting<boolean>(RESPONSE_VIEW_PREVIEW),
+        });
+      }
+    }
+  }
+
+  @errorHandler()
+  async save(document?: vscode.TextDocument, line?: number) {
+    const parsedDocument = await this.getCurrentHttpRegion(document, line);
+    if (parsedDocument && parsedDocument.httpRegion.response) {
+      const ext = extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
+      const filters: Record<string, Array<string>> = {};
+      if (ext) {
+        filters[ext] = [ext];
+      }
+      const uri = await vscode.window.showSaveDialog({
+        filters
+      });
+      if (uri) {
+        await fs.writeFile(uri.fsPath, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
+      }
+    }
+  }
+
+  private async getCurrentHttpRegion(doc: vscode.TextDocument  | undefined, line: number | undefined) {
     const document = doc || vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);

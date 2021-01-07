@@ -3,6 +3,9 @@ import {workspace, WorkspaceConfiguration} from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
+export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
+export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
+
 
 export function getConfigSetting<T>(section: string) {
   const config = workspace.getConfiguration(APP_NAME);

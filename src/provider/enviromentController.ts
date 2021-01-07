@@ -5,8 +5,8 @@ import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 
 const commands = {
-  toogleEnv: `${APP_NAME}.toogle-env`,
-  toogleAllEnv: `${APP_NAME}.toogle-allenv`,
+  toogleEnv: `${APP_NAME}.toggle-env`,
+  toogleAllEnv: `${APP_NAME}.toggle-allenv`,
   refresh: `${APP_NAME}.refresh`,
 };
 

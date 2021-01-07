@@ -27,6 +27,7 @@
 	],
 	"activationEvents": [
 		"onCommand:httpyac.send",
+		"onCommand:httpyac.sendAll",
 		"onLanguage:http"
 	],
 	"main": "./dist/extension.js",
@@ -169,6 +170,21 @@
 				"category": "httpYac"
 			},
 			{
+				"command": "httpyac.show",
+				"title": "Show response",
+				"category": "httpYac"
+			},
+			{
+				"command": "httpyac.showHeaders",
+				"title": "Show headers",
+				"category": "httpYac"
+			},
+			{
+				"command": "httpyac.save",
+				"title": "Save response",
+				"category": "httpYac"
+			},
+			{
 				"command": "httpyac.clearall",
 				"title": "Clear all responses",
 				"category": "httpYac"
@@ -209,23 +225,6 @@
 				{
 					"command": "httpyac.toggle-allenv",
 					"when": "editorLangId == http",
-					"group": "httpyac@1"
-				}
-			],
-			"editor/context": [
-				{
-					"command": "httpyac.send",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.resend",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.toggle-env",
-					"when": "editorTextFocus && editorLangId == http",
 					"group": "httpyac@1"
 				}
 			]
@@ -271,7 +270,10 @@
 		"webpack-cli": "^4.3.1"
 	},
 	"dependencies": {
+		"@types/mime-types": "^2.1.0",
 		"httpyac": "file:../httpyac",
-		"lodash.throttle": "^4.1.1"
+		"lodash.throttle": "^4.1.1",
+		"mime-types": "^2.1.28",
+		"tmp-promise": "^3.0.2"
 	}
 }

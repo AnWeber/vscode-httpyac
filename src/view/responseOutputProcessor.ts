@@ -1,21 +1,19 @@
 import { httpYacApi, HttpRegion, HttpFile, HttpRequest, HttpResponse, ContentType, utils } from 'httpyac';
 
 import * as vscode from 'vscode';
-import { EOL } from 'os';
-import { APP_NAME, getConfigSetting } from '../config';
+import { getConfigSetting } from '../config';
+import { file } from 'tmp-promise';
+import { extension } from 'mime-types';
+import { promises as fs } from 'fs';
+import { commands } from '../provider/requestCommandsController';
 
-const commands = {
-  openHeaders: `${APP_NAME}.openHeader`
-};
 
 interface OutputCacheItem{
   document: vscode.TextDocument;
-  request: HttpRequest;
-  response: HttpResponse;
+  httpRegion: HttpRegion;
 }
 
 export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.HoverProvider {
-
 
   private outputCache: Array<OutputCacheItem> = [];
   private subscriptions: Array<vscode.Disposable> = [];
@@ -26,7 +24,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     this.subscriptions = [
 			vscode.languages.registerHoverProvider({ scheme: 'untitled' }, this),
       vscode.languages.registerCodeLensProvider({ scheme: 'untitled' }, this),
-      vscode.commands.registerCommand(commands.openHeaders, this.openHeaders, this),
       vscode.workspace.onDidCloseTextDocument((document) => {
         this.remove(document);
       }),
@@ -43,13 +40,14 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     const result: Array<vscode.CodeLens> = [];
 
     const cacheItem = this.outputCache.find(obj => obj.document === document);
-    if (cacheItem) {
+    if (cacheItem && cacheItem.httpRegion.response) {
+      const response = cacheItem.httpRegion.response;
 
-      const title = [`HTTP${cacheItem.response.httpVersion} ${cacheItem.response.statusCode} - ${cacheItem.response.statusMessage}`];
+      const title = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
       const headers = getConfigSetting<Array<string>>('responseViewHeader');
       if (headers) {
         title.push(...headers.map(headerName => {
-          const val = utils.getHeader(cacheItem.response.headers, headerName);
+          const val = utils.getHeader(response.headers, headerName);
           if (val) {
             return `${headerName}: ${val}`;
           }
@@ -59,7 +57,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       result.push(
         new vscode.CodeLens(
           new vscode.Range(0, 0, 0, 0), {
-          arguments: [cacheItem],
+          arguments: [cacheItem.httpRegion],
           title: title.join(' | '),
             command: commands.openHeaders
         }));
@@ -72,74 +70,72 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     if (position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem) {
-        if (cacheItem.response?.headers) {
 
-          const responseHover = this.toMarkdown(cacheItem);
-          return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0,0),/[^-\s]/) || new vscode.Range(0,0,0,100));
-        }
+        const responseHover = utils.toMarkdown(cacheItem.httpRegion);
+        return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/) || new vscode.Range(0, 0, 0, 100));
       }
     }
     return undefined;
   }
 
-  private toMarkdown(cacheItem: OutputCacheItem) {
-    return `${utils.responseToString(cacheItem.response)}
-
----
-### timings
-${utils.timingsToString(cacheItem.response.timings)}
-
----
-### request
-${utils.requestToString(cacheItem.request)}
-          `.split(EOL).join(`  ${EOL}`);
-  }
-
   public async show(httpRegion: HttpRegion, httpFile: HttpFile): Promise<void> {
     if (httpRegion.request && httpRegion.response) {
-      await this.showResponse(httpRegion.request,httpRegion.response);
+
+      if (httpRegion.metaParams?.save) {
+        const ext = extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
+        const filters: Record<string, Array<string>> = {};
+        if (ext) {
+          filters[ext] = [ext];
+        }
+        const uri = await vscode.window.showSaveDialog({
+          filters
+        });
+        if (uri) {
+          await fs.writeFile(uri.fsPath, new Uint8Array(httpRegion.response.rawBody));
+          if (httpRegion.metaParams?.openWith) {
+            await vscode.commands.executeCommand('vscode.openWith', uri, httpRegion.metaParams?.openWith);
+          }
+        }
+      }else if (httpRegion.metaParams?.openWith) {
+        const { path } = await file({ postfix: `.${extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
+        await fs.writeFile(path, new Uint8Array(httpRegion.response.rawBody));
+        await vscode.commands.executeCommand('vscode.openWith', vscode.Uri.file(path), httpRegion.metaParams?.openWith);
+      } else {
+        await this.showTextDocument(httpRegion);
+      }
     }
   }
 
-  async openHeaders(cacheItem: OutputCacheItem) {
-    if (cacheItem) {
-      const content = this.toMarkdown(cacheItem);
-      const document = await vscode.workspace.openTextDocument({ language: 'markdown', content });
-      await vscode.window.showTextDocument(document, {
-        viewColumn: vscode.ViewColumn.Active,
+
+  private async showTextDocument(httpRegion: HttpRegion) {
+    const response = httpRegion.response;
+    if (response) {
+      let content: string;
+      if (utils.isString(response.body)) {
+        content = response.body;
+      } else {
+        content = JSON.stringify(response.body, null, 2);
+      }
+      const language = this.getLanguageId(response.contentType);
+
+      const document = await vscode.workspace.openTextDocument({ language, content });
+      this.outputCache.push({
+        document,
+        httpRegion
+      });
+      let viewColumn = vscode.ViewColumn.Beside;
+      if (getConfigSetting<string>('responseViewColumn') === 'current') {
+        viewColumn = vscode.ViewColumn.Active;
+      }
+      const editor = await vscode.window.showTextDocument(document, {
+        viewColumn,
         preserveFocus: getConfigSetting<boolean>('responseViewPreserveFocus'),
         preview: getConfigSetting<boolean>('responseViewPreview'),
       });
-    }
-  }
 
-  private async showResponse(request: HttpRequest, response: HttpResponse) {
-    let content: string;
-    if (utils.isString(response.body)) {
-      content = response.body;
-    } else {
-      content = JSON.stringify(response.body, null, 2);
-    }
-    const language = this.getLanguageId(response.contentType);
-
-
-    const document = await vscode.workspace.openTextDocument({ language, content });
-    this.outputCache.push({
-      document,
-      request,
-      response
-    });
-    let viewColumn = vscode.ViewColumn.Beside;
-    if (getConfigSetting<string>('responseViewColumn') === 'current') {
-      viewColumn = vscode.ViewColumn.Active;
-    }
-    const editor = await vscode.window.showTextDocument(document, {
-      viewColumn,
-      preserveFocus: getConfigSetting<boolean>('responseViewPreserveFocus'),
-      preview: getConfigSetting<boolean>('responseViewPreview'),
-    });
-    if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
-      await vscode.commands.executeCommand('editor.action.formatDocument', editor);
+      if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
+        await vscode.commands.executeCommand('editor.action.formatDocument', editor);
+      }
     }
   }
 
@@ -162,6 +158,8 @@ ${utils.requestToString(cacheItem.request)}
         return 'html';
       } else if (utils.isMimeTypeCSS(contentType)) {
         return 'css';
+      } else if (utils.isMimeTypeMarkdown(contentType)) {
+        return 'markdown';
       }
     }
     return 'text';
