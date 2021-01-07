@@ -31,7 +31,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
 function handleError(target: any, propertyKey: string | symbol, err: any) {
   log.error(`${target}.${String(propertyKey)}`, err);
   if (err instanceof Error) {
-    window.showErrorMessage(`${err.name} - ${err.message}`, err.stack|| '');
+    window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
   } else {
     window.showErrorMessage(err);
   }

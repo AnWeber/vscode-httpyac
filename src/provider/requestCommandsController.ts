@@ -79,20 +79,24 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   private currentRequest: CommandData | undefined;
 
+  @errorHandler()
   async send(document?: vscode.TextDocument, line?: number) {
     this.currentRequest = await this.getCurrentHttpRegion(document, line);
     await this.sendRequest();
   }
 
+  @errorHandler()
   async resend() {
     await this.sendRequest();
   }
 
-  @errorHandler()
   private async sendRequest() {
+
     if (this.currentRequest) {
       await httpYacApi.send(this.currentRequest.httpRegion, this.currentRequest.httpFile);
-      this.refreshCodeLens.fire();
+      if (this.refreshCodeLens) {
+        this.refreshCodeLens.fire();
+      }
       await httpYacApi.show(this.currentRequest.httpRegion, this.currentRequest.httpFile);
     }
   }
@@ -102,7 +106,9 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
       await httpYacApi.sendAll(httpFile);
-      this.refreshCodeLens.fire();
+      if (this.refreshCodeLens) {
+        this.refreshCodeLens.fire();
+      }
     }
   }
 

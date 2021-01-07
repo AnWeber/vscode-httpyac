@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { httpFileStore } from 'httpyac';
 import { default as throttle } from 'lodash.throttle';
-
+import { errorHandler } from './errorHandler';
 
 export class HttpFileStoreController {
 
@@ -34,10 +34,13 @@ export class HttpFileStoreController {
     ];
   }
 
+  @errorHandler()
   private async refreshHttpFile(document: vscode.TextDocument) {
     if (document.languageId === 'http') {
       await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
-      this.refreshCodeLens.fire();
+      if (this.refreshCodeLens) {
+        this.refreshCodeLens.fire();
+      }
     }
   }
 

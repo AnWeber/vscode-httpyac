@@ -129,28 +129,16 @@
     "metadata": {
       "patterns": [
         {
-          "match": "^\\s*\\#{1,}\\s+(?:((@)name)\\s+([^\\s\\.]+))$",
+          "match": "^\\s*\\#{1,}\\s+(?:((@).*)\\s+([^\\s]+))$",
           "captures": {
             "1": {
-              "name": "entity.other.attribute-name"
+              "name": "keyword.name.http"
             },
             "2": {
               "name": "punctuation.definition.block.tag.metadata"
             },
             "3": {
               "name": "entity.name.type.http"
-            }
-          },
-          "name": "comment.line.sharp.http"
-        },
-        {
-          "match": "^\\s*\\#{1,}\\s+((@)note)\\s*$",
-          "captures": {
-            "1": {
-              "name": "entity.other.attribute-name"
-            },
-            "2": {
-              "name": "punctuation.definition.block.tag.metadata"
             }
           },
           "name": "comment.line.sharp.http"
