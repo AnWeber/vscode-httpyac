@@ -7,6 +7,8 @@ import { EnvironmentController } from './provider/enviromentController';
 import { HttpFileStoreController } from './provider/httpFileStoreController';
 import { watchConfigSettings } from './config';
 import { initVscodeLogger } from './logger';
+import {HttpProxyAgent} from 'http-proxy-agent';
+import {HttpsProxyAgent} from 'https-proxy-agent';
 
 initVscodeLogger();
 
@@ -23,14 +25,21 @@ export function activate(context: vscode.ExtensionContext) {
 		new RequestCommandsController(refreshCodeLens, httpDocumentSelector),
 		new EnvironmentController(refreshCodeLens, httpDocumentSelector),
 		new ResponseOutputProcessor(),
-		watchConfigSettings(config => {
-			httpYacApi.httpClient = gotHttpClientFactory({
+		watchConfigSettings((config, httpConfig) => {
+			const options: Record<string, any> = {
 				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,
 				headers: config.requestDefaultHeaders,
 				rejectUnauthorized: !!config.requestSslCertficateValidation,
 				followRedirect: !!config.followRedirect,
-			});
-		}, 'requestDefaultHeaders', 'requestTimeout', 'requestSslCertficateValidation', 'requestFollowRedirect')
+			};
+			if (httpConfig.proxy) {
+				options.agent = {
+					http: new HttpProxyAgent(httpConfig.proxy),
+					https: new HttpsProxyAgent(httpConfig.proxy)
+				};
+			}
+			httpYacApi.httpClient = gotHttpClientFactory(options);
+		}, 'http')
 	]);
 
 	return httpYacApi;

@@ -94,13 +94,15 @@
 				"httpyac.environmentVariables": {
 					"type": "object",
 					"scope": "resource",
+					"default":{
+						"$SHARED":{}
+					},
 					"description": "environment variables"
 				},
 				"httpyac.dotenvDirname": {
 					"type": "string",
-					"default": "env",
 					"scope": "resource",
-					"description": "folder of dotenv files"
+					"description": "relative or absolute path to folder with dotenv files"
 				},
 				"httpyac.dotenvDefaultFiles": {
 					"type": "array",
@@ -108,7 +110,7 @@
 						".env"
 					],
 					"scope": "resource",
-					"description": "default dotenv search files"
+					"description": "default dotenv files which is active in all profiles"
 				},
 				"httpyac.responseViewHeader": {
 					"type": "array",
@@ -175,7 +177,7 @@
 				"category": "httpYac"
 			},
 			{
-				"command": "httpyac.showHeaders",
+				"command": "httpyac.viewHeader",
 				"title": "Show headers",
 				"category": "httpYac"
 			},
@@ -257,8 +259,8 @@
 		"lint": "eslint src --ext ts"
 	},
 	"devDependencies": {
-		"@types/got": "^9.6.11",
 		"@types/lodash.throttle": "^4.1.6",
+		"@types/mime-types": "^2.1.0",
 		"@types/node": "^14.14.20",
 		"@types/vscode": "^1.52.0",
 		"@typescript-eslint/eslint-plugin": "^4.12.0",
@@ -270,7 +272,8 @@
 		"webpack-cli": "^4.3.1"
 	},
 	"dependencies": {
-		"@types/mime-types": "^2.1.0",
+		"http-proxy-agent": "^4.0.1",
+		"https-proxy-agent": "^5.0.0",
 		"httpyac": "file:../httpyac",
 		"lodash.throttle": "^4.1.1",
 		"mime-types": "^2.1.28",

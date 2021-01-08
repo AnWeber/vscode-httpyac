@@ -7,21 +7,18 @@ export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
 
 
-export function getConfigSetting<T>(section: string) {
-  const config = workspace.getConfiguration(APP_NAME);
+export function getConfigSetting<T>(section: string, rootSection?: string) {
+  const config = workspace.getConfiguration(rootSection || APP_NAME);
   return config.get<T>(section);
 }
 
 
-export function watchConfigSettings(watcher: (config: Record<string, any>) => void, ...sections: Array<string>) {
-  const config = workspace.getConfiguration(APP_NAME);
-
-
-  watcher(getConfigs(sections, config));
-
+export function watchConfigSettings(watcher: (...config: Array<Record<string, any>>) => void, ...sections: Array<string>) {
+  const rootSections = [APP_NAME, ...sections];
+  watcher(...rootSections.map(section => workspace.getConfiguration(section)));
   return workspace.onDidChangeConfiguration((changeEvent) => {
     if (changeEvent.affectsConfiguration(APP_NAME)) {
-      watcher(getConfigs(sections, config));
+      watcher(...rootSections.map(section => workspace.getConfiguration(section)));
     }
   });
 }

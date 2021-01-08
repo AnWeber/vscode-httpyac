@@ -59,7 +59,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
           new vscode.Range(0, 0, 0, 0), {
           arguments: [cacheItem.httpRegion],
           title: title.join(' | '),
-            command: commands.openHeaders
+            command: commands.viewHeader
         }));
     }
 
@@ -81,31 +81,53 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   public async show(httpRegion: HttpRegion, httpFile: HttpFile): Promise<void> {
     if (httpRegion.request && httpRegion.response) {
 
+
+      const openWith = this.getOpenWith(httpRegion);
       if (httpRegion.metaParams?.save) {
+
+        const filters: Record<string, Array<string>> = {
+          'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
+        };
         const ext = extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
-        const filters: Record<string, Array<string>> = {};
         if (ext) {
           filters[ext] = [ext];
         }
         const uri = await vscode.window.showSaveDialog({
           filters
         });
-        if (uri) {
-          await fs.writeFile(uri.fsPath, new Uint8Array(httpRegion.response.rawBody));
-          if (httpRegion.metaParams?.openWith) {
-            await vscode.commands.executeCommand('vscode.openWith', uri, httpRegion.metaParams?.openWith);
-          }
-        }
-      }else if (httpRegion.metaParams?.openWith) {
+        await this.saveAndOpenWith(uri, httpRegion.response.rawBody, openWith);
+      }else if (openWith) {
         const { path } = await file({ postfix: `.${extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
-        await fs.writeFile(path, new Uint8Array(httpRegion.response.rawBody));
-        await vscode.commands.executeCommand('vscode.openWith', vscode.Uri.file(path), httpRegion.metaParams?.openWith);
+        await this.saveAndOpenWith(vscode.Uri.file(path), httpRegion.response.rawBody, openWith);
       } else {
         await this.showTextDocument(httpRegion);
       }
     }
   }
 
+  private getOpenWith(httpRegion: HttpRegion): string | undefined{
+    if (httpRegion.response) {
+      if (httpRegion.metaParams?.openWith) {
+        return httpRegion.metaParams.openWith;
+      } else if(utils.isMimeTypeImage(httpRegion.response.contentType)) {
+        return 'imagePreview.previewEditor';
+      } else if (utils.isMimeTypePdf(httpRegion.response.contentType)
+        && vscode.extensions.getExtension('tomoki1207.pdf')) {
+        return 'pdf.preview';
+      }
+    }
+    return undefined;
+  }
+
+
+  private async saveAndOpenWith(uri: vscode.Uri | undefined, buffer: Buffer, openWith: string | undefined) {
+    if (uri) {
+      await fs.writeFile(uri.fsPath, new Uint8Array(buffer));
+      if (openWith) {
+        await vscode.commands.executeCommand('vscode.openWith', uri, openWith);
+      }
+    }
+  }
 
   private async showTextDocument(httpRegion: HttpRegion) {
     const response = httpRegion.response;

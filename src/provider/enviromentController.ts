@@ -23,7 +23,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       vscode.commands.registerCommand(commands.toogleAllEnv, this.toogleAllEnv, this),
       vscode.commands.registerCommand(commands.refresh, this.refresh, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
-      watchConfigSettings(this.initEnvironmentProvider.bind(this), 'dotenvDirname', 'dotenvDefaultFiles', 'environmentenvironments' )
+      watchConfigSettings(this.initEnvironmentProvider.bind(this))
     ];
 
   }
@@ -44,12 +44,11 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     }
     this.environmentProviders = [];
 
-    const environmentenvironments = configs['environmentenvironments'];
-    if (environmentenvironments) {
-      this.environmentProviders.push(new environments.JsonEnvProvider(environmentenvironments));
+    if (configs.environmentVariables) {
+      this.environmentProviders.push(new environments.JsonEnvProvider(configs.environmentVariables));
     }
-    const dotEnvDirname = configs['dotenvDirname'];
-    const dotenvDefaultFiles = configs['dotenvDefaultFiles'];
+    const dotEnvDirname: string = configs.dotenvDirname;
+    const dotenvDefaultFiles: Array<string> = configs.dotenvDefaultFiles || [];
     if (dotEnvDirname && isAbsolute(dotEnvDirname)) {
       this.environmentProviders.push(new environments.DotenvProvider(dotEnvDirname, dotenvDefaultFiles));
     }

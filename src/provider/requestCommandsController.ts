@@ -15,7 +15,7 @@ export const commands = {
   sendAll:`${APP_NAME}.sendall`,
   clearAll:`${APP_NAME}.clearall`,
   show: `${APP_NAME}.show`,
-  openHeaders: `${APP_NAME}.openHeaders`,
+  viewHeader: `${APP_NAME}.viewHeader`,
   save: `${APP_NAME}.save`
 };
 
@@ -32,8 +32,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.sendAll, this.sendAll, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
       vscode.commands.registerCommand(commands.show, this.show, this),
-      vscode.commands.registerCommand(commands.save, this.show, this),
-      vscode.commands.registerCommand(commands.openHeaders, this.openHeaders, this),
+      vscode.commands.registerCommand(commands.save, this.save, this),
+      vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
 			vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
     ];
   }
@@ -85,7 +85,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
           }));
 
           result.push(new vscode.CodeLens(range, {
-            command: commands.openHeaders,
+            command: commands.viewHeader,
             arguments: args,
             title: 'show headers'
           }));
@@ -152,7 +152,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async openHeaders(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) {
+  async viewHeader(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) {
     if (document) {
       let httpRegion: HttpRegion | undefined;
       if (utils.isHttpRegion(document)) {
