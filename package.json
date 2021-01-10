@@ -3,11 +3,15 @@
 	"displayName": "httpYac - Yet Another Client",
 	"license": "MIT",
 	"publisher": "anweber",
-	"description": "HTTP/REST Client for Visual Studio Code",
-	"version": "0.1.0",
+	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
+	"version": "1.0.0",
+	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/AnWeber/vscode-httpyac"
+	},
+	"bugs": {
+		"url": "https://github.com/AnWeber/vscode-httpyac/issues"
 	},
 	"icon": "icon.png",
 	"engines": {
@@ -279,7 +283,7 @@
 		"eslint": "^7.17.0",
 		"ts-loader": "^8.0.14",
 		"typescript": "^4.1.3",
-		"webpack": "^5.11.1",
+		"webpack": "^5.12.3",
 		"webpack-cli": "^4.3.1"
 	},
 	"dependencies": {
@@ -288,7 +292,7 @@
 		"got": "^11.8.1",
 		"http-proxy-agent": "^4.0.1",
 		"https-proxy-agent": "^5.0.0",
-		"httpyac": "file:../httpyac",
+		"httpyac": "^1.0.1",
 		"lodash": "^4.17.20",
 		"mime-types": "^2.1.28",
 		"tmp-promise": "^3.0.2"
