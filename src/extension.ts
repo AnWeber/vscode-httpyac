@@ -30,7 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
 			const options: Record<string, any> = {
 				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,
 				headers: config.requestDefaultHeaders,
-				rejectUnauthorized: !!config.requestSslCertficateValidation,
+				https: {
+					rejectUnauthorized: !!config.requestSslCertficateValidation
+				},
 				followRedirect: !!config.followRedirect,
 			};
 			if (httpConfig.proxy) {

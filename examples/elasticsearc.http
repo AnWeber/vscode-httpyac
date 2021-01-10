@@ -1,5 +1,5 @@
 {{
-  exports.authorization = `Basic ${Buffer.from( user + ":" + password).toString('base64')}`
+  exports.authorization = `Basic ${Buffer.from( elastic_user + ":" + elastic_password).toString('base64')}`
 }}
 
 ###
@@ -8,3 +8,7 @@
 GET {{elastic_uri}}/
 Authorization:{{authorization}}
 
+{{
+  const assert = require('assert');
+  assert.equal(elastic.version.number, "7.6.2", "elastic version is valid");
+}}
