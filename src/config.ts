@@ -17,7 +17,7 @@ export function watchConfigSettings(watcher: (...config: Array<Record<string, an
   const rootSections = [APP_NAME, ...sections];
   watcher(...rootSections.map(section => workspace.getConfiguration(section)));
   return workspace.onDidChangeConfiguration((changeEvent) => {
-    if (changeEvent.affectsConfiguration(APP_NAME)) {
+    if (rootSections.some(section => changeEvent.affectsConfiguration(section))) {
       watcher(...rootSections.map(section => workspace.getConfiguration(section)));
     }
   });

@@ -3,6 +3,7 @@ import { APP_NAME , watchConfigSettings} from '../config';
 import { httpFileStore, environmentStore, environments } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
+import { getConfigSetting } from '../config';
 
 const commands = {
   toogleEnv: `${APP_NAME}.toggle-env`,
@@ -17,6 +18,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(refreshCodeLens: vscode.EventEmitter<void>, httpDocumentSelector: vscode.DocumentSelector) {
+    environmentStore.activeEnvironments = getConfigSetting<Array<string>>("environmentSelectedOnStart");
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toogleEnv, this.toogleEnv, this),
@@ -92,11 +94,19 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   private async pickEnv() {
     const envs = await environmentStore.getEnviroments();
     if (envs) {
-      environmentStore.activeEnv = await vscode.window.showQuickPick(envs, { placeHolder: "select environment" });
+      environmentStore.activeEnvironments = (await vscode.window.showQuickPick(envs.map(env => {
+        return {
+          label: env,
+          picked: environmentStore.activeEnvironments && environmentStore.activeEnvironments.indexOf(env) >= 0
+        };
+      }), {
+        placeHolder: "select environment",
+        canPickMany: true,
+      }))?.map(obj => obj.label);
     } else {
       vscode.window.showInformationMessage("no environment found");
     }
-    return environmentStore.activeEnv;
+    return environmentStore.activeEnvironments;
   }
 
   async toogleAllEnv() {

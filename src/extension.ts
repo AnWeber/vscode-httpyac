@@ -8,11 +8,12 @@ import { HttpFileStoreController } from './provider/httpFileStoreController';
 import { watchConfigSettings } from './config';
 import { initVscodeLogger } from './logger';
 import {HttpProxyAgent} from 'http-proxy-agent';
-import {HttpsProxyAgent} from 'https-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 initVscodeLogger();
 
 export function activate(context: vscode.ExtensionContext) {
+	httpYacApi.additionalRequire.vscode = vscode;
 
 	const httpDocumentSelector = [
 		{ language: 'http', scheme: '*' }
@@ -42,7 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}, 'http')
 	]);
 
-	return httpYacApi;
+	return {
+		httpYacApi
+	};
 }
 
 // this method is called when your extension is deactivated

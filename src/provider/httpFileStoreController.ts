@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { httpFileStore } from 'httpyac';
-import { default as throttle } from 'lodash.throttle';
+import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
 
 export class HttpFileStoreController {

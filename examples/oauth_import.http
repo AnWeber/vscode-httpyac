@@ -1,0 +1,11 @@
+
+
+###
+# @name health
+# @import ./oauth.http
+# @ref keycloak
+
+# @extension json
+GET {{spring_host}}/actuator/health
+Authorization: Bearer {{keycloak.access_token}}
+

@@ -1,0 +1,10 @@
+{{
+  exports.authorization = `Basic ${Buffer.from( user + ":" + password).toString('base64')}`
+}}
+
+###
+# @name elastic
+
+GET {{elastic_uri}}/
+Authorization:{{authorization}}
+

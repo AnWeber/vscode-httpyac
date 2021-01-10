@@ -11,10 +11,10 @@ import { commands } from '../provider/requestCommandsController';
 interface OutputCacheItem{
   document: vscode.TextDocument;
   httpRegion: HttpRegion;
+  prettyPrintNeeded: boolean;
 }
 
 export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.HoverProvider {
-
   private outputCache: Array<OutputCacheItem> = [];
   private subscriptions: Array<vscode.Disposable> = [];
 
@@ -26,6 +26,15 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       vscode.languages.registerCodeLensProvider({ scheme: 'untitled' }, this),
       vscode.workspace.onDidCloseTextDocument((document) => {
         this.remove(document);
+      }),
+      vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+        if (editor) {
+          const cacheItem = this.outputCache.find(obj => obj.prettyPrintNeeded && obj.document === editor.document);
+          if (cacheItem) {
+            await this.prettyPrint(editor);
+            cacheItem.prettyPrintNeeded = false;
+          }
+        }
       }),
     ];
   }
@@ -83,12 +92,12 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
 
       const openWith = this.getOpenWith(httpRegion);
-      if (httpRegion.metaParams?.save) {
+      if (httpRegion.metaParams.save) {
 
         const filters: Record<string, Array<string>> = {
           'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
         };
-        const ext = extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
+        const ext = httpRegion.metaParams.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
         if (ext) {
           filters[ext] = [ext];
         }
@@ -97,7 +106,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         });
         await this.saveAndOpenWith(uri, httpRegion.response.rawBody, openWith);
       }else if (openWith) {
-        const { path } = await file({ postfix: `.${extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
+        const { path } = await file({ postfix: `.${httpRegion.metaParams.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
         await this.saveAndOpenWith(vscode.Uri.file(path), httpRegion.response.rawBody, openWith);
       } else {
         await this.showTextDocument(httpRegion);
@@ -107,7 +116,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
   private getOpenWith(httpRegion: HttpRegion): string | undefined{
     if (httpRegion.response) {
-      if (httpRegion.metaParams?.openWith) {
+      if (httpRegion.metaParams.openWith) {
         return httpRegion.metaParams.openWith;
       } else if(utils.isMimeTypeImage(httpRegion.response.contentType)) {
         return 'imagePreview.previewEditor';
@@ -135,30 +144,68 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       let content: string;
       if (utils.isString(response.body)) {
         content = response.body;
+
       } else {
         content = JSON.stringify(response.body, null, 2);
       }
-      const language = this.getLanguageId(response.contentType);
+      const language = httpRegion.metaParams.language || this.getLanguageId(httpRegion.response?.contentType);
 
-      const document = await vscode.workspace.openTextDocument({ language, content });
+
+
+      if (getConfigSetting<boolean>('responseViewReuseEditor')) {
+        const cacheItem = this.outputCache.find(obj => obj.document.languageId === language && obj.document.isUntitled);
+        if (cacheItem) {
+          const lineCount = cacheItem.document.lineCount;
+          let editor = vscode.window.visibleTextEditors.find(obj => obj.document === cacheItem.document);
+          if (editor !== vscode.window.activeTextEditor) {
+            editor = await this.showTextEditor(cacheItem.document);
+          }
+          if (editor) {
+            await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
+            cacheItem.prettyPrintNeeded = await this.prettyPrint(editor);
+            return;
+          }
+        }
+      }
+      const { document, editor } = await this.createEditor(content, language);
+      const prettyPrintNeeded = await this.prettyPrint(editor);
       this.outputCache.push({
         document,
-        httpRegion
+        httpRegion,
+        prettyPrintNeeded
       });
-      let viewColumn = vscode.ViewColumn.Beside;
-      if (getConfigSetting<string>('responseViewColumn') === 'current') {
-        viewColumn = vscode.ViewColumn.Active;
-      }
-      const editor = await vscode.window.showTextDocument(document, {
-        viewColumn,
-        preserveFocus: getConfigSetting<boolean>('responseViewPreserveFocus'),
-        preview: getConfigSetting<boolean>('responseViewPreview'),
-      });
+    }
+  }
 
-      if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
+
+  private async prettyPrint(editor: vscode.TextEditor) {
+    if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
+      if (editor === vscode.window.activeTextEditor) {
         await vscode.commands.executeCommand('editor.action.formatDocument', editor);
+      } else {
+        return true;
       }
     }
+    return false;
+  }
+
+  private async createEditor(content: string, language: string) {
+    const document = await vscode.workspace.openTextDocument({ language, content });
+
+    const editor = await this.showTextEditor(document);
+    return { document, editor };
+  }
+
+  private async showTextEditor(document: vscode.TextDocument) {
+    let viewColumn = vscode.ViewColumn.Beside;
+    if (getConfigSetting<string>('responseViewColumn') === 'current') {
+      viewColumn = vscode.ViewColumn.Active;
+    }
+    return await vscode.window.showTextDocument(document, {
+      viewColumn,
+      preserveFocus: getConfigSetting<boolean>('responseViewPreserveFocus'),
+      preview: getConfigSetting<boolean>('responseViewPreview'),
+    });
   }
 
   remove(document: vscode.TextDocument) {

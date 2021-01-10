@@ -1,0 +1,18 @@
+
+{{
+  exports.authorization = Buffer.from( `${keycloak_clientId}:${keycloak_clientSecret}`).toString('base64');
+}}
+# @name keycloak
+POST {{keycloak_url}}/auth/realms/{{realm}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic {{authorization}}
+
+grant_type=client_credentials
+
+
+###
+# @name health
+# @ref keycloak
+GET {{spring_host}}/actuator/health
+Authorization: Bearer {{keycloak.access_token}}
+

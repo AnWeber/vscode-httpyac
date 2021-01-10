@@ -35,6 +35,9 @@ const config = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.ContextReplacementPlugin(/keyv/)
+  ]
 };
 module.exports = config;
