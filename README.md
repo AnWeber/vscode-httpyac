@@ -341,7 +341,7 @@ keybindings are only active in files with language http
 | - | - | - |
 | `httpyac.environmentSelectedOnStart` | list of selected environments on startup | - |
 | `httpyac.environmentVariables` | environment variables | `{ "$shared":{} }`|
-| `httpyac.dotenvDirname` | relative or absolute path to folder with dotenv files | - |
+| `httpyac.dotenvDirname` | relative or absolute path to folder with dotenv files | `"env"` |
 | `httpyac.dotenvDefaultFiles` | default dotenv files which is active in all profiles | `[".env"]`|
 
 #### Response View Settings
