@@ -111,6 +111,7 @@
 				"httpyac.dotenvDirname": {
 					"type": "string",
 					"scope": "resource",
+					"default": "env",
 					"description": "relative or absolute path to folder with dotenv files"
 				},
 				"httpyac.dotenvDefaultFiles": {
