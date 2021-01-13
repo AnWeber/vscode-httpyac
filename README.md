@@ -61,6 +61,9 @@ extend http language with custom parsers
 
 ![extendable with inline scripts](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/extendable.gif)
 
+#### Intellij HTTP Client compatibility
+
+*.http files of [Intellij HTTP Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) can be parsed and executed
 
 ## Http Language
 
@@ -358,7 +361,6 @@ keybindings are only active in files with language http
 ## Next Steps
 
 * Debugging and sanding rough corners
-* [Intellij HttpClient](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) compatibility layer
 * CLI support
 
 ## License

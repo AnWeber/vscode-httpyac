@@ -296,6 +296,7 @@
 		"httpyac": "^1.0.1",
 		"lodash": "^4.17.20",
 		"mime-types": "^2.1.28",
-		"tmp-promise": "^3.0.2"
+		"tmp-promise": "^3.0.2",
+		"uuid": "^8.3.2"
 	}
 }

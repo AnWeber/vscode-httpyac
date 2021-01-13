@@ -13,12 +13,32 @@
       "end": "\\s*}}\\s*",
       "beginCaptures": {
         "0": {
-          "name": "comment.line.sharp.http"
+          "name": "comment.line.http"
         }
       },
       "endCaptures": {
         "0": {
-          "name": "comment.line.sharp.http"
+          "name": "comment.line.http"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "begin": "^\\s*>\\s{1}{%?\\s*",
+      "name": "http.request.body.javascript",
+      "end": "\\s*%}\\s*",
+      "beginCaptures": {
+        "0": {
+          "name": "comment.line.http"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "comment.line.http"
         }
       },
       "patterns": [
@@ -129,7 +149,7 @@
     "metadata": {
       "patterns": [
         {
-          "match": "^\\s*\\#{1,}\\s+(@([^\\s]*))\\s+([^\\s]+)?$",
+          "match": "^\\s*#{1,}\\s+(@([^\\s]*))\\s+([^\\s]+)?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"

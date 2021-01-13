@@ -51,7 +51,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
     const result: Array<vscode.CodeLens> = [];
 
-    if (httpFile) {
+    if (httpFile && httpFile.httpRegions.length > 0) {
 
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.sendAll,

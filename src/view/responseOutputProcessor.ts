@@ -162,6 +162,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
           }
           if (editor) {
             await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
+            cacheItem.httpRegion = httpRegion;
             cacheItem.prettyPrintNeeded = await this.prettyPrint(editor);
             return;
           }
