@@ -5,6 +5,7 @@ import { httpYacApi, httpFileStore, gotHttpClientFactory } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
 import { EnvironmentController } from './provider/enviromentController';
 import { HttpFileStoreController } from './provider/httpFileStoreController';
+import { HttpDocumentSymbolProvider } from './provider/httpDocumentSymbolProvider';
 import { watchConfigSettings } from './config';
 import { initVscodeLogger } from './logger';
 import {HttpProxyAgent} from 'http-proxy-agent';
@@ -20,12 +21,14 @@ export function activate(context: vscode.ExtensionContext) {
 	];
 
 	const refreshCodeLens = new vscode.EventEmitter<void>();
+	const httpFileStoreController = new HttpFileStoreController(refreshCodeLens);
 	context.subscriptions.push(...[
 		refreshCodeLens,
-		new HttpFileStoreController(refreshCodeLens),
+		httpFileStoreController,
 		new RequestCommandsController(refreshCodeLens, httpDocumentSelector),
 		new EnvironmentController(refreshCodeLens, httpDocumentSelector),
 		new ResponseOutputProcessor(),
+		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new HttpDocumentSymbolProvider(httpFileStoreController)),
 		watchConfigSettings((config, httpConfig) => {
 			const options: Record<string, any> = {
 				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,

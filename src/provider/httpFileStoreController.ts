@@ -18,7 +18,7 @@ export class HttpFileStoreController {
         httpFileStore.remove(document.fileName);
       }),
       vscode.workspace.onDidOpenTextDocument( async (document: vscode.TextDocument) => {
-        await refreshHttpFileThrottled(document);
+        await this.refreshHttpFile(document);
       }),
       vscode.workspace.onDidChangeTextDocument(async (event) => {
         await refreshHttpFileThrottled(event.document);
@@ -35,13 +35,15 @@ export class HttpFileStoreController {
   }
 
   @errorHandler()
-  private async refreshHttpFile(document: vscode.TextDocument) {
+  async refreshHttpFile(document: vscode.TextDocument){
     if (document.languageId === 'http') {
-      await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
+      const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();
       }
+      return httpFile;
     }
+    return undefined;
   }
 
   dispose() {
@@ -50,4 +52,5 @@ export class HttpFileStoreController {
       this.subscriptions = [];
     }
   }
+
 }

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi, utils } from 'httpyac';
+import { httpFileStore, HttpRegion, HttpFile, httpYacApi, utils, HttpSymbolKind } from 'httpyac';
 import { APP_NAME, getConfigSetting, RESPONSE_VIEW_PRESERVE_FOCUS, RESPONSE_VIEW_PREVIEW } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
@@ -59,10 +59,11 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       }));
 
       for (const httpRegion of httpFile.httpRegions) {
-        const range = new vscode.Range(httpRegion.position.requestLine || httpRegion.position.start, 0, httpRegion.position.end, 0);
-        const args = [document, httpRegion.position.requestLine || httpRegion.position.start];
+        const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
+        const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
+        const args = [document, requestLine];
 
-        if (httpRegion.position.requestLine !== undefined && !httpRegion.metaParams.disabled) {
+        if (!!httpRegion.request && !httpRegion.metaParams.disabled) {
           result.push(new vscode.CodeLens(range, {
             command: commands.send,
             arguments: args,
@@ -201,7 +202,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       if (httpFile) {
         const currentLine = line ?? vscode.window.activeTextEditor?.selection.active.line;
         if (currentLine !== undefined) {
-          const httpRegion = httpFile.httpRegions.find(obj => obj.position.start <= currentLine && currentLine <= obj.position.end);
+          const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine);
           if (httpRegion) {
             return { httpRegion, httpFile };
           }
