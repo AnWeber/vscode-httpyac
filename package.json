@@ -48,7 +48,7 @@
 					"http",
 					"rest"
 				],
-				"firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$",
+				"firstLine": "^\\s*(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+.*?$",
 				"configuration": "./language-configuration.json"
 			}
 		],

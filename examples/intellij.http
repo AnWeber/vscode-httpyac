@@ -3,7 +3,7 @@ GET https://www.google.de?q={{$uuid}}
 Accept: text/html
 
 > {%
-client.global.set("search", "test");
+    client.global.set("search", "test");
     client.test("Request executed successfully", function() {
 
         client.assert(response.status === 200, "Response status is not 200");

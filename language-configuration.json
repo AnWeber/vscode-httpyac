@@ -5,8 +5,7 @@
     "brackets": [
         ["{", "}"],
         ["[", "]"],
-        ["(", ")"],
-        ["<", ">"]
+        ["(", ")"]
     ],
     "autoClosingPairs": [
         ["{", "}"],
@@ -17,12 +16,12 @@
     ],
     "folding": {
         "markers": {
-            "start": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+",
-            "end": "^\\s*(\\#{3,}.*?)?\\s*$"
+            "start": "^\\s*(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+",
+            "end": "^\\s*((#{3,}.*?)|((GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+.*))\\s*"
         },
         "script": {
-            "start": "^\\s*{{\\s*$",
-            "end": "^\\s*}}\\s*$"
+            "start": "^\\s*(({{)|(>\\s{1}{%)).*$",
+            "end": "^\\s*((}})|(*%}))\\s*$"
         }
     }
 }

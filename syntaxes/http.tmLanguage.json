@@ -30,7 +30,7 @@
     {
       "begin": "^\\s*>\\s{1}{%?\\s*",
       "name": "http.request.body.javascript",
-      "end": "\\s*%}\\s*",
+      "end": "^\\s*%}\\s*",
       "beginCaptures": {
         "0": {
           "name": "comment.line.http"
@@ -189,7 +189,7 @@
           ]
         }
       },
-      "match": "^(?:(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
+      "match": "^\\s*(?:(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
       "name": "http.requestline"
     },
     "protocol": {

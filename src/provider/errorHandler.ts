@@ -17,9 +17,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
       //@ts-ignore-line
       const result = method.apply(this, args);
       if (utils.isPromise(result)) {
-        return result.catch(err => {
-          handleError(target, propertyKey, err);
-        });
+        return result.catch(err => handleError(target, propertyKey, err));
       }
       return result;
     } catch (err) {
@@ -28,11 +26,15 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
   };
 }
 
-function handleError(target: any, propertyKey: string | symbol, err: any) {
+async function handleError(target: any, propertyKey: string | symbol, err: any) {
   log.error(`${target}.${String(propertyKey)}`, err);
   if (err instanceof Error) {
-    window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
+    const showTitle = 'show dialog';
+    const result = await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, showTitle);
+    if (result === showTitle) {
+      await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, {modal: true});
+    }
   } else {
-    window.showErrorMessage(err);
+    await window.showErrorMessage(err);
   }
 }
