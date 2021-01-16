@@ -168,12 +168,18 @@
 					"default": "beside",
 					"scope": "resource",
 					"description": "response preview column option"
+				},
+				"httpyac.showGutterIcon": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show gutter icon to highlight request lines"
+				},
+				"httpyac.extensionScript": {
+					"type": "string",
+					"scope": "window",
+					"description": "Path to a script with extensions for HttpYac"
 				}
-			},
-			"httpyac.extensionScript": {
-				"type": "string",
-				"scope": "window",
-				"description": "Path to a script with extensions for HttpYac"
 			}
 		},
 		"commands": [

@@ -475,6 +475,7 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.extensionScript` | Path to a file with which the extension is adjusted | - |
+| `httpyac.showGutterIcon` | show gutter icon to highlight request lines | `true` |
 
 ## Next Steps
 

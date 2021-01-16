@@ -1,4 +1,14 @@
+## 1.2 (2021-01-??)
 
+
+#### Features
+* variables can easily be defined in this format `@host = https://www.google.de`
+* request lines in RFC 2616 format do not need `###` delimiter
+* document symbols are supported
+* gutter icon to highlight request line
+
+#### Fixes
+* last request file has missing body
 
 ## 1.1 (2021-01-13)
 

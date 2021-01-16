@@ -22,7 +22,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	];
 
 	const refreshCodeLens = new vscode.EventEmitter<void>();
-	const httpFileStoreController = new HttpFileStoreController(refreshCodeLens);
+	const httpFileStoreController = new HttpFileStoreController(context, refreshCodeLens);
 	context.subscriptions.push(...[
 		refreshCodeLens,
 		httpFileStoreController,
