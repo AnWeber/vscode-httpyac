@@ -30,10 +30,11 @@ Built in support for variables and enviroments.
 
 ![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
 
-#### scripting
+#### script support
 
 enrich requests with custom scripts
   * create custom variables
+  * add Custom Authentication to the requests
   * Node JS scripting support (pre request and post request)
   * require any library
 
@@ -52,14 +53,31 @@ it is possible to reference other http files and create requeste cascades
 
 ![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/import.gif)
 
-#### extendable
+#### It's Extensible
 
-extend http language with custom parsers
+Due to the NodeJS support the client can be extended arbitrarily. In addition, the extension supports an Api with which, all components can be changed arbitrarily (parser, processing, output).
 
   * extension exports a [api](https://code.visualstudio.com/api/references/vscode-api#extensions)
-  * _hacky_ support of inline scripts
+  * extension support with setting `httpyac.extensionScript`, which points to script
 
-![extendable with inline scripts](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/extendable.gif)
+  ```javascript
+  const {httpYacApi} = require('httpYac');
+  const vscode = require('vscode');
+  httpYacApi.httpRegionParsers.splice(2, 0, {
+    parse: (lineReader,...args) => {
+      const next = lineReader.next();
+      if(next.value.textLine.startsWith('//')){
+        vscode.window.showInformationMessage(next.value.textLine.substring(1));
+        return {
+          endLine: next.value.line,
+          symbols: []
+        };
+      }
+      return false;
+    }
+  });
+  ```
+
 
 #### Intellij HTTP Client compatibility
 
@@ -165,6 +183,26 @@ Content-Type: application/pdf
 
 All lines starting with `#` are interpreted as comment lines. Lines starting with `###` starts a new region. Lines with `# @property value` are meta data and tags the request with the property.
 
+
+##### regions
+All lines starting with a `###` are interpreted as new region. Only one request per region is supported.
+
+```html
+https:/www.google.de
+
+###
+
+https://www.google.de
+```
+
+If the requests are provided in [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html) format, separation with `###` is not required. All scripts between the two requests are interpreted as post scripts.
+```html
+GET https:/www.google.de
+
+
+GET https://www.google.de
+```
+
 ##### name
 responses of a requests with a name are automatically added as variables and can be reused by other requests
 ```html
@@ -229,16 +267,43 @@ https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png
 
 extension of file for save or openWith.
 
-#### Script
+#### Variables
 
-It is possible to create NodeJS scripts. All scripts before the request line are executed before the request is called. All scripts after the request line are executed as soon as the response is received. All exports of the script are stored as variables. External scripts can be imported using require.
-All scripts in the request will be replaced with the value of the variable. But here no line break is supported
+Variables can be easily created with the following scheme.
+```
+@host = http://elastic:9200
+```
+
+These are valid from definition for all subsequent requests and scripts. The variables are saved per file after creation. The variables are also imported from other files using @import meta param.
+
+```
+# @import ./variables.http
+
+@host = {{keycloak_url}}
+```
+
+> Variables definition in this format also allows variables substitution
+
+#### Node JS Scripts
+It is possible to create NodeJS scripts. All scripts before the request line are executed before the request is called. All scripts after the request line are executed as soon as the response is received. All exports of the script are stored as variables. External scripts can be imported using require, but you need to install dependencies yourself.
+
+> Variables already defined can be accessed via the global scope.
 
 ```
 {{
-  exports.host="https://www.mydomain.de";
-  exports.authentcation="Bearer " + token;
+  const CryptoJS = require('crypto-js');
+  const request = httpRegion.request;
+  const authDate = new Date();
+  let requestUri = request.url.substring(request.url.indexOf('/v1'), request.url.indexOf('?') > 0 ? request.url.indexOf('?') : request.url.length);
+  let timeInMillis = authDate.getTime() - authDate.getMilliseconds();
+
+  let signature = request.method + "|" + requestUri + "|" + timeInMillis;
+
+  let signatureHmac = CryptoJS.HmacSHA256(signature, accessSecret);
+  let signatureBase64 = CryptoJS.enc.Base64.stringify(signatureHmac);
+  exports.authentcation = serviceToken + " " + accessKey + ":" + signatureBase64;
 }}
+@host = https://www.mydomain.de
 # @name admin
 GET {{host}}/admin
 Authentication: {{authentcation}}
@@ -251,29 +316,76 @@ Authentication: {{authentcation}}
 
 > Since all variables are placed on the global scope of the script, they may overwrite other variables. Please use unique variable names
 
-Scripts with no request in the same region are executed for every requests in the file
+Scripts with no request in the same region are executed for every requests in the file (Global Scripts)
+
+
+> External dependencies must be installed independently, exceptions are [vscode](https://www.npmjs.com/package/@types/vscode), [got](https://www.npmjs.com/package/got) and [httpYac](https://www.npmjs.com/package/httpyac) Dependency, which are provided from the extension.
+
+#### Variable Substitution in Request
+
+Before the request is sent, all variables in the request are replaced.
+
+##### NodeJs Script Replacement
+All entries of the form {{...}} are interpreted as NodeJS Javascript which returns exactly one value. Since all variables can be easily accessed on the global scope, this allows for simple substitution.
 
 ```
-{{
-  exports.host="https://www.mydomain.de";
-  exports.authentcation="Bearer " + token;
-}}
-###
-# @name admin
-GET {{host}}/admin
-Authentication: {{authentcation}}
+@searchVal = test
 
-###
-# @users
-GET {{host}}/users
-Authentication: {{authentcation}}
+GET https://www.google.de?q={{searchVal}}
+```
+
+> It is possible to create more complex scripts, but this is not recommended and you should use a separate script block instead.
+
+
+##### Intellij Dynamic Variables
+Intellij dynamic variables are supported.
+
+| Name | Description |
+| - | - |
+| $uuid | generates a universally unique identifier (UUID-v4) |
+|$timestamp | generates the current UNIX timestamp |
+| $randomInt| generates a random integer between 0 and 1000. |
 
 ```
+GET https://www.google.de?q={{$timestamp}}&q2={{$uuid}}&q2={{$randomInt}}
+```
+
+##### Host Replacment
+If the url starts with / and a variable host is defined the URL of this host will be prepended
+
+```
+@host = http://elastic:9200
+
+
+GET /.kibana
+
+GET /_cat/indices
+```
+
+#### Intellij Script
+
+Intellij Scripts are supported. An Http client and response object corresponding to the interface is created and are available in the script. Possibly the behavior (order of test execution, not described internal Api, ...) is not completely identical, to Intellij Execution. If needed, please let us know.
+
+```
+GET https://www.google.de?q={{$uuid}}
+Accept: text/html
+
+> {%
+    client.global.set("search", "test");
+    client.test("Request executed successfully", function() {
+
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+###
+```
+
+> Intellij scripts are always executed after request. Scripts before Request Line are ignored
 
 
 ## Environment Support
 
-The extension supports switching to different environments. Several environments can be active at the same time. The change of the environment is valid only per file. Newly opened files are opened with the last active environment.
+The extension supports switching to different environments. Several environments can be active at the same time. A different environment can be selected per file. Newly opened files are opened with the last active environment.
 
 ![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
 
@@ -295,16 +407,17 @@ Environments can be provided with VS Code setting `httpyac.environmentVariables`
   }
 }
 ```
+> VS Code settings are automatically monitored and when changes are made, the environment is reinitialized.
 
 ##### Dotenv File Support
 [dotenv](https://www.npmjs.com/package/dotenv) support is enabled by default. This automatically scans the root folder of the project and the current file folder of the http file for .env file. All files with the {{name}}.env or .env.{{name}} scheme are interpreted as different environment and can be picked while switching environments
 
-> If content of .env files is changed a manuel refresh of environments variable with command `httpyac.refresh` is needed.
+> .env files are automatically monitored by File Watcher and when changes are made, the environment is reinitialized.
 ## Commands
 
 ![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/commands.png)
 
-| Name | Description  |
+| Name | Description |
 | - | - | - |
 | `httpyac.send` | send request in ActiveTextEditor in active line |
 | `httpyac.sendall` | send all requests in ActiveTextEditor |
@@ -357,6 +470,11 @@ keybindings are only active in files with language http
 | `httpyac.responseViewPreserveFocus` | response view will take focus after receiving response | `true`|
 | `httpyac.responseViewColumn` | response preview column option (current, beside) | `beside`|
 
+#### httpYac Extension
+
+| Name | Description | Default |
+| - | - | - |
+| `httpyac.extensionScript` | Path to a file with which the extension is adjusted | - |
 
 ## Next Steps
 

@@ -169,6 +169,11 @@
 					"scope": "resource",
 					"description": "response preview column option"
 				}
+			},
+			"httpyac.extensionScript": {
+				"type": "string",
+				"scope": "window",
+				"description": "Path to a script with extensions for HttpYac"
 			}
 		},
 		"commands": [

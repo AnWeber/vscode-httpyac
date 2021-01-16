@@ -5,10 +5,11 @@
   exports.authorization = `Basic ${Buffer.from( exports.user + ":" + exports.password).toString('base64')}`
 }}
 
+@host = https://httpbin.org
+
 ###
 # @name basicauth
-
-GET {{host}}/basic-auth/{{user}}/{{password}}
+GET /basic-auth/{{user}}/{{password}}
 Authorization:{{authorization}}
 
 {{

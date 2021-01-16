@@ -103,12 +103,6 @@
       ]
     },
     {
-      "include": "#metadata"
-    },
-    {
-      "include": "#comments"
-    },
-    {
       "captures": {
         "1": {
           "name": "keyword.operator.http"
@@ -139,6 +133,15 @@
       "name": "http.headers"
     },
     {
+      "include": "#metadata"
+    },
+    {
+      "include": "#variable"
+    },
+    {
+      "include": "#comments"
+    },
+    {
       "include": "#request-line"
     },
     {
@@ -162,6 +165,21 @@
             }
           },
           "name": "comment.line.sharp.http"
+        }
+      ]
+    },
+    "variable": {
+      "patterns": [
+        {
+          "match": "^\\s*(@[^\\s]*)\\s*(=\\s*)?(?<value>.*)$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
+              "name": "string.other.http"
+            }
+          }
         }
       ]
     },
