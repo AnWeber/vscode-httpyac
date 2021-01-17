@@ -1,18 +1,13 @@
 import * as vscode from 'vscode';
-import { HttpFile, httpFileStore, HttpSymbolKind } from 'httpyac';
+import { HttpFile, httpFileStore } from 'httpyac';
 import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
-import { getConfigSetting } from '../config';
 
 export class HttpFileStoreController {
 
   private subscriptions: Array<vscode.Disposable> = [];
-  private decoration: vscode.TextEditorDecorationType;
-  constructor(context: vscode.ExtensionContext, private readonly refreshCodeLens: vscode.EventEmitter<void>) {
-    this.decoration = vscode.window.createTextEditorDecorationType({
-      gutterIconPath: context.asAbsolutePath('./assets/gutter.svg'),
-      gutterIconSize: "70%",
-    });
+  constructor(private readonly httpFileEmitter: vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>, private readonly refreshCodeLens: vscode.EventEmitter<void>) {
+
     const refreshHttpFileThrottled = throttle(this.refreshHttpFile.bind(this), 200);
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
@@ -46,32 +41,14 @@ export class HttpFileStoreController {
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();
       }
-      this.showGutterIcon(document, httpFile);
+      if (httpFile) {
+        this.httpFileEmitter.fire({ httpFile, document });
+      }
       return httpFile;
     }
     return undefined;
   }
 
-  private showGutterIcon(document: vscode.TextDocument, httpFile: HttpFile) {
-    if (getConfigSetting('showGutterIcon')) {
-      const editor = vscode.window.visibleTextEditors.find(obj => obj.document === document);
-      if (editor) {
-        const ranges: Array<vscode.Range> = [];
-
-        for (const httpRegion of httpFile.httpRegions) {
-          if (httpRegion.symbol.children) {
-            const symbol = httpRegion.symbol.children.find(obj => obj.kind === HttpSymbolKind.requestLine);
-            if (symbol) {
-              ranges.push(new vscode.Range(symbol.startLine, symbol.startOffset, symbol.endLine, symbol.endOffset));
-            }
-          }
-        }
-        if (ranges.length > 0) {
-          editor.setDecorations(this.decoration, ranges);
-        }
-      }
-    }
-  }
 
   dispose() {
     if (this.subscriptions) {

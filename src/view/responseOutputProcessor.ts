@@ -92,12 +92,12 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
 
       const openWith = this.getOpenWith(httpRegion);
-      if (httpRegion.metaParams.save) {
+      if (httpRegion.metaData.save) {
 
         const filters: Record<string, Array<string>> = {
           'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
         };
-        const ext = httpRegion.metaParams.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
+        const ext = httpRegion.metaData.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
         if (ext) {
           filters[ext] = [ext];
         }
@@ -106,7 +106,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         });
         await this.saveAndOpenWith(uri, httpRegion.response.rawBody, openWith);
       }else if (openWith) {
-        const { path } = await file({ postfix: `.${httpRegion.metaParams.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
+        const { path } = await file({ postfix: `.${httpRegion.metaData.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
         await this.saveAndOpenWith(vscode.Uri.file(path), httpRegion.response.rawBody, openWith);
       } else {
         await this.showTextDocument(httpRegion);
@@ -116,8 +116,8 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
   private getOpenWith(httpRegion: HttpRegion): string | undefined{
     if (httpRegion.response) {
-      if (httpRegion.metaParams.openWith) {
-        return httpRegion.metaParams.openWith;
+      if (httpRegion.metaData.openWith) {
+        return httpRegion.metaData.openWith;
       } else if(utils.isMimeTypeImage(httpRegion.response.contentType)) {
         return 'imagePreview.previewEditor';
       } else if (utils.isMimeTypePdf(httpRegion.response.contentType)
@@ -148,7 +148,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       } else {
         content = JSON.stringify(response.body, null, 2);
       }
-      const language = httpRegion.metaParams.language || this.getLanguageId(httpRegion.response?.contentType);
+      const language = httpRegion.metaData.language || this.getLanguageId(httpRegion.response?.contentType);
 
 
 

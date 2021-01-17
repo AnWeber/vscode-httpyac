@@ -63,7 +63,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document, requestLine];
 
-        if (!!httpRegion.request && !httpRegion.metaParams.disabled) {
+        if (!!httpRegion.request && !httpRegion.metaData.disabled) {
           result.push(new vscode.CodeLens(range, {
             command: commands.send,
             arguments: args,
@@ -181,7 +181,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   async save(document?: vscode.TextDocument, line?: number) {
     const parsedDocument = await this.getCurrentHttpRegion(document, line);
     if (parsedDocument && parsedDocument.httpRegion.response) {
-      const ext = parsedDocument.httpRegion.metaParams.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
+      const ext = parsedDocument.httpRegion.metaData.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
       const filters: Record<string, Array<string>> = {};
       if (ext) {
         filters[ext] = [ext];

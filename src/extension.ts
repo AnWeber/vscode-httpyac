@@ -1,14 +1,11 @@
 
 import * as vscode from 'vscode';
-import { RequestCommandsController } from './provider/requestCommandsController';
-import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils } from 'httpyac';
+import * as provider from './provider';
+import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils, HttpFile } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
-import { EnvironmentController } from './provider/enviromentController';
-import { HttpFileStoreController } from './provider/httpFileStoreController';
-import { HttpDocumentSymbolProvider } from './provider/httpDocumentSymbolProvider';
 import { watchConfigSettings, getConfigSetting } from './config';
 import { initVscodeLogger } from './logger';
-import {HttpProxyAgent} from 'http-proxy-agent';
+import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs} from 'fs';
 
@@ -21,15 +18,18 @@ export async function activate(context: vscode.ExtensionContext) {
 		{ language: 'http', scheme: '*' }
 	];
 
+	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
-	const httpFileStoreController = new HttpFileStoreController(context, refreshCodeLens);
+
+const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmitter, refreshCodeLens);
 	context.subscriptions.push(...[
 		refreshCodeLens,
 		httpFileStoreController,
-		new RequestCommandsController(refreshCodeLens, httpDocumentSelector),
-		new EnvironmentController(refreshCodeLens, httpDocumentSelector),
+		new provider.RequestCommandsController(refreshCodeLens, httpDocumentSelector),
+		new provider.EnvironmentController(refreshCodeLens, httpDocumentSelector),
+		new provider.DecorationProvider(context, httpFileEmitter),
 		new ResponseOutputProcessor(),
-		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new HttpDocumentSymbolProvider(httpFileStoreController)),
+		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStoreController)),
 		watchConfigSettings((config, httpConfig) => {
 			const options: Record<string, any> = {
 				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,

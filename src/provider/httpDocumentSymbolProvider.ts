@@ -1,4 +1,4 @@
-import { HttpSymbol, HttpSymbolKind } from 'httpyac';
+import { HttpSymbol, HttpSymbolKind, HttpFile } from 'httpyac';
 import {HttpFileStoreController} from './httpFileStoreController';
 import * as vscode from 'vscode';
 
