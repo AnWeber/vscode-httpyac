@@ -156,7 +156,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   async viewHeader(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) {
     if (document) {
       let httpRegion: HttpRegion | undefined;
-      if (utils.isHttpRegion(document)) {
+      if (this.isHttpRegion(document)) {
         httpRegion = document;
       } else {
         const parsedDocument = await this.getCurrentHttpRegion(document, line);
@@ -214,5 +214,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   toString() {
     return 'requestCommandsController';
+  }
+  isHttpRegion(obj: any): obj is HttpRegion{
+    return obj.actions && obj.position;
   }
 }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, environments } from 'httpyac';
+import { httpFileStore, environmentStore, EnvironmentProvider, environments } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting } from '../config';
@@ -14,7 +14,7 @@ const commands = {
 export class EnvironmentController implements vscode.CodeLensProvider{
 
   private subscriptions: Array<vscode.Disposable> = [];
-  private environmentProviders: Array<environments.EnvironmentProvider> | undefined;
+  private environmentProviders: Array<EnvironmentProvider> | undefined;
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(refreshCodeLens: vscode.EventEmitter<void>, httpDocumentSelector: vscode.DocumentSelector) {
@@ -72,7 +72,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     if (httpFile) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.toogleEnv,
-        title: `env: ${httpFile.env || '-'}`,
+        title: `env: ${httpFile.activeEnvironment || '-'}`,
       }));
     }
     return result;
@@ -85,7 +85,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
       if (httpFile) {
-        httpFile.env = env;
+        httpFile.activeEnvironment = env;
       }
     }
   }
@@ -114,7 +114,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     const httpFiles = httpFileStore.getAll();
     for (const httpFile of httpFiles) {
       if (httpFile) {
-        httpFile.env = env;
+        httpFile.activeEnvironment = env;
       }
     }
   }

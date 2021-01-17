@@ -3,12 +3,13 @@
 
 #### Features
 * variables can easily be defined in this format `@host = https://www.google.de`
-* request lines in RFC 2616 format do not need `###` delimiter
+* request lines in RFC 2616 format do not need `###` delimiter, but no pre request script is possible
 * document symbols are supported
 * gutter icon to highlight request line
 
 #### Fixes
 * last request file has missing body
+* Imports used variables of other environments if the file was loaded from 2 different environments
 
 ## 1.1 (2021-01-13)
 
