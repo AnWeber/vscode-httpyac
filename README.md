@@ -253,6 +253,14 @@ POST {{host}}/auth
 POST {{host}}/auth
 ```
 
+##### note
+shows a confirmation dialog before sending request
+
+```html
+# @note are you sure?
+DELETE /invoices
+```
+
 ##### save
 
 If `@save` is specified, the response will not be displayed but saved directly.

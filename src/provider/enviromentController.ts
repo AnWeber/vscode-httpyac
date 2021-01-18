@@ -3,7 +3,7 @@ import { APP_NAME , watchConfigSettings} from '../config';
 import { httpFileStore, environmentStore, EnvironmentProvider, environments } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
-import { getConfigSetting } from '../config';
+import { getConfigSetting, httpDocumentSelector } from '../config';
 
 const commands = {
   toogleEnv: `${APP_NAME}.toggle-env`,
@@ -17,7 +17,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   private environmentProviders: Array<EnvironmentProvider> | undefined;
   onDidChangeCodeLenses: vscode.Event<void>;
 
-  constructor(refreshCodeLens: vscode.EventEmitter<void>, httpDocumentSelector: vscode.DocumentSelector) {
+  constructor(refreshCodeLens: vscode.EventEmitter<void>) {
     environmentStore.activeEnvironments = getConfigSetting<Array<string>>("environmentSelectedOnStart");
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [

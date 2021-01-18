@@ -4,6 +4,7 @@ import { APP_NAME, getConfigSetting, RESPONSE_VIEW_PRESERVE_FOCUS, RESPONSE_VIEW
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
+import { httpDocumentSelector } from '../config';
 
 interface CommandData{
   httpRegion: HttpRegion;
@@ -24,7 +25,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   subscriptions: Array<vscode.Disposable>;
   onDidChangeCodeLenses: vscode.Event<void>;
 
-  constructor(private readonly refreshCodeLens: vscode.EventEmitter<void>, httpDocumentSelector: vscode.DocumentSelector) {
+  constructor(private readonly refreshCodeLens: vscode.EventEmitter<void>) {
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.send, this.send, this),
@@ -110,13 +111,14 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   private async sendRequest() {
-
     if (this.currentRequest) {
-      await httpYacApi.send(this.currentRequest.httpRegion, this.currentRequest.httpFile);
+      const result = await httpYacApi.send(this.currentRequest.httpRegion, this.currentRequest.httpFile);
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();
       }
-      await httpYacApi.show(this.currentRequest.httpRegion, this.currentRequest.httpFile);
+      if (result) {
+        await httpYacApi.show(this.currentRequest.httpRegion, this.currentRequest.httpFile);
+      }
     }
   }
   @errorHandler()

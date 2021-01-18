@@ -30,3 +30,7 @@ function getConfigs(sections: Array<string>, config: WorkspaceConfiguration) {
   }
   return result;
 }
+
+export const httpDocumentSelector = [
+	{ language: 'http', scheme: '*' }
+];

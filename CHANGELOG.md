@@ -1,15 +1,18 @@
 ## 1.2 (2021-01-??)
 
-
 #### Features
 * variables can easily be defined in this format `@host = https://www.google.de`
 * request lines in RFC 2616 format do not need `###` delimiter, but no pre request script is possible
 * document symbols are supported
+* code completion for request header, mime-types, @ref
+* metaName ignores starting " (@import supports [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense))
+* new meta data @note, to show confirmation dialog
 * gutter icon to highlight request line
 
 #### Fixes
 * last request file has missing body
 * Imports used variables of other environments if the file was loaded from 2 different environments
+* multiple parsing of a file because of missing version update fixed
 
 ## 1.1 (2021-01-13)
 

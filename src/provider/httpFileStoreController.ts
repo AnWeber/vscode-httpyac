@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { HttpFile, httpFileStore } from 'httpyac';
 import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
+import { httpDocumentSelector } from '../config';
 
 export class HttpFileStoreController {
 
@@ -21,22 +22,21 @@ export class HttpFileStoreController {
         await this.refreshHttpFile(document);
       }),
       vscode.workspace.onDidChangeTextDocument(async (event) => {
-        await refreshHttpFileThrottled(event.document);
+        if (event.contentChanges.length > 0) {
+          await refreshHttpFileThrottled(event.document);
+        }
       }),
       vscode.workspace.onDidRenameFiles((fileRenameEvent) => {
         fileRenameEvent.files.forEach(file => {
           httpFileStore.rename(file.oldUri.fsPath, file.newUri.fsPath);
         });
       }),
-      vscode.workspace.onDidChangeTextDocument(async event => {
-        await refreshHttpFileThrottled(event.document);
-      })
     ];
   }
 
   @errorHandler()
   async refreshHttpFile(document: vscode.TextDocument){
-    if (document.languageId === 'http') {
+    if (vscode.languages.match(httpDocumentSelector, document)) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();

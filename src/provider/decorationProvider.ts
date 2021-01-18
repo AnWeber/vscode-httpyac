@@ -1,6 +1,6 @@
 import { HttpFile, HttpSymbolKind, httpFileStore } from 'httpyac';
 import * as vscode from 'vscode';
-import { getConfigSetting } from '../config';
+import { getConfigSetting, httpDocumentSelector } from '../config';
 
 export class DecorationProvider{
 
@@ -16,7 +16,7 @@ export class DecorationProvider{
     this.subscriptions = [
       httpFileEmitter.event(({ document, httpFile }) => this.showGutterIcon(document, httpFile)),
       vscode.window.onDidChangeActiveTextEditor((editor) => {
-        if (editor && editor.document.languageId === 'http') {
+        if (editor && vscode.languages.match(httpDocumentSelector, editor.document)) {
           const httpFile = httpFileStore.get(editor.document.uri.fsPath);
           if (httpFile) {
             this.setDecoration(httpFile, editor);

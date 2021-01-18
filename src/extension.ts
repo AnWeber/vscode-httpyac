@@ -3,20 +3,22 @@ import * as vscode from 'vscode';
 import * as provider from './provider';
 import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils, HttpFile } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
-import { watchConfigSettings, getConfigSetting } from './config';
+import { watchConfigSettings, getConfigSetting, httpDocumentSelector } from './config';
 import { initVscodeLogger } from './logger';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { promises as fs} from 'fs';
+import { promises as fs } from 'fs';
+import { NoteMetaHttpRegionParser} from './parser/noteMetaHttpRegionParser';
 
 initVscodeLogger();
 
+
+
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
+	httpYacApi.httpRegionParsers.push(new NoteMetaHttpRegionParser());
 
-	const httpDocumentSelector = [
-		{ language: 'http', scheme: '*' }
-	];
+
 
 	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
@@ -25,9 +27,10 @@ const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmi
 	context.subscriptions.push(...[
 		refreshCodeLens,
 		httpFileStoreController,
-		new provider.RequestCommandsController(refreshCodeLens, httpDocumentSelector),
-		new provider.EnvironmentController(refreshCodeLens, httpDocumentSelector),
+		new provider.RequestCommandsController(refreshCodeLens),
+		new provider.EnvironmentController(refreshCodeLens),
 		new provider.DecorationProvider(context, httpFileEmitter),
+		new provider.HttpCompletionItemProvider(),
 		new ResponseOutputProcessor(),
 		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStoreController)),
 		watchConfigSettings((config, httpConfig) => {

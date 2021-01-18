@@ -32,9 +32,9 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
 
   private toDocumentSymbolKind(kind: HttpSymbolKind) {
     switch (kind) {
-      case HttpSymbolKind.metaParam: return vscode.SymbolKind.Field;
-      case HttpSymbolKind.metaParamKey: return vscode.SymbolKind.Key;
-      case HttpSymbolKind.metaParamValue: return vscode.SymbolKind.String;
+      case HttpSymbolKind.metaData: return vscode.SymbolKind.Field;
+      case HttpSymbolKind.metaDataKey: return vscode.SymbolKind.Key;
+      case HttpSymbolKind.metaDataValue: return vscode.SymbolKind.String;
       case HttpSymbolKind.requestMethod: return vscode.SymbolKind.Operator;
       case HttpSymbolKind.requestLine: return vscode.SymbolKind.Method;
       case HttpSymbolKind.requestUrl: return vscode.SymbolKind.String;
