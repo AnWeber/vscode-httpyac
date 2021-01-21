@@ -1,5 +1,5 @@
 
-import { HttpRegion, HttpRegionParserResult,  HttpRegionParser } from '../models';
+import { HttpRegion, HttpRegionParserResult,  HttpRegionParser } from 'httpyac';
 import { window } from 'vscode';
 
 

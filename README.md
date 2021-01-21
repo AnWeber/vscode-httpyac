@@ -245,6 +245,16 @@ requests can be disabled. It is possible to disable requests dynamically with `{
 POST {{host}}/auth
 ```
 
+##### jwt
+jwt meta data supports auto decode of jwt token. just provide property in response to decode and it is added to the promise with ${property}_parsed
+```html
+# @jwt access_secret
+
+POST {{keycloak}}/auth/realms/test/protocol/openid-connect/token
+
+```
+
+
 ##### language
 [Language Id](https://code.visualstudio.com/docs/languages/overview) of the response view. If language is not specified, it will be generated from the content-type header of the response
 
@@ -361,13 +371,41 @@ GET https://www.google.de?q={{$timestamp}}&q2={{$uuid}}&q2={{$randomInt}}
 ##### Host Replacment
 If the url starts with / and a variable host is defined the URL of this host will be prepended
 
-```
+```html
 @host = http://elastic:9200
 
 
 GET /.kibana
 
 GET /_cat/indices
+```
+
+
+##### BasicAuth Replacment
+A support method is provided for using Basic Authentication. Just specify the username and password separated by spaces and the base64 encoding will be applied automatically
+
+```html
+@host = https://httpbin.org
+@user=doe
+@password=12345678
+
+
+GET /basic-auth/{{user}}/{{password}}
+Authorization: Basic {{user}} {{password}}
+
+```
+##### DigestAuth Replacment
+A support method is provided for using Digest Authentication. Just specify the username and password separated by spaces and the digest access authentication will be applied automatically
+
+```html
+@host = https://httpbin.org
+@user=doe
+@password=12345678
+
+
+GET /digest-auth/auth/{{user}}/{{password}}
+Authorization: Digest {{user}} {{password}}
+
 ```
 
 #### Intellij Script
@@ -487,7 +525,8 @@ keybindings are only active in files with language http
 
 ## Next Steps
 
-* Debugging and sanding rough corners
+* debugging and sanding edges
+* import OpenApi
 * CLI support
 
 ## License

@@ -1,9 +1,12 @@
-## 1.2 (2021-01-??)
+## 1.2 (2021-01-21)
 
 #### Features
 * variables can easily be defined in this format `@host = https://www.google.de`
+* basic auth replacement added
+* digest auth replacement added
 * request lines in RFC 2616 format do not need `###` delimiter, but no pre request script is possible
 * document symbols are supported
+* jwt token decode support
 * code completion for request header, mime-types, @ref
 * metaName ignores starting " (@import supports [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense))
 * new meta data @note, to show confirmation dialog
