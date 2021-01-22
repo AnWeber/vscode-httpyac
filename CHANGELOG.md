@@ -1,3 +1,10 @@
+## 1.3.1 (2021-01-22)
+
+
+#### Fixes
+* forgot compiling httpyac
+
+
 ## 1.3 (2021-01-22)
 
 

@@ -34,7 +34,9 @@ async function handleError(target: any, propertyKey: string | symbol, err: any) 
     if (result === showTitle) {
       await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, {modal: true});
     }
-  } else {
+  } else if(utils.isString(err)) {
     await window.showErrorMessage(err);
+  } else {
+    await window.showErrorMessage(JSON.stringify(err));
   }
 }
