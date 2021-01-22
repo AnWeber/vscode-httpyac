@@ -3,6 +3,7 @@
   exports.user = 'doe';
   exports.password = '12345678';
   exports.filename =__filename;
+  exports.test = Buffer.from('test')
 }}
 
 @host = https://httpbin.org

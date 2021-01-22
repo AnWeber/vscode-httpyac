@@ -1,3 +1,10 @@
+## 1.3 (2021-01-22)
+
+
+#### Fixes
+* global context is available in script (e.g. process.env)
+
+
 ## 1.2 (2021-01-21)
 
 #### Features
