@@ -1,4 +1,4 @@
-import { httpYacApi, HttpRegion, HttpFile, HttpRequest, HttpResponse, ContentType, utils } from 'httpyac';
+import { httpYacApi, HttpRegion, HttpFile, ContentType, utils } from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
@@ -6,6 +6,7 @@ import { file } from 'tmp-promise';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
 import { commands } from '../provider/requestCommandsController';
+import { toMarkdown } from '../utils';
 
 
 interface OutputCacheItem{
@@ -80,7 +81,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem) {
 
-        const responseHover = utils.toMarkdown(cacheItem.httpRegion);
+        const responseHover = toMarkdown(cacheItem.httpRegion);
         return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/) || new vscode.Range(0, 0, 0, 100));
       }
     }

@@ -1,3 +1,13 @@
+## 1.4.0 (2021-??-??)
+
+
+#### Features
+* better presentation of the request information
+
+#### Fixes
+* error on creating jwt meta tag
+
+
 ## 1.3.1 (2021-01-22)
 
 

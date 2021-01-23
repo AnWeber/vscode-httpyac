@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi, utils, HttpSymbolKind } from 'httpyac';
-import { APP_NAME, getConfigSetting, RESPONSE_VIEW_PRESERVE_FOCUS, RESPONSE_VIEW_PREVIEW } from '../config';
+import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log } from 'httpyac';
+import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
 import { httpDocumentSelector } from '../config';
+import { file } from 'tmp-promise';
+import { toMarkdown } from '../utils';
 
 interface CommandData{
   httpRegion: HttpRegion;
@@ -22,6 +24,8 @@ export const commands = {
 
 export class RequestCommandsController implements vscode.CodeLensProvider {
 
+  private tmpFiles: Array<string> = [];
+
   subscriptions: Array<vscode.Disposable>;
   onDidChangeCodeLenses: vscode.Event<void>;
 
@@ -35,7 +39,18 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.show, this.show, this),
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
-			vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
+      vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
+      vscode.workspace.onDidCloseTextDocument(async (doc) => {
+        const index = this.tmpFiles.indexOf(doc.fileName);
+        if (index >= 0) {
+          try {
+            this.tmpFiles.splice(index, 1);
+            await fs.unlink(doc.fileName);
+          } catch (err) {
+            log.error(err);
+          }
+        }
+      })
     ];
   }
 
@@ -168,13 +183,14 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       }
 
       if (httpRegion) {
-        const content = utils.toMarkdown(httpRegion);
-        const document = await vscode.workspace.openTextDocument({ language: 'markdown', content });
-        await vscode.window.showTextDocument(document, {
-          viewColumn: vscode.ViewColumn.Active,
-          preserveFocus: getConfigSetting<boolean>(RESPONSE_VIEW_PRESERVE_FOCUS),
-          preview: getConfigSetting<boolean>(RESPONSE_VIEW_PREVIEW),
-        });
+        const content = toMarkdown(httpRegion);
+        const { path } = await file({ postfix: `.md` });
+        const uri = vscode.Uri.file(path);
+        if (uri) {
+          await fs.writeFile(uri.fsPath, content);
+          this.tmpFiles.push(uri.fsPath);
+          await vscode.commands.executeCommand('vscode.openWith', uri, 'vscode.markdown.preview.editor');
+        }
       }
     }
   }
