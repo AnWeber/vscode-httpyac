@@ -19,7 +19,7 @@ Create and execute any REST, SOAP, and GraphQL queries from within VS Code and v
   * view response header and timings
   * quick view configurable header list
 
-![send and resend](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/send.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/send.gif)
 
 #### variables
 
@@ -28,7 +28,7 @@ Built in support for variables and enviroments.
   * [dotenv](https://www.npmjs.com/package/dotenv) support
   * provide custom variables with scripts
 
-![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
 
 #### script support
 
@@ -38,7 +38,7 @@ enrich requests with custom scripts
   * Node JS scripting support (pre request and post request)
   * require any library
 
-![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/scripting.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/scripting.gif)
 
 
 #### preview feature
@@ -46,12 +46,12 @@ auto open custom preview editor
   * auto preview images and pdf ([vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) needed)
   * support custom editor with openWith Meta Tag
 
-![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/preview.gif)
+ > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/preview.gif)
 
 #### reference other *.http files
 it is possible to reference other http files and create requeste cascades
 
-![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/import.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/import.gif)
 
 #### It's Extensible
 
@@ -83,6 +83,23 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 
 *.http files of [Intellij HTTP Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) can be parsed and executed
 
+
+## Feature comparisons
+
+| Feature | httpYac | [Postman](https://www.postman.com/) | [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) | [Intellij Idea](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) |
+| - | - | - | - | - |
+| Send Request and View| ✓ | ✓ | ✓ | ✓ |
+| Variable support | ✓ | ✓ | ✓ | ✓ |
+| Custom Scripting support | ✓ | ✓ | [pull request](https://github.com/Huachao/vscode-restclient/pull/674) | partially |
+| Test/ Assert Response | ✓ | ✓ | - | ✓ |
+| Authorization support | ✓ | ✓ | partially | - |
+| Code Generation | in development | ✓ | ✓ | - |
+| Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
+| Share workspace | ✓ | paywall | ✓ | ✓ |
+| extensible/ plugin support | ✓ | partially | - | - |
+| cli support | in development | ✓ | - | - |
+| import OpenAPI | in development | ✓ | - | - |
+
 ## Http Language
 
 All Features are enabled if language of TextDocument is http. By default the language will be activated in two cases:
@@ -91,7 +108,7 @@ All Features are enabled if language of TextDocument is http. By default the lan
 
 Or manually
 
-![switch language](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/language.gif)
+> see [switch language](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/language.gif)
 
 #### Request
 
