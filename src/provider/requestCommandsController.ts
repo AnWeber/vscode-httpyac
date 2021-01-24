@@ -234,6 +234,6 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     return 'requestCommandsController';
   }
   isHttpRegion(obj: any): obj is HttpRegion{
-    return obj.actions && obj.position;
+    return obj.actions && obj.symbol && obj.metaData;
   }
 }

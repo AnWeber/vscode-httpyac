@@ -6,6 +6,7 @@ import { httpDocumentSelector } from '../config';
 
 export class HttpFileStoreController {
 
+  private syncParseHttpFile: Record<string, Promise<HttpFile>> = {};
   private subscriptions: Array<vscode.Disposable> = [];
   constructor(private readonly httpFileEmitter: vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>, private readonly refreshCodeLens: vscode.EventEmitter<void>) {
 
@@ -35,9 +36,10 @@ export class HttpFileStoreController {
   }
 
   @errorHandler()
-  async refreshHttpFile(document: vscode.TextDocument){
+  private async refreshHttpFile(document: vscode.TextDocument){
     if (vscode.languages.match(httpDocumentSelector, document)) {
-      const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
+
+      const httpFile = await this.getHttpFile(document);
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();
       }
@@ -47,6 +49,17 @@ export class HttpFileStoreController {
       return httpFile;
     }
     return undefined;
+  }
+
+  async getHttpFile(document: vscode.TextDocument) {
+    if (this.syncParseHttpFile[document.fileName]) {
+      return this.syncParseHttpFile[document.fileName];
+    }
+    const promise = httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
+    this.syncParseHttpFile[document.fileName] = promise;
+    const httpFile = await promise;
+    delete this.syncParseHttpFile[document.fileName];
+    return httpFile;
   }
 
 

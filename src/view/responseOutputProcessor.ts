@@ -94,7 +94,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
       const openWith = this.getOpenWith(httpRegion);
       if (httpRegion.metaData.save) {
-
         const filters: Record<string, Array<string>> = {
           'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
         };
@@ -151,8 +150,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       }
       const language = httpRegion.metaData.language || this.getLanguageId(httpRegion.response?.contentType);
 
-
-
       if (getConfigSetting<boolean>('responseViewReuseEditor')) {
         const cacheItem = this.outputCache.find(obj => obj.document.languageId === language && obj.document.isUntitled);
         if (cacheItem) {
@@ -183,7 +180,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   private async prettyPrint(editor: vscode.TextEditor) {
     if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
       if (editor === vscode.window.activeTextEditor) {
-        await vscode.commands.executeCommand('editor.action.formatDocument', editor);
+        return await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor) || false;
       } else {
         return true;
       }

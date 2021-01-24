@@ -17,7 +17,7 @@ export class DecorationProvider{
       httpFileEmitter.event(({ document, httpFile }) => this.showGutterIcon(document, httpFile)),
       vscode.window.onDidChangeActiveTextEditor((editor) => {
         if (editor && vscode.languages.match(httpDocumentSelector, editor.document)) {
-          const httpFile = httpFileStore.get(editor.document.uri.fsPath);
+          const httpFile = httpFileStore.get(editor.document.fileName);
           if (httpFile) {
             this.setDecoration(httpFile, editor);
           }

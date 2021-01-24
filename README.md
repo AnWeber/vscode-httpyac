@@ -87,12 +87,12 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 ## Feature comparisons
 
 | Feature | httpYac | [Postman](https://www.postman.com/) | [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) | [Intellij Idea](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) |
-| - | - | - | - | - |
+| - | :-: | :-: | :-: | :-: |
 | Send Request and View| ✓ | ✓ | ✓ | ✓ |
 | Variable support | ✓ | ✓ | ✓ | ✓ |
 | Custom Scripting support | ✓ | ✓ | [pull request](https://github.com/Huachao/vscode-restclient/pull/674) | partially |
 | Test/ Assert Response | ✓ | ✓ | - | ✓ |
-| Authorization support | ✓ | ✓ | partially | - |
+| Authorization support | ✓ | ✓ | partially (no custom auth flow) | - |
 | Code Generation | in development | ✓ | ✓ | - |
 | Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
 | Share workspace | ✓ | paywall | ✓ | ✓ |

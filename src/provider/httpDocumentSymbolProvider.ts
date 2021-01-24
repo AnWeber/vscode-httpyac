@@ -7,7 +7,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
   constructor(private readonly httpFileStoreController: HttpFileStoreController){}
 
   async provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken) : Promise<vscode.DocumentSymbol[]>{
-    const httpFile = await this.httpFileStoreController.refreshHttpFile(document);
+    const httpFile = await this.httpFileStoreController.getHttpFile(document);
 
     const symbols: Array<vscode.DocumentSymbol> = [];
     if (httpFile) {

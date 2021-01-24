@@ -1,25 +1,28 @@
 import { HttpRegion, utils } from 'httpyac';
 import { EOL } from 'os';
+import { getConfigSetting } from '../config';
 
 
 export function toMarkdown(httpRegion: HttpRegion) {
 
   const result: Array<string> = [];
   if (httpRegion.response) {
-    result.push(`HTTP${httpRegion.response.httpVersion || ''} ${httpRegion.response.statusCode} - ${httpRegion.response.statusMessage}`);
+    result.push(`HTTP${httpRegion.response.httpVersion || ''} **${httpRegion.response.statusCode}** - ${httpRegion.response.statusMessage}`);
 
     result.push('');
     result.push(`|  |  |`);
     result.push(`| --- | --- |`);
+
+    const headers = getConfigSetting<Array<string>>('responseViewHeader') || [];
     result.push(...Object.entries(httpRegion.response.headers)
-      .map(([key, value]) => `| ${key} | ${value} |`)
+      .map(([key, value]) => `| ${headers.indexOf(key) >= 0 ? '**' : ''}${key}${headers.indexOf(key) >= 0 ? '**' : ''} | ${value} |`)
       .sort()
     );
 
     result.push('');
     result.push('---');
     if (httpRegion.response.request) {
-      result.push('### request');
+      result.push('### Request');
       result.push('');
       const request = httpRegion.response.request;
       result.push(`${request.method} ${request.url}`);
@@ -31,15 +34,16 @@ export function toMarkdown(httpRegion: HttpRegion) {
         .sort()
       );
       if (utils.isString(request.body)) {
-        result.push('');
+        result.push('```');
         result.push(request.body);
+        result.push('```');
       }
 
 
       result.push('');
       result.push('---');
       result.push('');
-      result.push('### timings');
+      result.push('# Timings');
       result.push('');
       result.push(`|  |  |`);
       result.push(`| --- | --- |`);
