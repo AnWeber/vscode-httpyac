@@ -6,7 +6,8 @@
 
 #### Fixes
 * error on creating jwt meta tag
-
+* response body parsing error on reopen http file
+* error open request information from response view fixed
 
 ## 1.3.1 (2021-01-22)
 
