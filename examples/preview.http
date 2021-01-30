@@ -9,3 +9,9 @@ https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
 # @openWith imagePreview.previewEditor
 # @extension img
 https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png
+
+
+
+###
+# @name ubuntu
+GET https://releases.ubuntu.com/20.04.1/ubuntu-20.04.1-desktop-amd64.iso

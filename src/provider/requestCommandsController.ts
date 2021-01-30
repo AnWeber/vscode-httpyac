@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log } from 'httpyac';
+import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
@@ -112,41 +112,59 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     return Promise.resolve(result);
   }
 
-  private currentRequest: CommandData | undefined;
+  private httpRegionSendContext: HttpRegionSendContext | undefined;
 
   @errorHandler()
   async send(document?: vscode.TextDocument, line?: number) {
-    this.currentRequest = await this.getCurrentHttpRegion(document, line);
-    await this.sendRequest();
+    this.httpRegionSendContext = await this.getCurrentHttpRegionSendContext(document, line);
+    await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
   async resend() {
-    await this.sendRequest();
+    await this.sendRequest(this.httpRegionSendContext);
   }
 
-  private async sendRequest() {
-    if (this.currentRequest) {
-      const result = await httpYacApi.send(this.currentRequest.httpRegion, this.currentRequest.httpFile);
-      if (this.refreshCodeLens) {
-        this.refreshCodeLens.fire();
-      }
-      if (result) {
-        await httpYacApi.show(this.currentRequest.httpRegion, this.currentRequest.httpFile);
-      }
-    }
-  }
   @errorHandler()
   async sendAll() {
     const document  = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
-      await httpYacApi.sendAll(httpFile);
-      if (this.refreshCodeLens) {
-        this.refreshCodeLens.fire();
-      }
+      await this.sendRequest({httpFile});
+
     }
   }
+
+  private async sendRequest(context: HttpRegionSendContext| HttpFileSendContext | undefined) {
+
+    if (context) {
+      await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        cancellable: true,
+        title: "send",
+      }, async (progress, token) => {
+          context.progress = {
+            isCanceled: () => token.isCancellationRequested,
+            register: (event: () => void) => {
+              const dispose = token.onCancellationRequested(event);
+              return () => dispose.dispose();
+            },
+            report: (data) => progress.report(data),
+          };
+
+          const result = await httpYacApi.send(context);
+          if (this.refreshCodeLens) {
+            this.refreshCodeLens.fire();
+          }
+          if (result && utils.isHttpRegionSendContext(context)) {
+            await httpYacApi.show(context.httpRegion,context.httpFile);
+          }
+
+      });
+    }
+
+  }
+
 
   @errorHandler()
   async clearAll() {
@@ -163,7 +181,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   @errorHandler()
   async show(document?: vscode.TextDocument, line?: number) {
-    const parsedDocument = await this.getCurrentHttpRegion(document, line);
+    const parsedDocument = await this.getCurrentHttpRegionSendContext(document, line);
     if (parsedDocument) {
       await httpYacApi.show(parsedDocument.httpRegion, parsedDocument.httpFile);
     }
@@ -176,7 +194,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       if (this.isHttpRegion(document)) {
         httpRegion = document;
       } else {
-        const parsedDocument = await this.getCurrentHttpRegion(document, line);
+        const parsedDocument = await this.getCurrentHttpRegionSendContext(document, line);
         if (parsedDocument) {
           httpRegion = parsedDocument.httpRegion;
         }
@@ -197,7 +215,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   @errorHandler()
   async save(document?: vscode.TextDocument, line?: number) {
-    const parsedDocument = await this.getCurrentHttpRegion(document, line);
+    const parsedDocument = await this.getCurrentHttpRegionSendContext(document, line);
     if (parsedDocument && parsedDocument.httpRegion.response) {
       const ext = parsedDocument.httpRegion.metaData.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
       const filters: Record<string, Array<string>> = {};
@@ -213,7 +231,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     }
   }
 
-  private async getCurrentHttpRegion(doc: vscode.TextDocument  | undefined, line: number | undefined) {
+  private async getCurrentHttpRegionSendContext(doc: vscode.TextDocument  | undefined, line: number | undefined) {
     const document = doc || vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);

@@ -1,5 +1,10 @@
-## 1.4.0 (2021-??-??)
+## 1.5.0 (2021-01-xx)
 
+#### Features
+* cancel request
+* progress for send request
+
+## 1.4.0 (2021-01-24)
 
 #### Features
 * better presentation of the request information

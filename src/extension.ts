@@ -73,7 +73,12 @@ async function initExtensionScript() {
 			}
 			if (scriptPath) {
 				const script = await fs.readFile(scriptPath, { encoding: 'utf-8' });
-				await actionProcessor.executeScript(script, scriptPath, {}, 0);
+				await actionProcessor.executeScript({
+					script,
+					fileName: scriptPath,
+					variables: {},
+					lineOffset: 0
+				});
 			}
 		}
 	} catch (err) {
