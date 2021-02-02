@@ -1,8 +1,12 @@
-## 1.5.0 (2021-01-xx)
+## 1.5.0 (2021-02-02)
 
 #### Features
+* intellij environment variables support
 * cancel request
 * progress for send request
+
+#### Fixes
+* environments of dotenv files next to *.http files could not be selected
 
 ## 1.4.0 (2021-01-24)
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, EnvironmentProvider, environments } from 'httpyac';
+import { httpFileStore, environmentStore, EnvironmentProvider, environments, httpYacApi, variables, HttpFile } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting, httpDocumentSelector } from '../config';
@@ -40,6 +40,11 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   @errorHandler()
   initEnvironmentProvider(configs: Record<string, any>) {
     if (this.environmentProviders) {
+      for (const envProvider of this.environmentProviders) {
+        if (envProvider.reset) {
+          envProvider.reset();
+        }
+      }
       const otherEnvProvider = environmentStore.environmentProviders.filter(obj => this.environmentProviders && this.environmentProviders.indexOf(obj) < 0);
       environmentStore.environmentProviders.length = 0;
       environmentStore.environmentProviders.push(...otherEnvProvider);
@@ -49,21 +54,45 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     if (configs.environmentVariables) {
       this.environmentProviders.push(new environments.JsonEnvProvider(configs.environmentVariables));
     }
-    const dotEnvDirname: string = configs.dotenvDirname;
-    const dotenvDefaultFiles: Array<string> = configs.dotenvDefaultFiles || [];
-    if (dotEnvDirname && isAbsolute(dotEnvDirname)) {
-      this.environmentProviders.push(new environments.DotenvProvider(dotEnvDirname, dotenvDefaultFiles));
+
+    if (configs.intellijEnvEnabled) {
+      const factory = (path: string) => new environments.IntellijProvider(path);
+      const ignorePaths = this.registerWorkspaceEnvironmentProvider(factory, configs.intellijDirname);
+      if (configs.intellijVariableProviderEnabled) {
+        httpYacApi.variableProviders.splice(0, 0, new variables.provider.EnvVariableProvider(factory, ignorePaths));
+      }
     }
-    if (vscode.workspace.workspaceFolders) {
-      for (const workspace of vscode.workspace.workspaceFolders) {
-        this.environmentProviders.push(new environments.DotenvProvider(workspace.uri.fsPath, dotenvDefaultFiles));
-        if (dotEnvDirname && !isAbsolute(dotEnvDirname)) {
-          this.environmentProviders.push(new environments.DotenvProvider(join(workspace.uri.fsPath, dotEnvDirname), dotenvDefaultFiles));
-        }
+    if (configs.dotenvEnabled) {
+      const factory = (path: string) => new environments.DotenvProvider(path, configs.dotenvDefaultFiles || []);
+      const ignorePaths = this.registerWorkspaceEnvironmentProvider(factory, configs.dotenvDirname);
+      if (configs.dotenvVariableProviderEnabled) {
+        httpYacApi.variableProviders.splice(0, 0, new variables.provider.EnvVariableProvider(factory, ignorePaths));
       }
     }
     environmentStore.environmentProviders.push(...this.environmentProviders);
-    environmentStore.refresh();
+    environmentStore.reset();
+  }
+
+  private registerWorkspaceEnvironmentProvider(factory: (path: string) => EnvironmentProvider, additionalDirName: string): Array<string>{
+    const result: Array<string> = [];
+    if (this.environmentProviders) {
+      if (additionalDirName && isAbsolute(additionalDirName)) {
+        this.environmentProviders.push(factory(additionalDirName));
+        result.push(additionalDirName);
+      }
+      if (vscode.workspace.workspaceFolders) {
+        for (const workspace of vscode.workspace.workspaceFolders) {
+          this.environmentProviders.push(factory(workspace.uri.fsPath));
+          result.push(workspace.uri.fsPath);
+          if (additionalDirName && !isAbsolute(additionalDirName)) {
+            const relativePath = join(workspace.uri.fsPath, additionalDirName);
+            this.environmentProviders.push(factory(relativePath));
+            result.push(additionalDirName);
+          }
+        }
+      }
+    }
+    return result;
   }
 
   provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
@@ -80,19 +109,19 @@ export class EnvironmentController implements vscode.CodeLensProvider{
 
   @errorHandler()
   async toogleEnv(doc?: vscode.TextDocument) {
-    const env = await this.pickEnv();
     const document = doc || vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
       if (httpFile) {
+        const env = await this.pickEnv(httpFile);
         httpFile.activeEnvironment = env;
       }
     }
   }
 
   @errorHandler()
-  private async pickEnv() {
-    const envs = await environmentStore.getEnviroments();
+  private async pickEnv(httpFile?: HttpFile) {
+    const envs = await environmentStore.getEnviroments(httpFile);
     if (envs) {
       environmentStore.activeEnvironments = (await vscode.window.showQuickPick(envs.map(env => {
         return {
@@ -120,7 +149,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   }
 
   refresh() {
-    environmentStore.refresh();
+    environmentStore.reset();
   }
 
   toString() {

@@ -473,9 +473,18 @@ Environments can be provided with VS Code setting `httpyac.environmentVariables`
 > VS Code settings are automatically monitored and when changes are made, the environment is reinitialized.
 
 ##### Dotenv File Support
-[dotenv](https://www.npmjs.com/package/dotenv) support is enabled by default. This automatically scans the root folder of the project and the current file folder of the http file for .env file. All files with the {{name}}.env or .env.{{name}} scheme are interpreted as different environment and can be picked while switching environments
+[dotenv](https://www.npmjs.com/package/dotenv) support is enabled by default.  This automatically scans the root folder of the project and a configurable folder for .env file. All files with the {{name}}.env or .env.{{name}} scheme are interpreted as different environment and can be picked while switching environments
 
 > .env files are automatically monitored by File Watcher and when changes are made, the environment is reinitialized.
+
+> it is possible to enable a dotenvVariableProvider, which scans the directory of the current *.http file. The default for this setting is disabled.
+
+##### Intellij Environment Variables
+[intellij environment variables support](https://www.jetbrains.com/help/idea/exploring-http-syntax.html#environment-variables) support is enabled by default. This automatically scans the root folder of the project and a configurable folder for http-client.env.json/ http-client.private.env.json file.
+
+> http-client.env.json files are automatically monitored by File Watcher and when changes are made, the environment is reinitialized.
+
+> it is possible to enable a intellijVariableProvider, which scans the directory of the current *.http file. The default for this setting is disabled.
 ## Commands
 
 ![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/commands.png)
@@ -520,8 +529,13 @@ keybindings are only active in files with language http
 | - | - | - |
 | `httpyac.environmentSelectedOnStart` | list of selected environments on startup | - |
 | `httpyac.environmentVariables` | environment variables | `{ "$shared":{} }`|
+| `httpyac.dotenvEnabled` | dotenv support is enabled | `true` |
 | `httpyac.dotenvDirname` | relative or absolute path to folder with dotenv files | `"env"` |
 | `httpyac.dotenvDefaultFiles` | default dotenv files which is active in all profiles | `[".env"]`|
+| `httpyac.dotenvVariableProviderEnabled` | search for .env file next to *.http files | `false`|
+| `httpyac.intellijEnvEnabled` | intellij support is enabled | `true` |
+| `httpyac.intellijDirname` | relative or absolute path to folder with intellij variables files | - |
+| `httpyac.intellijVariableProviderEnabled` | search for http-client.env.json file next to *.http files | `false` |
 
 #### Response View Settings
 | Name | Description | Default |
