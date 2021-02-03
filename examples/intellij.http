@@ -10,3 +10,8 @@ Accept: text/html
     });
 %}
 ###
+
+GET https://www.google.de?q={{$uuid}}
+Accept: text/html
+
+> ./intellij.js

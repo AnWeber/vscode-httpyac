@@ -1,6 +1,5 @@
 import { HttpRegion, utils } from 'httpyac';
 import { EOL } from 'os';
-import { getConfigSetting } from '../config';
 
 
 export function toMarkdown(httpRegion: HttpRegion) {
