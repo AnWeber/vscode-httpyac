@@ -46,18 +46,22 @@ export function toMarkdown(httpRegion: HttpRegion) {
         .sort()
       );
 
-      if (!!httpRegion.response.ip || (httpRegion.response.redirectUrls && httpRegion.response.redirectUrls.length > 0)) {
+      if (!!httpRegion.response.meta) {
         result.push('');
         result.push('');
         result.push('# Data');
         result.push('');
         result.push(`|  |  |`);
         result.push(`| --- | --- |`);
-        if (httpRegion.response.ip) {
-          result.push(`| ip | ${httpRegion.response.ip} |`);
-        }
-        if (httpRegion.response.redirectUrls && httpRegion.response.redirectUrls.length > 0) {
-          result.push(`| redirectUrls | ${httpRegion.response.redirectUrls} |`);
+        for (const [key, value] of Object.entries(httpRegion.response.meta)) {
+
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              result.push(`| ${key} | ${value.join(',')} |`);
+            }
+          } else {
+            result.push(`| ${key} | ${value} |`);
+          }
         }
       }
     }

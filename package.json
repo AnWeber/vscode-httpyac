@@ -198,6 +198,19 @@
 					"scope": "resource",
 					"description": "response preview column option"
 				},
+				"httpyac.logLevel": {
+					"type": "string",
+					"default": "warn",
+					"scope": "resource",
+					"enum": [
+						"trace",
+						"debug",
+						"warn",
+						"error",
+						"info"
+					],
+					"description": "log level of output channel"
+				},
 				"httpyac.showGutterIcon": {
 					"type": "boolean",
 					"default": true,
@@ -317,20 +330,21 @@
 	"devDependencies": {
 		"@types/mime-types": "^2.1.0",
 		"@types/lodash": "^4.14.168",
-		"@types/node": "^14.14.22",
+		"@types/node": "^14.14.25",
 		"@types/vscode": "^1.50.0",
 		"@types/uuid": "^8.3.0",
 		"@typescript-eslint/eslint-plugin": "^4.14.2",
 		"@typescript-eslint/parser": "^4.14.2",
 		"eslint": "^7.19.0",
-		"ts-loader": "^8.0.14",
+		"ts-loader": "^8.0.15",
 		"typescript": "^4.1.3",
-		"webpack": "^5.20.1",
+		"webpack": "^5.20.2",
 		"webpack-cli": "^4.5.0"
 	},
 	"dependencies": {
 		"dotenv": "^8.2.0",
 		"encodeurl": "^1.0.2",
+		"filesize": "^6.1.0",
 		"got": "^11.8.1",
 		"http-proxy-agent": "^4.0.1",
 		"https-proxy-agent": "^5.0.0",

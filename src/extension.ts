@@ -1,7 +1,7 @@
 
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils, HttpFile } from 'httpyac';
+import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils, HttpFile, LogLevel, log } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
 import { watchConfigSettings, getConfigSetting, httpDocumentSelector } from './config';
 import { initVscodeLogger } from './logger';
@@ -50,6 +50,13 @@ const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmi
 			}
 			httpYacApi.httpClient = gotHttpClientFactory(options);
 		}, 'http'),
+		watchConfigSettings((config) => {
+			for (const level in LogLevel) {
+				if (config.logLevel === LogLevel[level]) {
+					log.level = +level;
+				}
+		 }
+		})
 	]);
 
 	await initExtensionScript();

@@ -1,37 +1,38 @@
 import { window } from 'vscode';
 import { APP_NAME } from './config';
-
-import { log } from 'httpyac';
+import { log, LogLevel } from 'httpyac';
 
 const outputChannel = window.createOutputChannel(APP_NAME);
 
-function logToOutputChannel(level: string,  message: string, ...params: any[]){
-  outputChannel.appendLine(`[${level} - ${(new Date().toLocaleTimeString())}] ${message}`);
-  if (params) {
-    for (const data of params) {
-      if (typeof data === 'string') {
-        outputChannel.appendLine(data);
-      } else {
-        outputChannel.appendLine(`${data}`);
+function logToOutputChannel(level: LogLevel, message: string, ...params: any[]) {
+  if (level >= log.level) {
+    outputChannel.appendLine(`[${LogLevel[level].toUpperCase()} - ${(new Date().toLocaleTimeString())}] ${message}`);
+    if (params) {
+      for (const data of params) {
+        if (typeof data === 'string') {
+          outputChannel.appendLine(data);
+        } else {
+          outputChannel.appendLine(`${data}`);
+        }
       }
     }
   }
 }
 
 function info (message: string, ...params: any[]) {
-    logToOutputChannel('INFO', message, ...params);
+    logToOutputChannel(LogLevel.info, message, ...params);
 };
 function trace (message: string, ...params: any[]) {
-    logToOutputChannel('TRACE', message, ...params);
+    logToOutputChannel(LogLevel.trace, message, ...params);
 };
 function debug (message: string, ...params: any[]) {
-    logToOutputChannel('DEBUG', message, ...params);
+    logToOutputChannel(LogLevel.debug, message, ...params);
 };
 function error (message: string, ...params: any[]) {
-    logToOutputChannel('ERROR', message, ...params);
+    logToOutputChannel(LogLevel.error, message, ...params);
 };
 function warn(message: string, ...params: any[]) {
-  logToOutputChannel('WARN', message, ...params);
+  logToOutputChannel(LogLevel.warn, message, ...params);
 };
 
 
