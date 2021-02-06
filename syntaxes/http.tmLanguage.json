@@ -186,6 +186,21 @@
     "comments": {
       "patterns": [
         {
+          "begin": "^\\s*\\/\\*.*",
+          "name": "comment.block.http",
+          "end": "^\\s*\\*\\/\\s*",
+          "beginCaptures": {
+            "0": {
+              "name": "comment.block.http"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "comment.block.http"
+            }
+          }
+        },
+        {
           "match": "^\\s*\\#{1,}.*$",
           "name": "comment.line.sharp.http"
         }
