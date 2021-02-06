@@ -1,3 +1,13 @@
+## 1.5.0 (2021-02-xx)
+
+#### Features
+* inputBox und quickpick VariableReplacer eingefügt
+* multi-line comments
+
+#### Fixes
+* warning on invalid js variable names
+
+
 ## 1.5.0 (2021-02-02)
 
 #### Features

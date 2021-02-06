@@ -9,6 +9,8 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs } from 'fs';
 import { NoteMetaHttpRegionParser} from './parser/noteMetaHttpRegionParser';
+import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
+import { showQuickpickVariableReplacer } from './replacer/showQuickpickVariableReplacer';
 
 initVscodeLogger();
 
@@ -17,6 +19,8 @@ initVscodeLogger();
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
 	httpYacApi.httpRegionParsers.push(new NoteMetaHttpRegionParser());
+	httpYacApi.variableReplacers.splice(0,0,showInputBoxVariableReplacer);
+	httpYacApi.variableReplacers.splice(0,0,showQuickpickVariableReplacer);
 
 
 

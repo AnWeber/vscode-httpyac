@@ -378,7 +378,7 @@ Intellij dynamic variables are supported.
 | Name | Description |
 | - | - |
 | $uuid | generates a universally unique identifier (UUID-v4) |
-|$timestamp | generates the current UNIX timestamp |
+| $timestamp | generates the current UNIX timestamp |
 | $randomInt| generates a random integer between 0 and 1000. |
 
 ```
@@ -397,6 +397,15 @@ GET /.kibana
 GET /_cat/indices
 ```
 
+
+##### Input und QuickPick Replacment
+Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is supported
+
+```html
+@app = {{$pick select app? $value: foo,bar}}
+@app2 = {{$input input app? $value: foo}}
+
+```
 
 ##### BasicAuth Replacment
 A support method is provided for using Basic Authentication. Just specify the username and password separated by spaces and the base64 encoding will be applied automatically

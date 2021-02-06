@@ -5,6 +5,7 @@
   exports.filename =__filename;
 }}
 
+@host2 = {{$pick Bitte host eingeben? $value: test,foo,bar}}
 @host = https://httpbin.org
 
 ###
