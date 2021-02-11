@@ -15,3 +15,9 @@ grant_type=client_credentials
 GET {{spring_host}}/actuator/health
 Authorization: Bearer {{keycloak.access_token}}
 
+
+###
+# @name health_openidreplacer
+GET {{spring_host}}/actuator/health
+Authorization: openid password auth
+

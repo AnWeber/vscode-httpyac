@@ -130,12 +130,12 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     const document  = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
-      await this.sendRequest({httpFile});
+      await this.sendRequest({httpFile, httpClient: httpYacApi.httpClient});
 
     }
   }
 
-  private async sendRequest(context: HttpRegionSendContext| HttpFileSendContext | undefined) {
+  private async sendRequest(context: HttpRegionSendContext | HttpFileSendContext | undefined) {
 
     if (context) {
       await vscode.window.withProgress({
@@ -240,7 +240,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         if (currentLine !== undefined) {
           const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine);
           if (httpRegion) {
-            return { httpRegion, httpFile };
+            return { httpRegion, httpFile, httpClient: httpYacApi.httpClient };
           }
         }
       }

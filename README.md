@@ -407,6 +407,55 @@ Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is suppo
 
 ```
 
+##### OpenID Connect Replacment
+The following [Open ID Connect](https://openid.net/specs/openid-connect-basic-1_0.html) flows are supported.
+
+* Authentication (or Basic) Flow (grant_type = authorization_code)
+* Resource Owner Password Grant (grant_type = password)
+* Client Credentials Grant (grant_type = client_credentials)
+
+```html
+
+GET /secured_service
+Authorization: openid {{grant_type}} {{variable_prefix}}
+
+# example
+
+GET /secured_service
+Authorization: openid client_credentials auth
+```
+To configure the flow, the following variables must be specified
+| variable | flow |
+| - | - |
+| {{prefix}}_tokenEndpoint | authorization_code, password, client_credentials |
+| {{prefix}}_clientId | authorization_code, password, client_credentials |
+| {{prefix}}_clientId | authorization_code, password, client_credentials |
+| {{prefix}}_authorizationEndpoint | authorization_code |
+| {{prefix}}_port | authorization_code |
+| {{prefix}}_username | password |
+| {{prefix}}_password | password |
+
+> To get the code from the Open ID server, a http server must be started for the Authorization Flow. The server is stopped immediatly after receiving the code
+
+It is possible to convert the generated token into a token of another realm using [Token Exchange](https://tools.ietf.org/html/rfc8693)
+
+
+```html
+
+GET /secured_service
+Authorization: openid {{grant_type}} {{variable_prefix}} token_exchange {{token_exchange_prefix}}
+
+# example
+
+GET /secured_service
+Authorization: openid client_credentials auth token_exchange realm_auth
+```
+
+> All calls made can be traced in the output channel httpyac
+
+> Functionality was tested using [keycloak](https://www.keycloak.org/docs/latest/getting_started/)
+
+
 ##### BasicAuth Replacment
 A support method is provided for using Basic Authentication. Just specify the username and password separated by spaces and the base64 encoding will be applied automatically
 
@@ -458,8 +507,21 @@ Accept: text/html
 ## Environment Support
 
 The extension supports switching to different environments. Several environments can be active at the same time. A different environment can be selected per file. Newly opened files are opened with the last active environment.
+All environment variables are expanded automatically.
 
-![environment switching](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
+```
+# .env
+auth_tokenEndpoint={{authHost}}/auth/realms/test/protocol/openid-connect/token
+
+# 9.env
+authHost=https://my.openid.de
+
+# resolved variables
+authHost=https://my.openid.de
+auth_tokenEndpoint=https://my.openid.de/auth/realms/test/protocol/openid-connect/token
+```
+
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
 
 ##### VS Code Setting
 Environments can be provided with VS Code setting `httpyac.environmentVariables`. All settings with key `$shared` are shared between all environments

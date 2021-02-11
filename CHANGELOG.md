@@ -1,6 +1,9 @@
 ## 1.5.0 (2021-02-xx)
 
 #### Features
+* open id flows (Client Credentials Grant, Resource Owner Password Grant, Authentication Flow) added
+* expanding variables
+* better output channel logging
 * inputBox und quickpick VariableReplacer eingefügt
 * multi-line comments
 
