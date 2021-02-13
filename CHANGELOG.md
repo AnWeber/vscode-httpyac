@@ -1,4 +1,9 @@
-## 1.5.0 (2021-02-xx)
+## 1.8.0 (2021-02-13)
+
+#### Features
+* better graphql support
+
+## 1.7.0 (2021-02-12)
 
 #### Features
 * open id flows (Client Credentials Grant, Resource Owner Password Grant, Authentication Flow) added

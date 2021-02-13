@@ -78,7 +78,7 @@
       ]
     },
     {
-      "begin": "\\s*(?=(query|mutation))",
+      "begin": "\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
       "end": "^\\s*(\\#{3,}.*?)?\\s*$",
       "endCaptures": {
@@ -93,7 +93,7 @@
       ]
     },
     {
-      "begin": "\\s*(?=(query|mutation))",
+      "begin": "\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
       "end": "^\\{\\s*$",
       "patterns": [

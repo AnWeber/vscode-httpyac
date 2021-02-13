@@ -196,6 +196,37 @@ Content-Type: application/pdf
 --WebKitFormBoundary
 ```
 
+GraphQL is supported if the content-type of the request is application/json. Parsing Logic will automatically generate a GraphQL request body from the query and the optional variables. GraphQL fragments are also supported and are included in the body by name.
+
+```html
+fragment IOParts on Repository {
+  description
+  diskUsage
+}
+
+POST https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer {{git_api_key}}
+
+
+query repositoryQuery($name: String!, $owner: String!) {
+  repository(name: $name, owner: $owner) {
+    name
+    fullName: nameWithOwner
+    ...IOParts
+    forkCount
+    watchers {
+        totalCount
+    }
+  }
+}
+
+{
+    "name": "vscode-httpyac",
+    "owner": "AnWeber"
+}
+```
+
 #### Meta Data
 
 All lines starting with `#` are interpreted as comment lines. Lines starting with `###` starts a new region. Lines with `# @property value` are meta data and tags the request with the property.

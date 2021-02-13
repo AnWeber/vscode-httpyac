@@ -45,6 +45,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
       case HttpSymbolKind.variable: return vscode.SymbolKind.Variable;
       case HttpSymbolKind.variableName: return vscode.SymbolKind.Variable;
       case HttpSymbolKind.varialbeValue: return vscode.SymbolKind.String;
+      case HttpSymbolKind.gql: return vscode.SymbolKind.String;
     }
     return vscode.SymbolKind.Object;
   }
