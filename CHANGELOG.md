@@ -1,3 +1,9 @@
+## 1.9.0 (2021-02-xx)
+
+#### Features
+* gql external file support
+* caldav http methods added
+
 ## 1.8.0 (2021-02-13)
 
 #### Features
