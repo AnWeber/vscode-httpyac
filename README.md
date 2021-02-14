@@ -144,6 +144,19 @@ Content-Type: text/html
 Authorization: Bearer {{token}}
 ```
 
+If you use the same headers several times, it is possible to store them in a variable and reuse them.
+
+```html
+{{
+  exports.defaultHeaders = {
+    'Content-Type': 'text/html',
+    'Authorization': `Bearer ${token}`
+  };
+}}
+GET https://www.google.de HTTP/1.1
+...defaultHeaders
+```
+
 ##### Request Body
 All content separated with a blank line after the request-line gets parsed as request body
 
@@ -196,7 +209,7 @@ Content-Type: application/pdf
 --WebKitFormBoundary
 ```
 
-GraphQL is supported if the content-type of the request is application/json. Parsing Logic will automatically generate a GraphQL request body from the query and the optional variables. GraphQL fragments are also supported and are included in the body by name.
+GraphQL queries are supported. Parsing Logic will automatically generate a GraphQL request body from the query and the optional variables. GraphQL fragments are also supported and are included in the body by name.
 
 ```html
 fragment IOParts on Repository {

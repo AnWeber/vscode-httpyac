@@ -3,6 +3,7 @@
 #### Features
 * gql external file support
 * caldav http methods added
+* variable based default header support
 
 ## 1.8.0 (2021-02-13)
 
