@@ -19,7 +19,8 @@ export const commands = {
   clearAll:`${APP_NAME}.clearall`,
   show: `${APP_NAME}.show`,
   viewHeader: `${APP_NAME}.viewHeader`,
-  save: `${APP_NAME}.save`
+  save: `${APP_NAME}.save`,
+  new: `${APP_NAME}.new`,
 };
 
 export class RequestCommandsController implements vscode.CodeLensProvider {
@@ -39,6 +40,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.show, this.show, this),
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
+      vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
       vscode.workspace.onDidCloseTextDocument(async (doc) => {
         const index = this.tmpFiles.indexOf(doc.fileName);
@@ -229,6 +231,13 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         await fs.writeFile(uri.fsPath, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
       }
     }
+  }
+
+  @errorHandler()
+  async newHttpFile() {
+    const language = 'http';
+    const document = await vscode.workspace.openTextDocument({ language, content: '' });
+    await vscode.window.showTextDocument(document);
   }
 
   private async getCurrentHttpRegionSendContext(doc: vscode.TextDocument  | undefined, line: number | undefined) {

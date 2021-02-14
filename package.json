@@ -226,6 +226,11 @@
 		},
 		"commands": [
 			{
+				"command": "httpyac.new",
+				"title": "create empty http file",
+				"category": "httpYac"
+			},
+			{
 				"command": "httpyac.send",
 				"title": "Send",
 				"category": "httpYac"
@@ -302,6 +307,11 @@
 		},
 		"keybindings": [
 			{
+				"command": "httpyac.new",
+				"key": "ctrl+alt+n",
+				"mac": "cmd+alt+n"
+			},
+			{
 				"command": "httpyac.send",
 				"key": "ctrl+alt+r",
 				"mac": "cmd+alt+r",
@@ -316,7 +326,8 @@
 			{
 				"command": "httpyac.toggle-env",
 				"key": "ctrl+alt+e",
-				"mac": "cmd+alt+e"
+				"mac": "cmd+alt+e",
+				"when": "editorTextFocus && editorLangId == 'http'"
 			}
 		]
 	},

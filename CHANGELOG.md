@@ -4,6 +4,7 @@
 * gql external file support
 * caldav http methods added
 * variable based default header support
+* add command to create empty http file (scratchpad)
 
 ## 1.8.0 (2021-02-13)
 
