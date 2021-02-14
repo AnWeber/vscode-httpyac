@@ -227,6 +227,23 @@ query repositoryQuery($name: String!, $owner: String!) {
 }
 ```
 
+To import GraphQL File you need to use special GraphQL Import Directive. Operationname foo is optional
+
+```html
+POST https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer {{git_api_key}}
+
+
+gql foo < ./bar.gql
+
+{
+    "name": "vscode-httpyac",
+    "owner": "AnWeber"
+}
+```
+
+
 #### Meta Data
 
 All lines starting with `#` are interpreted as comment lines. Lines starting with `###` starts a new region. Lines with `# @property value` are meta data and tags the request with the property.
@@ -456,6 +473,7 @@ GET /secured_service
 Authorization: openid client_credentials auth
 ```
 To configure the flow, the following variables must be specified
+
 | variable | flow |
 | - | - |
 | {{prefix}}_tokenEndpoint | authorization_code, password, client_credentials |
@@ -466,7 +484,8 @@ To configure the flow, the following variables must be specified
 | {{prefix}}_username | password |
 | {{prefix}}_password | password |
 
-> To get the code from the Open ID server, a http server must be started for the Authorization Flow. The server is stopped immediatly after receiving the code
+> To get the code from the Open ID server, a http server must be started for the Authorization Flow on port 3000 (default). The server is stopped immediatly after receiving the code. You need to configure your OpenId Provider to allow localhost:3000 as valid redirect url
+
 
 It is possible to convert the generated token into a token of another realm using [Token Exchange](https://tools.ietf.org/html/rfc8693)
 
@@ -484,7 +503,7 @@ Authorization: openid client_credentials auth token_exchange realm_auth
 
 > All calls made can be traced in the output channel httpyac
 
-> Functionality was tested using [keycloak](https://www.keycloak.org/docs/latest/getting_started/)
+Functionality was tested using [keycloak](https://www.keycloak.org/docs/latest/getting_started/)
 
 
 ##### BasicAuth Replacment

@@ -32,3 +32,16 @@ query test($name: String!, $owner: String!) {
     "name": "vscode-httpyac",
     "owner": "AnWeber"
 }
+
+
+POST https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer {{git_api_key}}
+
+
+gql foo < ./bar.gql
+
+{
+    "name": "vscode-httpyac",
+    "owner": "AnWeber"
+}
