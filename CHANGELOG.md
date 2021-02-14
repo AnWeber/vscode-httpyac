@@ -1,10 +1,15 @@
-## 1.9.0 (2021-02-xx)
+## 1.9.0 (2021-02-14)
 
 #### Features
 * gql external file support
 * caldav http methods added
 * variable based default header support
 * add command to create empty http file (scratchpad)
+
+
+#### Fixes
+* output parsed jwt token not working in openidvariable replace
+* fix table in docs openid
 
 ## 1.8.0 (2021-02-13)
 
