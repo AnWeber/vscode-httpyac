@@ -1,3 +1,9 @@
+## 1.10.0 (2021-02-15)
+
+#### Fix
+
+* variable replacement in body is broken
+
 ## 1.9.0 (2021-02-14)
 
 #### Features
