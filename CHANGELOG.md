@@ -1,4 +1,10 @@
 
+## 1.12.0 (2021-02-15)
+
+#### Fix
+
+* parsed jwt token is added right after request is received
+
 ## 1.11.0 (2021-02-15)
 
 #### Features

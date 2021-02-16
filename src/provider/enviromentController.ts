@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, EnvironmentProvider, environments, httpYacApi, variables, HttpFile } from 'httpyac';
+import { httpFileStore, environmentStore, EnvironmentProvider, environments, httpYacApi, variables, HttpFile, EnvironmentConfig } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting, httpDocumentSelector } from '../config';
@@ -14,7 +14,7 @@ const commands = {
 export class EnvironmentController implements vscode.CodeLensProvider{
 
   private subscriptions: Array<vscode.Disposable> = [];
-  private environmentProviders: Array<EnvironmentProvider> | undefined;
+  private disposeEnvironment: (() => void) | false = false;
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(refreshCodeLens: vscode.EventEmitter<void>) {
@@ -38,57 +38,39 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   }
 
   @errorHandler()
-  initEnvironmentProvider(configs: Record<string, any>) {
-    if (this.environmentProviders) {
-      for (const envProvider of this.environmentProviders) {
-        if (envProvider.reset) {
-          envProvider.reset();
-        }
-      }
-      const otherEnvProvider = environmentStore.environmentProviders.filter(obj => this.environmentProviders && this.environmentProviders.indexOf(obj) < 0);
-      environmentStore.environmentProviders.length = 0;
-      environmentStore.environmentProviders.push(...otherEnvProvider);
-    }
-    this.environmentProviders = [];
+  async initEnvironmentProvider(configs: Record<string, any>) {
 
-    if (configs.environmentVariables) {
-      this.environmentProviders.push(new environments.JsonEnvProvider(configs.environmentVariables));
+    if (this.disposeEnvironment) {
+      this.disposeEnvironment();
     }
 
+    const config: EnvironmentConfig = {
+      environments: configs.environmentVariables,
+    };
     if (configs.intellijEnvEnabled) {
-      const factory = (path: string) => new environments.IntellijProvider(path);
-      const ignorePaths = this.registerWorkspaceEnvironmentProvider(factory, configs.intellijDirname);
-      if (configs.intellijVariableProviderEnabled) {
-        httpYacApi.variableProviders.splice(0, 0, new variables.provider.EnvVariableProvider(factory, ignorePaths));
-      }
+      config.intellijVariableProviderEnabled = configs.intellijVariableProviderEnabled;
+      config.intellijDirs = this.getWorkspaceDirs(configs.intellijDirname);
     }
     if (configs.dotenvEnabled) {
-      const factory = (path: string) => new environments.DotenvProvider(path, configs.dotenvDefaultFiles || []);
-      const ignorePaths = this.registerWorkspaceEnvironmentProvider(factory, configs.dotenvDirname);
-      if (configs.dotenvVariableProviderEnabled) {
-        httpYacApi.variableProviders.splice(0, 0, new variables.provider.EnvVariableProvider(factory, ignorePaths));
-      }
+      config.dotenvVariableProviderEnabled = configs.dotenvVariableProviderEnabled;
+      config.dotenvDefaultFiles = configs.dotenvDefaultFiles;
+      config.dotenvDirs = this.getWorkspaceDirs(configs.dotenvDirname);
     }
-    environmentStore.environmentProviders.push(...this.environmentProviders);
-    environmentStore.reset();
+    this.disposeEnvironment = await environmentStore.configure(config);
   }
 
-  private registerWorkspaceEnvironmentProvider(factory: (path: string) => EnvironmentProvider, additionalDirName: string): Array<string>{
+  private getWorkspaceDirs(additionalDirName: string): Array<string> {
     const result: Array<string> = [];
-    if (this.environmentProviders) {
-      if (additionalDirName && isAbsolute(additionalDirName)) {
-        this.environmentProviders.push(factory(additionalDirName));
-        result.push(additionalDirName);
-      }
-      if (vscode.workspace.workspaceFolders) {
-        for (const workspace of vscode.workspace.workspaceFolders) {
-          this.environmentProviders.push(factory(workspace.uri.fsPath));
-          result.push(workspace.uri.fsPath);
-          if (additionalDirName && !isAbsolute(additionalDirName)) {
-            const relativePath = join(workspace.uri.fsPath, additionalDirName);
-            this.environmentProviders.push(factory(relativePath));
-            result.push(additionalDirName);
-          }
+
+    if (additionalDirName && isAbsolute(additionalDirName)) {
+      result.push(additionalDirName);
+    }
+    if (vscode.workspace.workspaceFolders) {
+      for (const workspace of vscode.workspace.workspaceFolders) {
+        result.push(workspace.uri.fsPath);
+        if (additionalDirName && !isAbsolute(additionalDirName)) {
+          const relativePath = join(workspace.uri.fsPath, additionalDirName);
+          result.push(relativePath);
         }
       }
     }
