@@ -8,6 +8,7 @@ import { initVscodeLogger } from './logger';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs } from 'fs';
+import { DefaultHeadersHttpRegionParser} from './parser/defaultHeadersHttpRegionParser';
 import { NoteMetaHttpRegionParser} from './parser/noteMetaHttpRegionParser';
 import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
 import { showQuickpickVariableReplacer } from './replacer/showQuickpickVariableReplacer';
@@ -18,6 +19,7 @@ initVscodeLogger();
 
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
+	httpYacApi.httpRegionParsers.push(new DefaultHeadersHttpRegionParser());
 	httpYacApi.httpRegionParsers.push(new NoteMetaHttpRegionParser());
 	httpYacApi.variableReplacers.splice(0,0,showInputBoxVariableReplacer);
 	httpYacApi.variableReplacers.splice(0,0,showQuickpickVariableReplacer);
@@ -27,7 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
 
-const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmitter, refreshCodeLens);
+	const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmitter, refreshCodeLens);
 	context.subscriptions.push(...[
 		refreshCodeLens,
 		httpFileStoreController,
@@ -40,7 +42,6 @@ const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmi
 		watchConfigSettings((config, httpConfig) => {
 			const options: Record<string, any> = {
 				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,
-				headers: config.requestDefaultHeaders,
 				https: {
 					rejectUnauthorized: !!config.requestSslCertficateValidation
 				},
