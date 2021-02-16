@@ -1,3 +1,15 @@
+
+## 1.11.0 (2021-02-15)
+
+#### Features
+* keep alive for openid jwt token
+
+#### Fix
+
+* default headers variable replacment fixed
+* fixed bug in isTokenExpired
+
+
 ## 1.10.0 (2021-02-15)
 
 #### Fix
