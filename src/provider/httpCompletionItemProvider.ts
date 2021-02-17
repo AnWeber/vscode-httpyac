@@ -178,13 +178,19 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
 
   private getMimetypes(line: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
     if (isInRequestLine && line.toLowerCase().indexOf('content-type') >= 0) {
-      return Object.entries(types).map(([key, value]) => {
+      const result = Object.entries(types).map(([key, value]) => {
         return {
           name: value,
           description: key,
           kind: vscode.CompletionItemKind.Value,
         };
       });
+      result.push({
+        name: 'application/x-www-form-urlencoded',
+        description: 'application/x-www-form-urlencoded',
+        kind: vscode.CompletionItemKind.Value,
+      });
+      return result;
     }
     return [];
   }
