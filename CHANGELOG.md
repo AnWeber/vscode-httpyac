@@ -1,3 +1,8 @@
+## 1.13.0 (2021-02-15)
+
+#### Features
+
+* new setting `httpyac.environmentPickMany`
 
 ## 1.12.0 (2021-02-15)
 

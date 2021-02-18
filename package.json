@@ -100,6 +100,12 @@
 					"scope": "resource",
 					"description": "list of default environment on startup"
 				},
+				"httpyac.environmentPickMany": {
+					"type": "boolean",
+					"scope": "resource",
+					"default": true,
+					"description": "allow picking many environments at the same time"
+				},
 				"httpyac.environmentVariables": {
 					"type": "object",
 					"scope": "resource",

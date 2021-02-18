@@ -662,6 +662,7 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.environmentSelectedOnStart` | list of selected environments on startup | - |
+| `httpyac.environmentPickMany` | allow picking many environments at the same time | `true` |
 | `httpyac.environmentVariables` | environment variables | `{ "$shared":{} }`|
 | `httpyac.dotenvEnabled` | dotenv support is enabled | `true` |
 | `httpyac.dotenvDirname` | relative or absolute path to folder with dotenv files | `"env"` |

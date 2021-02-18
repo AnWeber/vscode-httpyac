@@ -105,15 +105,24 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   private async pickEnv(httpFile?: HttpFile) {
     const envs = await environmentStore.getEnviroments(httpFile);
     if (envs) {
-      environmentStore.activeEnvironments = (await vscode.window.showQuickPick(envs.map(env => {
+      const pickedObj = await vscode.window.showQuickPick(envs.map(env => {
         return {
           label: env,
           picked: environmentStore.activeEnvironments && environmentStore.activeEnvironments.indexOf(env) >= 0
         };
       }), {
         placeHolder: "select environment",
-        canPickMany: true,
-      }))?.map(obj => obj.label);
+        canPickMany: getConfigSetting<boolean>('environmentPickMany'),
+      });
+      if (pickedObj) {
+        if (Array.isArray(pickedObj)) {
+          environmentStore.activeEnvironments = pickedObj.map(obj => obj.label);
+        } else {
+          environmentStore.activeEnvironments = [pickedObj.label];
+        }
+      } else {
+        environmentStore.activeEnvironments = undefined;
+      }
     } else {
       vscode.window.showInformationMessage("no environment found");
     }
