@@ -226,7 +226,7 @@
 				"httpyac.extensionScript": {
 					"type": "string",
 					"scope": "window",
-					"description": "Path to a script with extensions for HttpYac"
+					"description": "absolute path to a script with extensions for HttpYac"
 				}
 			}
 		},

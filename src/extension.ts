@@ -1,13 +1,14 @@
 
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, utils, HttpFile, LogLevel, log } from 'httpyac';
+import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, HttpFile, LogLevel, log } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
-import { watchConfigSettings, getConfigSetting, httpDocumentSelector } from './config';
+import { watchConfigSettings, httpDocumentSelector } from './config';
 import { initVscodeLogger } from './logger';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs } from 'fs';
+import { isAbsolute } from 'path';
 import { DefaultHeadersHttpRegionParser} from './parser/defaultHeadersHttpRegionParser';
 import { NoteMetaHttpRegionParser} from './parser/noteMetaHttpRegionParser';
 import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
@@ -61,41 +62,43 @@ export async function activate(context: vscode.ExtensionContext) {
 					log.level = +level;
 				}
 		 }
-		})
+		}),
+		initExtensionScript(),
 	]);
-
-	await initExtensionScript();
 
 	return {
 		httpYacApi
 	};
 }
 
-async function initExtensionScript() {
-	try {
-		const extensionScript = getConfigSetting<string>('extensionScript');
-		if (extensionScript && vscode.workspace.workspaceFolders) {
-			let scriptPath: string | undefined;
-			for (const workspace of vscode.workspace.workspaceFolders) {
-				const path = await utils.toAbsoluteFilename(extensionScript, workspace.uri.fsPath, true);
-				if (path) {
-					scriptPath = path;
-					break;
+
+function initExtensionScript() {
+	let disposable: vscode.Disposable;
+	disposable = watchConfigSettings(async (config) => {
+		try {
+			const extensionScript = config.extensionScript;
+			if (extensionScript) {
+				if (isAbsolute(extensionScript) && await fs.stat(extensionScript)) {
+					const script = await fs.readFile(extensionScript, { encoding: 'utf-8' });
+					await actionProcessor.executeScript({
+						script,
+						fileName: extensionScript,
+						variables: {},
+						lineOffset: 0
+					});
+					log.info('extenionscript executed. dispose config watcher');
+					if (disposable) {
+						disposable.dispose();
+					}
+				}else{
+					log.warn('extenionscript not found');
 				}
 			}
-			if (scriptPath) {
-				const script = await fs.readFile(scriptPath, { encoding: 'utf-8' });
-				await actionProcessor.executeScript({
-					script,
-					fileName: scriptPath,
-					variables: {},
-					lineOffset: 0
-				});
-			}
+		} catch (err) {
+			console.error(err);
 		}
-	} catch (err) {
-		console.error(err);
-	}
+	});
+	return disposable;
 }
 
 // this method is called when your extension is deactivated
