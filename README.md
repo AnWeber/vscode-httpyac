@@ -412,7 +412,13 @@ Authentication: {{authentcation}}
 
 > Since all variables are placed on the global scope of the script, they may overwrite other variables. Please use unique variable names
 
-Scripts with no request in the same region are executed for every requests in the file (Global Scripts)
+Scripts with no request in the same region are always executed (Global Scripts). Global Scripts initialized with `{{+` are executed for every region.
+
+```
+{{+
+  log.info(httpRegion.request.url)
+}}
+```
 
 
 > External dependencies must be installed independently, exceptions are [vscode](https://www.npmjs.com/package/@types/vscode), [got](https://www.npmjs.com/package/got) and [httpYac](https://www.npmjs.com/package/httpyac) Dependency, which are provided from the extension.
