@@ -693,6 +693,7 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.extensionScript` | absolute path to a script with extensions for HttpYac | - |
+| `httpyac.httpRegionScript` | absolute or relative path to a script which gets executed for every http request in a file | - |
 | `httpyac.showGutterIcon` | show gutter icon to highlight request lines | `true` |
 
 ## Next Steps

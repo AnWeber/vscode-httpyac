@@ -9,8 +9,7 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs } from 'fs';
 import { isAbsolute } from 'path';
-import { DefaultHeadersHttpRegionParser} from './parser/defaultHeadersHttpRegionParser';
-import { NoteMetaHttpRegionParser} from './parser/noteMetaHttpRegionParser';
+import * as parser from './parser';
 import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
 import { showQuickpickVariableReplacer } from './replacer/showQuickpickVariableReplacer';
 
@@ -20,8 +19,11 @@ initVscodeLogger();
 
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
-	httpYacApi.httpRegionParsers.push(new DefaultHeadersHttpRegionParser());
-	httpYacApi.httpRegionParsers.push(new NoteMetaHttpRegionParser());
+	httpYacApi.httpRegionParsers.push(new parser.DefaultHeadersHttpRegionParser());
+	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser());
+
+
+
 	httpYacApi.variableReplacers.splice(0,0,showInputBoxVariableReplacer);
 	httpYacApi.variableReplacers.splice(0,0,showQuickpickVariableReplacer);
 
@@ -61,7 +63,17 @@ export async function activate(context: vscode.ExtensionContext) {
 				if (config.logLevel === LogLevel[level]) {
 					log.level = +level;
 				}
-		 }
+			}
+		}),
+		watchConfigSettings((config) => {
+			httpFileStore.clear();
+			const index = httpYacApi.httpRegionParsers.findIndex(obj => obj instanceof parser.SettingsScriptHttpRegionParser);
+			if (index >= 0) {
+				httpYacApi.httpRegionParsers.splice(index, 1);
+			}
+			if (config.httpRegionScript) {
+				httpYacApi.httpRegionParsers.push(new parser.SettingsScriptHttpRegionParser());
+			}
 		}),
 		initExtensionScript(),
 	]);

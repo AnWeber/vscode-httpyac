@@ -3,6 +3,7 @@
 #### Features
 
 * new setting `httpyac.environmentPickMany`
+* new script injection with `httpyac.httpRegionScript`
 
 ## 1.12.0 (2021-02-15)
 
