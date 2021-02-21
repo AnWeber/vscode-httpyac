@@ -36,6 +36,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(...[
 		refreshCodeLens,
 		httpFileStoreController,
+		new provider.HarCommandsController(),
 		new provider.RequestCommandsController(refreshCodeLens),
 		new provider.EnvironmentController(refreshCodeLens),
 		new provider.DecorationProvider(context, httpFileEmitter),

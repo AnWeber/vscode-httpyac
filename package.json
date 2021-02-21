@@ -252,6 +252,11 @@
 				"category": "httpYac"
 			},
 			{
+				"command": "httpyac.generateCode",
+				"title": "generate Code",
+				"category": "httpYac"
+			},
+			{
 				"command": "httpyac.resend",
 				"title": "Resend last",
 				"category": "httpYac"
@@ -339,6 +344,12 @@
 				"key": "ctrl+alt+e",
 				"mac": "cmd+alt+e",
 				"when": "editorTextFocus && editorLangId == 'http'"
+			},
+			{
+				"command": "httpyac.generateCode",
+				"key": "ctrl+alt+g",
+				"mac": "cmd+alt+g",
+				"when": "editorTextFocus && editorLangId == 'http'"
 			}
 		]
 	},
@@ -350,11 +361,11 @@
 		"lint": "eslint src --ext ts"
 	},
 	"devDependencies": {
-		"@types/mime-types": "^2.1.0",
 		"@types/lodash": "^4.14.168",
+		"@types/mime-types": "^2.1.0",
 		"@types/node": "^14.14.25",
-		"@types/vscode": "^1.50.0",
 		"@types/uuid": "^8.3.0",
+		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^4.14.2",
 		"@typescript-eslint/parser": "^4.14.2",
 		"eslint": "^7.19.0",
@@ -370,6 +381,7 @@
 		"got": "^11.8.1",
 		"http-proxy-agent": "^4.0.1",
 		"https-proxy-agent": "^5.0.0",
+		"httpsnippet": "^1.24.0",
 		"httpyac": "^1.12.0",
 		"lodash": "^4.17.20",
 		"mime-types": "^2.1.28",

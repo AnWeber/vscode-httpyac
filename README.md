@@ -93,7 +93,7 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 | Custom Scripting support | ✓ | ✓ | [pull request](https://github.com/Huachao/vscode-restclient/pull/674) | partially |
 | Test/ Assert Response | ✓ | ✓ | - | ✓ |
 | Authorization support | ✓ | ✓ | partially (no custom auth flow) | - |
-| Code Generation | in development | ✓ | ✓ | - |
+| Code Generation | ✓ | ✓ | ✓ | - |
 | Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
 | Share workspace | ✓ | paywall | ✓ | ✓ |
 | extensible/ plugin support | ✓ | partially | - | - |
@@ -640,7 +640,9 @@ Environments can be provided with VS Code setting `httpyac.environmentVariables`
 | `httpyac.clearall` | clear all cached responses |
 | `httpyac.toggle-env` | toggle environment of active text document |
 | `httpyac.toggle-allenv` | toggle environment of all files |
+| `httpyac.generateCode` | generate code of request in ActiveTextEditor in active line |
 | `httpyac.refresh` | reload environments |
+| `httpyac.new` | create empty http file |
 
 ## Keybindings
 

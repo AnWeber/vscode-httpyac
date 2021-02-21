@@ -1,7 +1,8 @@
-## 1.13.0 (2021-02-15)
+## 1.13.0 (2021-02-xx)
 
 #### Features
 
+* generate code with [httpsnippet](https://www.npmjs.com/package/httpsnippet)
 * new setting `httpyac.environmentPickMany`
 * new script injection with `httpyac.httpRegionScript`
 
