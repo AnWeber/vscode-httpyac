@@ -1,3 +1,9 @@
+## 1.14.0 (2021-02-22)
+
+#### Fix
+
+* scope param is added to authorization code flow
+
 ## 1.13.0 (2021-02-21)
 
 #### Features

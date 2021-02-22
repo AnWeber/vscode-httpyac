@@ -493,15 +493,17 @@ Authorization: openid client_credentials auth
 ```
 To configure the flow, the following variables must be specified
 
-| variable | flow |
-| - | - |
-| {{prefix}}_tokenEndpoint | authorization_code, password, client_credentials |
-| {{prefix}}_clientId | authorization_code, password, client_credentials |
-| {{prefix}}_clientId | authorization_code, password, client_credentials |
-| {{prefix}}_authorizationEndpoint | authorization_code |
-| {{prefix}}_port | authorization_code |
-| {{prefix}}_username | password |
-| {{prefix}}_password | password |
+| variable | flow | description |
+| - | - | - |
+| {{prefix}}_tokenEndpoint | authorization_code, password, client_credentials | Token Endpoint URI |
+| {{prefix}}_clientId | authorization_code, password, client_credentials | OAuth 2.0 Client Identifier |
+| {{prefix}}_clientSecret | authorization_code, password, client_credentials | OAuth 2.0 Client Secret |
+| {{prefix}}_authorizationEndpoint | authorization_code | Authorization Endpoint URI |
+| {{prefix}}_scope | authorization_code, password, client_credentials | Scope |
+| {{prefix}}_port | authorization_code | http server port used for Authorization Flow |
+| {{prefix}}_username | password | username for password flow |
+| {{prefix}}_password | password | password for password flow |
+| {{prefix}}_keepAlive | authorization_code, password, client_credentials | AccessToken is automatically renewed in the background before expiration with RequestToken |
 
 > To get the code from the Open ID server, a http server must be started for the Authorization Flow on port 3000 (default). The server is stopped immediatly after receiving the code. You need to configure your OpenId Provider to allow localhost:3000 as valid redirect url
 
