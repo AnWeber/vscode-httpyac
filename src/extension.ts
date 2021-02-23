@@ -1,7 +1,7 @@
 
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, HttpFile, LogLevel, log } from 'httpyac';
+import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, HttpFile, LogLevel, log, popupService } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
 import { watchConfigSettings, httpDocumentSelector } from './config';
 import { initVscodeLogger } from './logger';
@@ -103,7 +103,8 @@ function initExtensionScript() {
 					if (disposable) {
 						disposable.dispose();
 					}
-				}else{
+				} else {
+					popupService.error('extenionscript not found');
 					log.warn('extenionscript not found');
 				}
 			}

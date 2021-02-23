@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils } from 'httpyac';
-import { APP_NAME } from '../config';
+import { APP_NAME, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
@@ -76,6 +76,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         title: 'send all'
       }));
 
+      const useMethodInSendCodeLens = getConfigSetting<boolean>('useMethodInSendCodeLens');
+
       for (const httpRegion of httpFile.httpRegions) {
         const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
@@ -85,7 +87,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
           result.push(new vscode.CodeLens(range, {
             command: commands.send,
             arguments: args,
-            title: 'send'
+            title:  useMethodInSendCodeLens? `send (${httpRegion.request.method})` : 'send'
           }));
 
         }

@@ -465,7 +465,7 @@ GET /_cat/indices
 ```
 
 
-##### Input und QuickPick Replacment
+##### Input und QuickPick Replacement
 Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is supported
 
 ```html
@@ -474,7 +474,7 @@ Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is suppo
 
 ```
 
-##### OpenID Connect Replacment
+##### OpenID Connect Replacement (OAuth 2)
 The following [Open ID Connect](https://openid.net/specs/openid-connect-basic-1_0.html) flows are supported.
 
 * Authentication (or Basic) Flow (grant_type = authorization_code)
@@ -699,6 +699,8 @@ keybindings are only active in files with language http
 | `httpyac.extensionScript` | absolute path to a script with extensions for HttpYac | - |
 | `httpyac.httpRegionScript` | absolute or relative path to a script which gets executed for every http request in a file | - |
 | `httpyac.showGutterIcon` | show gutter icon to highlight request lines | `true` |
+| `httpyac.useMethodInSendCodeLens` | use request method in send code lens | `false` |
+| `httpyac.logLevel` | log level of output channel | `warn` |
 
 ## Next Steps
 

@@ -1,45 +1,46 @@
 import { window } from 'vscode';
 import { APP_NAME } from './config';
-import { log, LogLevel } from 'httpyac';
+import { outputProvider, LogLevel } from 'httpyac';
 
 const outputChannel = window.createOutputChannel(APP_NAME);
 
-function logToOutputChannel(level: LogLevel, message: string, ...params: any[]) {
-  if (level >= log.level) {
-    outputChannel.appendLine(`[${LogLevel[level].toUpperCase()} - ${(new Date().toLocaleTimeString())}] ${message}`);
-    if (params) {
-      for (const data of params) {
-        if (typeof data === 'string') {
-          outputChannel.appendLine(data);
-        } else {
-          outputChannel.appendLine(`${data}`);
-        }
+function logToOutputChannel(level: LogLevel, ...params: any[]) {
+  const [message, ...args] = params;
+  outputChannel.appendLine(`[${LogLevel[level].toUpperCase()} - ${(new Date().toLocaleTimeString())}] ${message}`);
+  if (args) {
+    for (const data of args) {
+      if (typeof data === 'string') {
+        outputChannel.appendLine(data);
+      } else {
+        outputChannel.appendLine(`${data}`);
       }
     }
   }
 }
 
-function info (message: string, ...params: any[]) {
-    logToOutputChannel(LogLevel.info, message, ...params);
-};
-function trace (message: string, ...params: any[]) {
-    logToOutputChannel(LogLevel.trace, message, ...params);
-};
-function debug (message: string, ...params: any[]) {
-    logToOutputChannel(LogLevel.debug, message, ...params);
-};
-function error (message: string, ...params: any[]) {
-    logToOutputChannel(LogLevel.error, message, ...params);
-};
-function warn(message: string, ...params: any[]) {
-  logToOutputChannel(LogLevel.warn, message, ...params);
-};
+
+function showMessage(level: LogLevel, ...params: any[]) {
+  const [message, ...args] = params;
+  if (message) {
+    switch (level) {
+      case LogLevel.error:
+        window.showErrorMessage(message, ...args);
+        break;
+      case LogLevel.warn:
+        window.showWarningMessage(message, ...args);
+        break;
+      default:
+        window.showInformationMessage(message, ...args);
+        break;
+    }
+  }
+}
+
+
+
 
 
 export function initVscodeLogger() {
-	log.info = info;
-	log.warn = warn;
-	log.trace = trace;
-	log.debug = debug;
-	log.error = error;
+  outputProvider.log = logToOutputChannel;
+  outputProvider.showMessage = showMessage;
 }

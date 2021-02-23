@@ -1,3 +1,14 @@
+## 1.15.0 (2021-02-xx)
+
+
+#### Features
+
+* display of request method in code lens possible
+
+#### Fix
+
+* better oauth server management
+* error on undefined authorizationEndpoint in oauth2 flow fixed
 ## 1.14.0 (2021-02-22)
 
 #### Fix
