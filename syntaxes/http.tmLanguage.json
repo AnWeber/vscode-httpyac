@@ -171,7 +171,7 @@
     "variable": {
       "patterns": [
         {
-          "match": "^\\s*(@[^\\s]*)\\s*(=\\s*)?(?<value>.*)$",
+          "match": "^\\s*(@[^(\\s=)]*)(?:(\\s*=\\s*)|(\\s+))(?<value>.*)$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
@@ -202,6 +202,10 @@
         },
         {
           "match": "^\\s*\\#{1,}.*$",
+          "name": "comment.line.sharp.http"
+        },
+        {
+          "match": "^\\s*\\/{2}.*$",
           "name": "comment.line.sharp.http"
         }
       ]
