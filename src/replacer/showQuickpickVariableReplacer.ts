@@ -1,11 +1,12 @@
 
+import { ProcessorContext } from 'httpyac';
 import * as vscode from 'vscode';
 
-export async function showQuickpickVariableReplacer(text: string) {
+export async function showQuickpickVariableReplacer(text: string, type: string, context: ProcessorContext) {
 
   const variableRegex = /\{{2}(.+?)\}{2}/g;
   let match: RegExpExecArray | null;
-  let result = text;
+  let result: string | undefined = text;
   while ((match = variableRegex.exec(text)) !== null) {
     const [searchValue, variable] = match;
 
@@ -17,8 +18,11 @@ export async function showQuickpickVariableReplacer(text: string) {
       const replacement = await vscode.window.showQuickPick(value.split(','),{
           placeHolder
       });
-      if (replacement) {
+      if (replacement && result) {
         result = result.replace(searchValue, `${replacement}`);
+      } else if(context.cancelVariableReplacer) {
+        context.cancelVariableReplacer();
+        result = undefined;
       }
     }
 

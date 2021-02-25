@@ -4,11 +4,17 @@
 #### Features
 
 * display of request method in code lens possible
-
+* Intellij Idea Features implemented
+  * support single line script
+  * support no-log meta param
+  * support no-redirect meta param
+  * support multi-line request url
+* redirect console.log statements in inline scripts to outputchannel
 #### Fix
 
 * better oauth server management
 * error on undefined authorizationEndpoint in oauth2 flow fixed
+* display error when highlighting the variable
 ## 1.14.0 (2021-02-22)
 
 #### Fix

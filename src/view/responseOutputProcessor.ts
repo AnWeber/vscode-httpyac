@@ -230,7 +230,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         return 'markdown';
       }
     }
-    return 'text';
+    return 'plaintext';
   }
 }
 

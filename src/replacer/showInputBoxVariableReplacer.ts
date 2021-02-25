@@ -1,9 +1,10 @@
 
+import { ProcessorContext } from 'httpyac';
 import * as vscode from 'vscode';
 
 const lastValue: Record<string, string> = {};
 
-export async function showInputBoxVariableReplacer(text: string) {
+export async function showInputBoxVariableReplacer(text: string, type: string, context: ProcessorContext) {
 
   const variableRegex = /\{{2}(.+?)\}{2}/g;
   let match: RegExpExecArray | null;
@@ -23,6 +24,8 @@ export async function showInputBoxVariableReplacer(text: string) {
       if (replacement) {
         lastValue[placeholder] = replacement;
         result = result.replace(searchValue, `${replacement}`);
+      } else if(context.cancelVariableReplacer) {
+        context.cancelVariableReplacer();
       }
     }
 

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Progress as httpProgress, httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpClientOptions, HttpResponse } from 'httpyac';
+import { Progress as httpProgress, httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpClientOptions, HttpResponse, HttpClientContext } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { getHttpRegionFromLine } from '../utils';
@@ -52,8 +52,8 @@ export class HarCommandsController {
 
           const httpClient = context.httpClient;
 
-          context.httpClient = async (options: HttpClientOptions, progress: httpProgress | undefined, showProgressBar: boolean): Promise<HttpResponse | false> => {
-            if (showProgressBar) {
+          context.httpClient = async (options: HttpClientOptions, context: HttpClientContext): Promise<HttpResponse | false> => {
+            if (context.showProgressBar) {
               const harRequest: any = this.getHarRequest(options);
               const snippet = new HttpSnippet(harRequest);
               const content = snippet.convert(target.target, target.client);
@@ -63,7 +63,7 @@ export class HarCommandsController {
               await vscode.window.showTextDocument(document);
               return false;
             }
-            return await httpClient(options, progress, showProgressBar);
+            return await httpClient(options, context);
           };
           await httpYacApi.send(context);
       });
