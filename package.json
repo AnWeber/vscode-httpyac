@@ -254,6 +254,11 @@
 				"category": "httpYac"
 			},
 			{
+				"command": "httpyac.sendRepeat",
+				"title": "Send (repeat)",
+				"category": "httpYac"
+			},
+			{
 				"command": "httpyac.sendall",
 				"title": "Send all",
 				"category": "httpYac"

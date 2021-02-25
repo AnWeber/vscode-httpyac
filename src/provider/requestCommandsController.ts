@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils } from 'httpyac';
+import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils, RepeatOrder } from 'httpyac';
 import { APP_NAME, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
@@ -14,6 +14,7 @@ interface CommandData{
 }
 export const commands = {
   send: `${APP_NAME}.send`,
+  sendRepeat: `${APP_NAME}.sendRepeat`,
   resend: `${APP_NAME}.resend`,
   sendAll:`${APP_NAME}.sendall`,
   clearAll:`${APP_NAME}.clearall`,
@@ -34,6 +35,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.send, this.send, this),
+      vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),
       vscode.commands.registerCommand(commands.clearAll, this.clearAll, this),
       vscode.commands.registerCommand(commands.sendAll, this.sendAll, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
@@ -122,6 +124,23 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   async send(document?: vscode.TextDocument, line?: number) {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line);
     await this.sendRequest(this.httpRegionSendContext);
+  }
+
+  @errorHandler()
+  async sendRepeat(document?: vscode.TextDocument, line?: number) {
+    this.httpRegionSendContext = await getHttpRegionFromLine(document, line);
+    const repeatOrder = await vscode.window.showQuickPick([{label: 'parallel', value: RepeatOrder.parallel}, {label: 'sequential', value: RepeatOrder.sequential}]);
+    const count = await vscode.window.showInputBox({
+      placeHolder: 'repeat count',
+    });
+
+    if (repeatOrder && count && +count > 0 && this.httpRegionSendContext) {
+      this.httpRegionSendContext.repeat = {
+        count: +count,
+        type: repeatOrder?.value
+      };
+      await this.sendRequest(this.httpRegionSendContext);
+    }
   }
 
   @errorHandler()
@@ -229,7 +248,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       const uri = await vscode.window.showSaveDialog({
         filters
       });
-      if (uri) {
+      if (uri && parsedDocument.httpRegion.response.rawBody) {
         await fs.writeFile(uri.fsPath, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
       }
     }

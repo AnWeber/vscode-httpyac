@@ -93,7 +93,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
 
       const openWith = this.getOpenWith(httpRegion);
-      if (httpRegion.metaData.save) {
+      if (httpRegion.metaData.save && httpRegion.response.rawBody) {
         const filters: Record<string, Array<string>> = {
           'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
         };
@@ -105,7 +105,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
           filters
         });
         await this.saveAndOpenWith(uri, httpRegion.response.rawBody, openWith);
-      }else if (openWith) {
+      }else if (openWith && httpRegion.response.rawBody) {
         const { path } = await file({ postfix: `.${httpRegion.metaData.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
         await this.saveAndOpenWith(vscode.Uri.file(path), httpRegion.response.rawBody, openWith);
       } else {
