@@ -204,7 +204,6 @@
 					"scope": "resource",
 					"description": "response preview column option"
 				},
-
 				"httpyac.logLevel": {
 					"type": "string",
 					"default": "warn",
@@ -397,7 +396,7 @@
 		"http-proxy-agent": "^4.0.1",
 		"https-proxy-agent": "^5.0.0",
 		"httpsnippet": "^1.24.0",
-		"httpyac": "^1.14.0",
+		"httpyac": "^1.15.0",
 		"lodash": "^4.17.20",
 		"mime-types": "^2.1.28",
 		"open": "^7.4.2",

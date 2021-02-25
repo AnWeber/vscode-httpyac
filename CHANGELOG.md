@@ -1,6 +1,4 @@
-## 1.15.0 (2021-02-xx)
-
-
+## 1.15.0 (2021-02-25)
 #### Features
 
 * display of request method in code lens possible
