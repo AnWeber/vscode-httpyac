@@ -1,3 +1,6 @@
+## 1.15.0 (2021-02-26)
+#### Fix
+* error in gql parsing
 ## 1.15.0 (2021-02-25)
 #### Features
 
