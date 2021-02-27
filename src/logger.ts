@@ -1,19 +1,45 @@
-import { window } from 'vscode';
+import { OutputChannel, window } from 'vscode';
 import { APP_NAME } from './config';
-import { outputProvider, LogLevel } from 'httpyac';
+import { outputProvider, LogLevel, PopupChannel, RequestChannel } from 'httpyac';
 
-const outputChannel = window.createOutputChannel(APP_NAME);
 
-function logToOutputChannel(level: LogLevel, ...params: any[]) {
-  const [message, ...args] = params;
-  outputChannel.appendLine(`[${LogLevel[level].toUpperCase()} - ${(new Date().toLocaleTimeString())}] ${message}`);
-  if (args) {
-    for (const data of args) {
-      if (typeof data === 'string') {
-        outputChannel.appendLine(data);
+const outputChannels: Record<string, OutputChannel> = {};
+
+function getOutputChannel(channel: string) {
+  let outputChannel = outputChannels[channel];
+  if (!outputChannel) {
+    outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);
+    outputChannels[channel] = outputChannel;
+    outputChannel.show(true);
+  }
+  return outputChannel;
+}
+
+function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) {
+  if (channel === PopupChannel) {
+    showMessage(level, ...params);
+    return;
+  }
+
+  const outputChannel = getOutputChannel(channel);
+  if (params) {
+    if (channel !== RequestChannel) {
+      outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
+    }
+    for (const param of params) {
+      if (typeof param === 'string') {
+        outputChannel.appendLine(param);
+      } else if (param instanceof Error) {
+        outputChannel.appendLine(`${param.name} - ${param.message}`);
+        if (param.stack) {
+          outputChannel.appendLine(param.stack);
+        }
       } else {
-        outputChannel.appendLine(`${data}`);
+        outputChannel.appendLine(`${JSON.stringify(param)}`);
       }
+    }
+    if (level === LogLevel.error) {
+      outputChannel.show(true);
     }
   }
 }
@@ -42,5 +68,12 @@ function showMessage(level: LogLevel, ...params: any[]) {
 
 export function initVscodeLogger() {
   outputProvider.log = logToOutputChannel;
-  outputProvider.showMessage = showMessage;
+  return {
+    dispose: function dispose() {
+      for (const [key, value] of Object.entries(outputChannels)) {
+        value.dispose();
+        delete outputChannels[key];
+      }
+    }
+  };
 }

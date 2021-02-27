@@ -178,14 +178,16 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
 
   private async prettyPrint(editor: vscode.TextEditor) {
+    let result = false;
     if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
       if (editor === vscode.window.activeTextEditor) {
-        return await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor) || false;
+        result = await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor) || false;
       } else {
-        return true;
+        result = true;
       }
     }
-    return false;
+    editor.revealRange(new vscode.Range(0, 0, editor.document.lineCount, 0), vscode.TextEditorRevealType.AtTop);
+    return result;
   }
 
   private async createEditor(content: string, language: string) {

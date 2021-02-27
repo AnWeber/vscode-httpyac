@@ -27,7 +27,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
 }
 
 async function handleError(target: any, propertyKey: string | symbol, err: any) {
-  log.error(`${target}.${String(propertyKey)}`, err);
+  log.error(err);
   if (err instanceof Error) {
     const showTitle = 'show dialog';
     const result = await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, showTitle);

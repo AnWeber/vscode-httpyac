@@ -13,7 +13,6 @@ import * as parser from './parser';
 import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
 import { showQuickpickVariableReplacer } from './replacer/showQuickpickVariableReplacer';
 
-initVscodeLogger();
 
 
 
@@ -77,6 +76,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 		}),
 		initExtensionScript(),
+		initVscodeLogger(),
 	]);
 
 	return {
@@ -109,7 +109,7 @@ function initExtensionScript() {
 				}
 			}
 		} catch (err) {
-			console.error(err);
+			log.error(err);
 		}
 	});
 	return disposable;
