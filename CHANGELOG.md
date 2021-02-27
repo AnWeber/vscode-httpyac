@@ -1,4 +1,13 @@
-## 1.15.0 (2021-02-26)
+## 1.16.0 (2021-02-26)
+
+#### Features
+
+* separated log output (log, script console, requests)
+* scroll to top on new requests
+#### Fix
+* cache error in openidVariableReplacer if inline Variables are used
+
+## 1.15.1 (2021-02-26)
 #### Fix
 * error in gql parsing
 ## 1.15.0 (2021-02-25)
