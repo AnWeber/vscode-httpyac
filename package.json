@@ -190,6 +190,11 @@
 					"scope": "resource",
 					"description": "response view will take focus after receiving response"
 				},
+				"httpyac.responseViewLanguageMap": {
+					"type": "object",
+					"scope": "resource",
+					"description": "mimetype to languageId map for response view"
+				},
 				"httpyac.responseViewColumn": {
 					"type": "string",
 					"enum": [

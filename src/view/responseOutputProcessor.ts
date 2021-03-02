@@ -218,12 +218,17 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
   private getLanguageId(contentType: ContentType | undefined) {
     if (contentType) {
+
+      const languageMap = getConfigSetting<Record<string, string>>('responseViewLanguageMap');
+      if (languageMap && languageMap[contentType.mimeType]) {
+        return languageMap[contentType.mimeType];
+      }
       if (utils.isMimeTypeJSON(contentType)) {
         return 'json';
       } else if (utils.isMimeTypeJavascript(contentType)) {
         return 'javascript';
       } else if (utils.isMimeTypeXml(contentType)) {
-        return 'xml';
+        return 'html';
       } else if (utils.isMimeTypeHtml(contentType)) {
         return 'html';
       } else if (utils.isMimeTypeCSS(contentType)) {

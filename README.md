@@ -691,6 +691,9 @@ keybindings are only active in files with language http
 | `httpyac.responseViewPrettyPrint` | response view pretty prints content (uses VSCode Format Document) | `true`|
 | `httpyac.responseViewPreserveFocus` | response view will take focus after receiving response | `true`|
 | `httpyac.responseViewColumn` | response preview column option (current, beside) | `beside`|
+| `httpyac.responseViewLanguageMap` | mimetype to [languageId](https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers) map for response view | `beside`|
+
+
 
 #### httpYac Extension
 
