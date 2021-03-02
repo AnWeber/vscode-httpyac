@@ -186,7 +186,7 @@
 				},
 				"httpyac.responseViewPreserveFocus": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"scope": "resource",
 					"description": "response view will take focus after receiving response"
 				},
