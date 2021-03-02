@@ -29,11 +29,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
 async function handleError(target: any, propertyKey: string | symbol, err: any) {
   log.error(err);
   if (err instanceof Error) {
-    const showTitle = 'show dialog';
-    const result = await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, showTitle);
-    if (result === showTitle) {
-      await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`, {modal: true});
-    }
+    await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
   } else if(utils.isString(err)) {
     await window.showErrorMessage(err);
   } else {
