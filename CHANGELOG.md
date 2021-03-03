@@ -1,3 +1,12 @@
+## 1.17.0 (2021-03-xx)
+
+#### Features
+
+* see current sessions and logout
+
+#### Fix
+* user session depending on OAuth Flow, clientId and possibly username. On changed scopes user session is renewed
+
 ## 1.16.0 (2021-02-26)
 
 #### Features

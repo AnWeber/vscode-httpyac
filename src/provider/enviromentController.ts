@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, EnvironmentProvider, environments, httpYacApi, variables, HttpFile, EnvironmentConfig } from 'httpyac';
+import { httpFileStore, environmentStore, HttpFile, EnvironmentConfig ,log } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting, httpDocumentSelector } from '../config';
@@ -8,7 +8,8 @@ import { getConfigSetting, httpDocumentSelector } from '../config';
 const commands = {
   toogleEnv: `${APP_NAME}.toggle-env`,
   toogleAllEnv: `${APP_NAME}.toggle-allenv`,
-  refresh: `${APP_NAME}.refresh`,
+  reset: `${APP_NAME}.reset`,
+  logout: `${APP_NAME}.logout`,
 };
 
 export class EnvironmentController implements vscode.CodeLensProvider{
@@ -23,7 +24,8 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toogleEnv, this.toogleEnv, this),
       vscode.commands.registerCommand(commands.toogleAllEnv, this.toogleAllEnv, this),
-      vscode.commands.registerCommand(commands.refresh, this.refresh, this),
+      vscode.commands.registerCommand(commands.reset, this.reset, this),
+      vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
       watchConfigSettings(this.initEnvironmentProvider.bind(this))
     ];
@@ -139,8 +141,32 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     }
   }
 
-  refresh() {
+  reset() {
     environmentStore.reset();
+  }
+
+  async logout() {
+    const userSessions = await vscode.window.showQuickPick(environmentStore.userSessions.map(userSession => {
+      return {
+        id: userSession.id,
+        description: userSession.description,
+        label: userSession.title,
+        data: userSession
+      };
+    }), {
+      placeHolder: 'select user sessions to logout',
+        canPickMany: true,
+        onDidSelectItem: (item: any) => {
+          log.info(JSON.stringify(item.data));
+        }
+    });
+
+    if (userSessions) {
+      for (const userSession of userSessions) {
+        environmentStore.removeUserSession(userSession.id);
+        log.info(`${userSession.label} removed`);
+      }
+    }
   }
 
   toString() {

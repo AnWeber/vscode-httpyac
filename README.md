@@ -643,7 +643,8 @@ Environments can be provided with VS Code setting `httpyac.environmentVariables`
 | `httpyac.toggle-env` | toggle environment of active text document |
 | `httpyac.toggle-allenv` | toggle environment of all files |
 | `httpyac.generateCode` | generate code of request in ActiveTextEditor in active line |
-| `httpyac.refresh` | reload environments |
+| `httpyac.reset` | reset environments |
+| `httpyac.logout` | see current sessions and logout |
 | `httpyac.new` | create empty http file |
 
 ## Keybindings

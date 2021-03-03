@@ -308,8 +308,13 @@
 				"category": "httpYac"
 			},
 			{
-				"command": "httpyac.refresh",
-				"title": "refresh environments",
+				"command": "httpyac.reset",
+				"title": "reset environments",
+				"category": "httpYac"
+			},
+			{
+				"command": "httpyac.logout",
+				"title": "logout usersessions",
 				"category": "httpYac"
 			}
 		],
