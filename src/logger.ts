@@ -1,5 +1,5 @@
 import { OutputChannel, window } from 'vscode';
-import { APP_NAME } from './config';
+import { APP_NAME, getConfigSetting } from './config';
 import { outputProvider, LogLevel, PopupChannel, RequestChannel } from 'httpyac';
 
 
@@ -46,18 +46,20 @@ function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) 
 
 
 function showMessage(level: LogLevel, ...params: any[]) {
-  const [message, ...args] = params;
-  if (message) {
-    switch (level) {
-      case LogLevel.error:
-        window.showErrorMessage(message, ...args);
-        break;
-      case LogLevel.warn:
-        window.showWarningMessage(message, ...args);
-        break;
-      default:
-        window.showInformationMessage(message, ...args);
-        break;
+  if (getConfigSetting('showNotificationPopup')) {
+    const [message, ...args] = params;
+    if (message) {
+      switch (level) {
+        case LogLevel.error:
+          window.showErrorMessage(message, ...args);
+          break;
+        case LogLevel.warn:
+          window.showWarningMessage(message, ...args);
+          break;
+        default:
+          window.showInformationMessage(message, ...args);
+          break;
+      }
     }
   }
 }

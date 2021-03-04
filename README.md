@@ -478,6 +478,7 @@ Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is suppo
 The following [Open ID Connect](https://openid.net/specs/openid-connect-basic-1_0.html) flows are supported.
 
 * Authentication (or Basic) Flow (grant_type = authorization_code)
+* Implicit (or Hybrid) Flow (grant_type = implicit)
 * Resource Owner Password Grant (grant_type = password)
 * Client Credentials Grant (grant_type = client_credentials)
 
@@ -495,17 +496,20 @@ To configure the flow, the following variables must be specified
 
 | variable | flow | description |
 | - | - | - |
-| {{prefix}}_tokenEndpoint | authorization_code, password, client_credentials | Token Endpoint URI |
-| {{prefix}}_clientId | authorization_code, password, client_credentials | OAuth 2.0 Client Identifier |
-| {{prefix}}_clientSecret | authorization_code, password, client_credentials | OAuth 2.0 Client Secret |
-| {{prefix}}_authorizationEndpoint | authorization_code | Authorization Endpoint URI |
-| {{prefix}}_scope | authorization_code, password, client_credentials | Scope |
-| {{prefix}}_port | authorization_code | http server port used for Authorization Flow |
+| {{prefix}}_tokenEndpoint | authorization_code, implicit, password, client_credentials | Token Endpoint URI |
+| {{prefix}}_clientId | authorization_code, implicit, password, client_credentials | OAuth 2.0 Client Identifier |
+| {{prefix}}_clientSecret | authorization_code, implicit, password, client_credentials | OAuth 2.0 Client Secret |
+| {{prefix}}_authorizationEndpoint | authorization_code, implicit | Authorization Endpoint URI |
+| {{prefix}}_scope | authorization_code, implicit, password, client_credentials | Scope |
+| {{prefix}}_responseType | authorization_code, implicit | response type of auth server |
+| {{prefix}}_audience | authorization_code, implicit | audience |
+| {{prefix}}_port | authorization_code, implicit | http server port used for Authorization Flow |
 | {{prefix}}_username | password | username for password flow |
 | {{prefix}}_password | password | password for password flow |
 | {{prefix}}_keepAlive | authorization_code, password, client_credentials | AccessToken is automatically renewed in the background before expiration with RequestToken |
+| {{prefix}}_noLog | authorization_code, implicit, password, client_credentials | do not log http requests and responses |
 
-> To get the code from the Open ID server, a http server must be started for the Authorization Flow on port 3000 (default). The server is stopped immediatly after receiving the code. You need to configure your OpenId Provider to allow localhost:3000 as valid redirect url
+> To get the code from the Open ID server, a http server must be started for the Authorization Flow and Implicit Flow on port 3000 (default). The server is stopped immediatly after receiving the code. You need to configure your OpenId Provider to allow localhost:3000 as valid redirect url
 
 
 It is possible to convert the generated token into a token of another realm using [Token Exchange](https://tools.ietf.org/html/rfc8693)
@@ -703,6 +707,7 @@ keybindings are only active in files with language http
 | `httpyac.extensionScript` | absolute path to a script with extensions for HttpYac | - |
 | `httpyac.httpRegionScript` | absolute or relative path to a script which gets executed for every http request in a file | - |
 | `httpyac.showGutterIcon` | show gutter icon to highlight request lines | `true` |
+| `httpyac.showNotificationPopup` | show information, warning and error notifiation message | `true` |
 | `httpyac.useMethodInSendCodeLens` | use request method in send code lens | `false` |
 | `httpyac.logLevel` | log level of output channel | `warn` |
 

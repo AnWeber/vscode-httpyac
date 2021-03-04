@@ -2,7 +2,9 @@
 
 #### Features
 
+* oauth2 implicit flow
 * see current sessions and logout
+* disable notifications
 
 #### Fix
 * user session depending on OAuth Flow, clientId and possibly username. On changed scopes user session is renewed

@@ -105,7 +105,7 @@ function initExtensionScript() {
 					}
 				} else {
 					popupService.error('extenionscript not found');
-					log.warn('extenionscript not found');
+					log.error('extenionscript not found');
 				}
 			}
 		} catch (err) {

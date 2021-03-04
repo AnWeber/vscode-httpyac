@@ -234,6 +234,12 @@
 					"scope": "resource",
 					"description": "show gutter icon to highlight request lines"
 				},
+				"httpyac.showNotificationPopup": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show information, warning and error notifiation message"
+				},
 				"httpyac.extensionScript": {
 					"type": "string",
 					"scope": "window",

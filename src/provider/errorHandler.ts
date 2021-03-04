@@ -1,5 +1,6 @@
 import { log, utils } from 'httpyac';
 import { window } from 'vscode';
+import { getConfigSetting } from '../config';
 
 export function errorHandler(): MethodDecorator {
   return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
@@ -28,11 +29,14 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
 
 async function handleError(target: any, propertyKey: string | symbol, err: any) {
   log.error(err);
-  if (err instanceof Error) {
-    await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
-  } else if(utils.isString(err)) {
-    await window.showErrorMessage(err);
-  } else {
-    await window.showErrorMessage(JSON.stringify(err));
+
+  if (getConfigSetting('showNotificationPopup')) {
+    if (err instanceof Error) {
+      await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
+    } else if (utils.isString(err)) {
+      await window.showErrorMessage(err);
+    } else {
+      await window.showErrorMessage(JSON.stringify(err));
+    }
   }
 }
