@@ -36,7 +36,7 @@ async function handleError(target: any, propertyKey: string | symbol, err: any) 
     } else if (utils.isString(err)) {
       await window.showErrorMessage(err);
     } else {
-      await window.showErrorMessage(JSON.stringify(err));
+      await window.showErrorMessage(JSON.stringify(err, null, 2));
     }
   }
 }

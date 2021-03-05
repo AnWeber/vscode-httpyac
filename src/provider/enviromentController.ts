@@ -177,7 +177,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       placeHolder: 'select user sessions to logout',
         canPickMany: true,
         onDidSelectItem: (item: any) => {
-          log.info(JSON.stringify(item.data));
+          log.info(JSON.stringify(item.data, null, 2));
         }
     });
 

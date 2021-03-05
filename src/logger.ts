@@ -35,7 +35,7 @@ function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) 
           outputChannel.appendLine(param.stack);
         }
       } else {
-        outputChannel.appendLine(`${JSON.stringify(param)}`);
+        outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
       }
     }
     if (level === LogLevel.error) {
