@@ -4,7 +4,7 @@ import { APP_NAME, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
-import { httpDocumentSelector } from '../config';
+import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
 import { getHttpRegionFromLine, toMarkdown } from '../utils';
 
@@ -26,6 +26,7 @@ export const commands = {
 
 export class RequestCommandsController implements vscode.CodeLensProvider {
 
+  private config: Record<string, any> = {};
   private tmpFiles: Array<string> = [];
 
   subscriptions: Array<vscode.Disposable>;
@@ -34,6 +35,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   constructor(private readonly refreshCodeLens: vscode.EventEmitter<void>) {
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
+      watchConfigSettings((config) => this.config = config),
       vscode.commands.registerCommand(commands.send, this.send, this),
       vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),
       vscode.commands.registerCommand(commands.clearAll, this.clearAll, this),
@@ -73,45 +75,59 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
     if (httpFile && httpFile.httpRegions.length > 0) {
 
-      result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-        command: commands.sendAll,
-        title: 'send all'
-      }));
 
-      const useMethodInSendCodeLens = getConfigSetting<boolean>('useMethodInSendCodeLens');
+      if (this.config.showCodeLensSendAll) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.sendAll,
+          title: 'send all'
+        }));
+      }
+
+      if (this.config.showCodeLensClearAll) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.clearAll,
+          title: 'clear all'
+        }));
+      }
 
       for (const httpRegion of httpFile.httpRegions) {
         const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document, requestLine];
 
-        if (!!httpRegion.request && !httpRegion.metaData.disabled) {
+        if (!!httpRegion.request && !httpRegion.metaData.disabled && this.config.showCodeLensSend) {
           result.push(new vscode.CodeLens(range, {
             command: commands.send,
             arguments: args,
-            title:  useMethodInSendCodeLens? `send (${httpRegion.request.method})` : 'send'
+            title:  this.config.useMethodInSendCodeLens? `send (${httpRegion.request.method})` : 'send'
           }));
 
         }
 
         if (httpRegion.response) {
-          result.push(new vscode.CodeLens(range, {
-            command: commands.show,
-            arguments: args,
-            title: 'show'
-          }));
+          if (this.config.showCodeLensShowResponse) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.show,
+              arguments: args,
+              title: 'show'
+            }));
+          }
 
-          result.push(new vscode.CodeLens(range, {
-            command: commands.save,
-            arguments: args,
-            title: 'save'
-          }));
+          if (this.config.showCodeLensSaveResponse) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.save,
+              arguments: args,
+              title: 'save'
+            }));
+          }
 
-          result.push(new vscode.CodeLens(range, {
-            command: commands.viewHeader,
-            arguments: args,
-            title: 'show headers'
-          }));
+          if (this.config.showCodeLensShowResponseHeaders) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.viewHeader,
+              arguments: args,
+              title: 'show headers'
+            }));
+          }
         }
       }
     }

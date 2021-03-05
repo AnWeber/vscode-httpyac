@@ -14,6 +14,7 @@ const commands = {
 
 export class EnvironmentController implements vscode.CodeLensProvider{
 
+  private config: Record<string, any> = {};
   private subscriptions: Array<vscode.Disposable> = [];
   private disposeEnvironment: (() => void) | false = false;
   onDidChangeCodeLenses: vscode.Event<void>;
@@ -41,6 +42,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
 
   @errorHandler()
   async initEnvironmentProvider(configs: Record<string, any>) {
+    this.config = configs;
 
     if (this.disposeEnvironment) {
       this.disposeEnvironment();
@@ -80,12 +82,30 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   }
 
   provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
-    const httpFile = httpFileStore.get(document.fileName);
     const result: Array<vscode.CodeLens> = [];
-    if (httpFile) {
+    const httpFile = httpFileStore.get(document.fileName);
+    if (this.config.showCodeLensEnvironment) {
+      if (httpFile) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.toogleEnv,
+          title: `env: ${httpFile.activeEnvironment || '-'}`,
+        }));
+      }
+    }
+
+    if (this.config.showCodeLensResetEnvironment) {
+      if (httpFile) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.reset,
+          title: `reset environment`,
+        }));
+      }
+    }
+
+    if (environmentStore.userSessions.length > 0 && this.config.showCodeLensLogoutUserSession) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-        command: commands.toogleEnv,
-        title: `env: ${httpFile.activeEnvironment || '-'}`,
+        command: commands.logout,
+        title: `logout usersession (${environmentStore.userSessions.length})`,
       }));
     }
     return result;

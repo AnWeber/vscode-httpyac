@@ -1,3 +1,9 @@
+## 1.18.0 (2021-03-xx)
+
+#### Features
+
+* enable/disable code lens in settings
+
 ## 1.17.0 (2021-03-04)
 
 #### Features

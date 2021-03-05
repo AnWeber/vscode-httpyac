@@ -240,6 +240,60 @@
 					"scope": "resource",
 					"description": "show information, warning and error notifiation message"
 				},
+				"httpyac.showCodeLensEnvironment": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for toggle environment"
+				},
+				"httpyac.showCodeLensResetEnvironment": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "show code lens for reset environment"
+				},
+				"httpyac.showCodeLensLogoutUserSession": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'logout usersession'"
+				},
+				"httpyac.showCodeLensSendAll": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'send all' requests"
+				},
+				"httpyac.showCodeLensClearAll": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "show code lens for 'clear all' requests"
+				},
+				"httpyac.showCodeLensSend": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'send' requests"
+				},
+				"httpyac.showCodeLensShowResponse": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'show' requests"
+				},
+				"httpyac.showCodeLensSaveResponse": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "show code lens for 'save' requests"
+				},
+				"httpyac.showCodeLensShowResponseHeaders": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "show code lens for show response headers"
+				},
 				"httpyac.extensionScript": {
 					"type": "string",
 					"scope": "window",
