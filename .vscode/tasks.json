@@ -13,6 +13,32 @@
 		{
 			"type": "npm",
 			"script": "watch",
+			"problemMatcher": {
+				"owner": "typescript",
+				"pattern": [
+					{
+						"regexp": "\\[tsl\\] (ERROR|WARNING) in (.*)?\\((\\d+),(\\d+)\\)",
+						"severity": 1,
+						"file": 2,
+						"line": 3,
+						"column": 4
+					},
+					{
+						"regexp": "\\s*TS(\\d+):\\s*(.*)$",
+						"code": 1,
+						"message": 2
+					}
+				],
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": {
+						"regexp": "Compiling.*?|Compilation .*?starting"
+					},
+					"endsPattern": {
+						"regexp": "[Cc]ompiled (.*?successfully|with .*?error)|[Cc]ompilation .*?finished"
+					}
+				}
+			},
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never"
@@ -20,7 +46,9 @@
 			"group": {
 				"kind": "build",
 				"isDefault": true
-			}
+			},
+			"label": "npm: watch",
+			"detail": "webpack --watch --config ./webpack.config.js"
 		}
 	]
 }
