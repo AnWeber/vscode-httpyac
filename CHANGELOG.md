@@ -3,6 +3,7 @@
 #### Features
 
 * enable/disable code lens in settings
+* AWS signature v4 support
 
 ## 1.17.0 (2021-03-04)
 

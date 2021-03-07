@@ -1,4 +1,4 @@
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Downloads](https://vsmarketplacebadge.apphb.com/downloads/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Installs](https://vsmarketplacebadge.apphb.com/installs/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)
+[![Build](https://github.com/AnWeber/vscode-httpyac/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/AnWeber/vscode-httpyac/actions/workflows/main.yml) [![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Downloads](https://vsmarketplacebadge.apphb.com/downloads/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Installs](https://vsmarketplacebadge.apphb.com/installs/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
@@ -90,15 +90,19 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 | - | :-: | :-: | :-: | :-: |
 | Send Request and View| ✓ | ✓ | ✓ | ✓ |
 | Variable support | ✓ | ✓ | ✓ | ✓ |
-| Custom Scripting support | ✓ | ✓ | [pull request](https://github.com/Huachao/vscode-restclient/pull/674) | partially |
+| Custom Scripting support | ✓ | ✓ | - ([pull request](https://github.com/Huachao/vscode-restclient/pull/674)) | partially |
 | Test/ Assert Response | ✓ | ✓ | - | ✓ |
 | Authorization support | ✓ | ✓ | partially (no custom auth flow) | - |
+| - OAuth2/ OpenId Connect | ✓ | ✓ | - | - |
+| - AWS Signnature v4 | ✓ | ✓ | ✓ | - |
+| - Basic Authentication | ✓ | ✓ | ✓ | ✓ |
+| - Digest Authentication | ✓ | ✓ | ✓ | ✓ |
+| - Custom Authentication | ✓ | ✓ | - | - |
 | Code Generation | ✓ | ✓ | ✓ | - |
 | Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
 | Share workspace | ✓ | paywall | ✓ | ✓ |
 | extensible/ plugin support | ✓ | partially | - | - |
 | cli support | in development | ✓ | - | - |
-| import OpenAPI | in development | ✓ | - | - |
 
 ## Http Language
 
@@ -474,7 +478,7 @@ Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is suppo
 
 ```
 
-##### OpenID Connect Replacement (OAuth 2)
+##### OAuth2 / OpenID Connect Replacemen
 The following [Open ID Connect](https://openid.net/specs/openid-connect-basic-1_0.html) flows are supported.
 
 * Authentication (or Basic) Flow (grant_type = authorization_code)
@@ -530,7 +534,14 @@ Authorization: openid client_credentials auth token_exchange realm_auth
 
 Functionality was tested using [keycloak](https://www.keycloak.org/docs/latest/getting_started/)
 
+##### AWS Signnature v4 Replacment
 
+AWS Signature v4 authenticates requests to AWS services.
+
+```html
+GET https://httpbin.org/aws
+Authorization: AWS {{accessKeyId}} {{secretAccessKey}} token:{{token}} region:{{region}} service:{{serviceName}}
+```
 ##### BasicAuth Replacment
 A support method is provided for using Basic Authentication. Just specify the username and password separated by spaces and the base64 encoding will be applied automatically
 
