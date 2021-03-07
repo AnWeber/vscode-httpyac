@@ -1,9 +1,13 @@
-## 1.18.0 (2021-03-xx)
+## 1.18.0 (2021-03-07)
 
 #### Features
 
 * enable/disable code lens in settings
 * AWS signature v4 support
+
+#### Fix
+
+* removing header in default headers did not always remove header from request
 
 ## 1.17.0 (2021-03-04)
 
