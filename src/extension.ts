@@ -21,12 +21,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.httpRegionParsers.push(new parser.DefaultHeadersHttpRegionParser());
 	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser());
 
-
-
 	httpYacApi.variableReplacers.splice(0,0,showInputBoxVariableReplacer);
 	httpYacApi.variableReplacers.splice(0,0,showQuickpickVariableReplacer);
-
-
 
 	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
@@ -80,7 +76,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	]);
 
 	return {
-		httpYacApi
+		httpYacApi,
+		httpFileStoreController
 	};
 }
 

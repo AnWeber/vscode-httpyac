@@ -1,3 +1,9 @@
+## 1.18.1 (2021-03-07)
+
+#### Fix
+
+* error in gql requests (I should invest in unit tests)
+
 ## 1.18.0 (2021-03-07)
 
 #### Features
