@@ -1,5 +1,5 @@
 
-import { log, HttpRegionParserResult,  HttpRegionParser, ParserContext, ProcessorContext, actionProcessor } from 'httpyac';
+import { log, HttpRegionParserResult,  HttpRegionParser, ParserContext, ProcessorContext, actionProcessor, utils } from 'httpyac';
 import { getConfigSetting } from '../config';
 import { isAbsolute, join } from 'path';
 import { promises as fs } from 'fs';
@@ -16,7 +16,7 @@ export class SettingsScriptHttpRegionParser implements HttpRegionParser{
 
   close({ httpRegion }: ParserContext): void {
     if (httpRegion.request) {
-      httpRegion.actions.splice(0, 0, {
+      httpRegion.actions.splice(utils.actionProcessorIndexAfterRequest(httpRegion), 0, {
         type: 'settings_js',
         processor: this.executeSettingsScript,
       });
