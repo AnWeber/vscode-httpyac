@@ -95,13 +95,21 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document, requestLine];
 
-        if (!!httpRegion.request && !httpRegion.metaData.disabled && this.config.showCodeLensSend) {
-          result.push(new vscode.CodeLens(range, {
-            command: commands.send,
-            arguments: args,
-            title:  this.config.useMethodInSendCodeLens? `send (${httpRegion.request.method})` : 'send'
-          }));
-
+        if (!!httpRegion.request && !httpRegion.metaData.disabled) {
+          if (this.config.showCodeLensSend) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.send,
+              arguments: args,
+              title: this.config.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
+            }));
+          }
+          if (this.config.showCodeLensSendRepeat) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.sendRepeat,
+              arguments: args,
+              title: this.config.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
+            }));
+          }
         }
 
         if (httpRegion.response) {
