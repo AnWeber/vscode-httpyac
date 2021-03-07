@@ -647,7 +647,7 @@ Environments can be provided with VS Code setting `httpyac.environmentVariables`
 ![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/commands.png)
 
 | Name | Description |
-| - | - | - |
+| - | - |
 | `httpyac.send` | send request in ActiveTextEditor in active line |
 | `httpyac.sendall` | send all requests in ActiveTextEditor |
 | `httpyac.resend` | resend last request |
