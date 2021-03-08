@@ -1,4 +1,4 @@
-import { httpYacApi, HttpRegion, HttpFile, ContentType, utils } from 'httpyac';
+import { httpYacApi, HttpRegion, HttpFile, ContentType, utils,log } from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
@@ -144,7 +144,16 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       let content: string;
       if (utils.isString(response.body)) {
         content = response.body;
-
+        if (utils.isMimeTypeJSON(response.contentType)
+          && getConfigSetting<boolean>('responseViewPreserveFocus')
+          && getConfigSetting<boolean>('responseViewPrettyPrint')) {
+          // vscode only formats on focus
+          try {
+            content = JSON.stringify(JSON.parse(content), null, 2);
+          } catch (err) {
+            log.error(err);
+          }
+        }
       } else {
         content = JSON.stringify(response.body, null, 2);
       }
