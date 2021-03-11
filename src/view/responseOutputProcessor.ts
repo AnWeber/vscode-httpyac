@@ -54,7 +54,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       const response = cacheItem.httpRegion.response;
 
       const title = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
-      const headers = getConfigSetting<Array<string>>('responseViewHeader');
+      const headers = getConfigSetting().responseViewHeader;
       if (headers) {
         title.push(...headers.map(headerName => {
           const val = utils.getHeader(response.headers, headerName);
@@ -139,14 +139,15 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   }
 
   private async showTextDocument(httpRegion: HttpRegion) {
+    const config = getConfigSetting();
     const response = httpRegion.response;
     if (response) {
       let content: string;
       if (utils.isString(response.body)) {
         content = response.body;
         if (utils.isMimeTypeJSON(response.contentType)
-          && getConfigSetting<boolean>('responseViewPreserveFocus')
-          && getConfigSetting<boolean>('responseViewPrettyPrint')) {
+          && config.responseViewPreserveFocus
+          && config.responseViewPrettyPrint) {
           // vscode only formats on focus
           try {
             content = JSON.stringify(JSON.parse(content), null, 2);
@@ -159,7 +160,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       }
       const language = httpRegion.metaData.language || this.getLanguageId(httpRegion.response?.contentType);
 
-      if (getConfigSetting<boolean>('responseViewReuseEditor')) {
+      if (config.responseViewReuseEditor) {
         const cacheItem = this.outputCache.find(obj => obj.document.languageId === language && obj.document.isUntitled);
         if (cacheItem) {
           const lineCount = cacheItem.document.lineCount;
@@ -187,8 +188,9 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
 
   private async prettyPrint(editor: vscode.TextEditor) {
+
     let result = false;
-    if (getConfigSetting<boolean>('responseViewPrettyPrint')) {
+    if (getConfigSetting().responseViewPrettyPrint) {
       if (editor === vscode.window.activeTextEditor) {
         result = await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor) || false;
       } else {
@@ -208,13 +210,13 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
   private async showTextEditor(document: vscode.TextDocument) {
     let viewColumn = vscode.ViewColumn.Beside;
-    if (getConfigSetting<string>('responseViewColumn') === 'current') {
+    if (getConfigSetting().responseViewColumn === 'current') {
       viewColumn = vscode.ViewColumn.Active;
     }
     return await vscode.window.showTextDocument(document, {
       viewColumn,
-      preserveFocus: getConfigSetting<boolean>('responseViewPreserveFocus'),
-      preview: getConfigSetting<boolean>('responseViewPreview'),
+      preserveFocus: getConfigSetting().responseViewPreserveFocus,
+      preview: getConfigSetting().responseViewPreview,
     });
   }
 
@@ -228,7 +230,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   private getLanguageId(contentType: ContentType | undefined) {
     if (contentType) {
 
-      const languageMap = getConfigSetting<Record<string, string>>('responseViewLanguageMap');
+      const languageMap = getConfigSetting().responseViewLanguageMap;
       if (languageMap && languageMap[contentType.mimeType]) {
         return languageMap[contentType.mimeType];
       }

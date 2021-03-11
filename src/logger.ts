@@ -46,7 +46,7 @@ function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) 
 
 
 function showMessage(level: LogLevel, ...params: any[]) {
-  if (getConfigSetting('showNotificationPopup')) {
+  if (getConfigSetting().showNotificationPopup) {
     const [message, ...args] = params;
     if (message) {
       switch (level) {

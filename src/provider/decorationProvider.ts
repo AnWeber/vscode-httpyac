@@ -36,7 +36,7 @@ export class DecorationProvider{
   }
 
   private setDecoration(httpFile: HttpFile, editor: vscode.TextEditor) {
-    if (getConfigSetting('showGutterIcon')) {
+    if (getConfigSetting().showGutterIcon) {
       const ranges: Array<vscode.Range> = [];
 
       for (const httpRegion of httpFile.httpRegions) {

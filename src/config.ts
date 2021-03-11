@@ -7,9 +7,53 @@ export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
 
 
-export function getConfigSetting<T>(section: string, rootSection?: string) {
-  const config = workspace.getConfiguration(rootSection || APP_NAME);
-  return config.get<T>(section);
+
+export interface AppConfig {
+  requestDefaultHeaders?: Record<string, string>
+
+  requestSslCertficateValidation?: boolean,
+  requestFollowRedirect?:boolean,
+  requestTimeout?:number,
+  environmentSelectedOnStart?: Array<string>,
+  environmentPickMany?:boolean,
+  environmentVariables?:object,
+  dotenvEnabled?:boolean,
+  dotenvDirname?:string,
+  dotenvDefaultFiles?:Array<string>,
+  dotenvVariableProviderEnabled?:boolean,
+  intellijEnvEnabled?:boolean,
+  intellijDirname?:string,
+  intellijVariableProviderEnabled?:boolean,
+  responseViewHeader?:Array<string>,
+  responseViewPreview?:boolean,
+  responseViewReuseEditor?:boolean,
+  responseViewPrettyPrint?:boolean,
+  responseViewPreserveFocus?:boolean,
+  responseViewLanguageMap?:Record<string,string>,
+  responseViewColumn?:string,
+  logLevel?:string,
+  useMethodInSendCodeLens?:boolean,
+  showGutterIcon?:boolean,
+  showNotificationPopup?:boolean,
+  showCodeLensEnvironment?:boolean,
+  showCodeLensResetEnvironment?:boolean,
+  showCodeLensLogoutUserSession?:boolean,
+  showCodeLensSendAll?: boolean,
+  showCodeLensSend?:boolean,
+  showCodeLensSendRepeat?:boolean,
+  showCodeLensShowResponse?:boolean,
+  showCodeLensSaveResponse?:boolean,
+  showCodeLensShowResponseHeaders?:boolean,
+  extensionScript?:string,
+  httpRegionScript?: string,
+
+  readonly [key: string]: any;
+
+};
+
+
+export function getConfigSetting() : AppConfig {
+  return workspace.getConfiguration(APP_NAME);
 }
 
 

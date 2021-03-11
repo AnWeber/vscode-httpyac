@@ -20,7 +20,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(refreshCodeLens: vscode.EventEmitter<void>) {
-    environmentStore.activeEnvironments = getConfigSetting<Array<string>>("environmentSelectedOnStart");
+    environmentStore.activeEnvironments =getConfigSetting().environmentSelectedOnStart;
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toogleEnv, this.toogleEnv, this),
@@ -134,7 +134,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
         };
       }), {
         placeHolder: "select environment",
-        canPickMany: getConfigSetting<boolean>('environmentPickMany'),
+        canPickMany: getConfigSetting().environmentPickMany,
       });
       if (pickedObj) {
         if (Array.isArray(pickedObj)) {

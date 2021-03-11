@@ -30,7 +30,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
 async function handleError(target: any, propertyKey: string | symbol, err: any) {
   log.error(err);
 
-  if (getConfigSetting('showNotificationPopup')) {
+  if (getConfigSetting().showNotificationPopup) {
     if (err instanceof Error) {
       await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
     } else if (utils.isString(err)) {

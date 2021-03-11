@@ -21,7 +21,7 @@ export class DefaultHeadersHttpRegionParser implements HttpRegionParser{
 }
 
 async function defaultHeadersActionProcessor (data: unknown, context: ProcessorContext) {
-  const defaultHeaders = getConfigSetting<Record<string, string>>('requestDefaultHeaders');
+  const defaultHeaders = getConfigSetting().requestDefaultHeaders;
   if (context.request && defaultHeaders) {
     for (const [key, value] of Object.entries(defaultHeaders)) {
       if (!context.request.headers[key]) {

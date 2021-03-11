@@ -24,7 +24,7 @@ export class SettingsScriptHttpRegionParser implements HttpRegionParser{
   }
 
   async executeSettingsScript(data: unknown, context: ProcessorContext): Promise<boolean>{
-    const fileName = getConfigSetting<string>('httpRegionScript');
+    const fileName = getConfigSetting().httpRegionScript;
     if (fileName) {
       const scriptData = await readScriptData(fileName);
       if (scriptData) {
