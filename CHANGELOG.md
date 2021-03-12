@@ -1,3 +1,9 @@
+## 1.19.0 (2021-03-12)
+
+#### Fix
+
+* preview mode only works if file is saved to temp file
+
 ## 1.18.1 (2021-03-07)
 
 #### Fix

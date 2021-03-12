@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "1.18.1",
+	"version": "1.19.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -166,29 +166,17 @@
 					"scope": "resource",
 					"description": "headers visible in code lens of response"
 				},
-				"httpyac.responseViewPreview": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "response view will act as preview tab"
-				},
-				"httpyac.responseViewReuseEditor": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "response view will open in text document of same language id"
-				},
 				"httpyac.responseViewPrettyPrint": {
 					"type": "boolean",
 					"default": true,
 					"scope": "resource",
-					"description": "response view pretty prints content"
+					"description": "response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation)"
 				},
 				"httpyac.responseViewPreserveFocus": {
 					"type": "boolean",
 					"default": true,
 					"scope": "resource",
-					"description": "response view will take focus after receiving response"
+					"description": "response view will not take focus after receiving response"
 				},
 				"httpyac.responseViewLanguageMap": {
 					"type": "object",
@@ -208,6 +196,22 @@
 					"default": "beside",
 					"scope": "resource",
 					"description": "response preview column option"
+				},
+				"httpyac.responseViewMode": {
+					"type": "string",
+					"enum": [
+						"preview",
+						"reuse",
+						"none"
+					],
+					"markdownEnumDescriptions": [
+						"open editor in preview mode. The value is ignored when workbench.editor.previewEnabled is disabled",
+						"reuse editor with same language",
+						"always open in new editor"
+					],
+					"default": "preview",
+					"scope": "resource",
+					"description": "response view mode of file"
 				},
 				"httpyac.logLevel": {
 					"type": "string",
@@ -473,7 +477,7 @@
 		"http-proxy-agent": "^4.0.1",
 		"https-proxy-agent": "^5.0.0",
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^1.18.1",
+		"httpyac": "^1.19.0",
 		"lodash": "^4.17.21",
 		"mime-types": "^2.1.29",
 		"open": "^8.0.2",

@@ -702,12 +702,11 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.responseViewHeader` | headers visible in code lens of response | `[ "content-type", "content-length" ]`|
-| `httpyac.responseViewPreview` | response view will act as preview tab | `true` |
-| `httpyac.responseViewReuseEditor` | response view will open in text document of same language id | `true` |
-| `httpyac.responseViewPrettyPrint` | response view pretty prints content (uses VSCode Format Document) | `true`|
-| `httpyac.responseViewPreserveFocus` | response view will take focus after receiving response | `true`|
+| `httpyac.responseViewMode` | response view mode of file | `preview` |
+| `httpyac.responseViewPrettyPrint` | response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation) | `true`|
+| `httpyac.responseViewPreserveFocus` | response view will not take focus after receiving response | `true`|
 | `httpyac.responseViewColumn` | response preview column option (current, beside) | `beside`|
-| `httpyac.responseViewLanguageMap` | mimetype to [languageId](https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers) map for response view | `beside`|
+| `httpyac.responseViewLanguageMap` | mimetype to [languageId](https://code.visualstudio.com/docs/languages/identifiers#_known-language-identifiers) map for response view (only used if not in preview mode) | `beside`|
 
 
 

@@ -2,17 +2,22 @@ import { httpYacApi, HttpRegion, HttpFile, ContentType, utils,log } from 'httpya
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
-import { file } from 'tmp-promise';
-import { extension } from 'mime-types';
-import { promises as fs } from 'fs';
 import { commands } from '../provider/requestCommandsController';
 import { toMarkdown } from '../utils';
+import { saveFileResponseHandler } from './saveFileResponseHandler';
+import { openWithResponseHandler } from './openWithResponseHandler';
+import { previewDocumentResponseHandler } from './previewDocumentResponseHandler';
+import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
+import { openDocumentResponseHandler } from './openDocumentResponseHandler';
+import { promises as fs } from 'fs';
+import { ResponseHandler } from './responseHandler';
 
 
 interface OutputCacheItem{
   document: vscode.TextDocument;
   httpRegion: HttpRegion;
   prettyPrintNeeded: boolean;
+  deleteFile: boolean;
 }
 
 export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.HoverProvider {
@@ -22,9 +27,15 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   constructor() {
     httpYacApi.httpOutputProcessors.push(this.show.bind(this));
 
+    const documentFilter = [{
+      scheme: 'untitled',
+    },{
+      scheme: 'file',
+    }];
+
     this.subscriptions = [
-			vscode.languages.registerHoverProvider({ scheme: 'untitled' }, this),
-      vscode.languages.registerCodeLensProvider({ scheme: 'untitled' }, this),
+      vscode.languages.registerHoverProvider(documentFilter, this),
+      vscode.languages.registerCodeLensProvider(documentFilter, this),
       vscode.workspace.onDidCloseTextDocument((document) => {
         this.remove(document);
       }),
@@ -52,7 +63,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     const cacheItem = this.outputCache.find(obj => obj.document === document);
     if (cacheItem && cacheItem.httpRegion.response) {
       const response = cacheItem.httpRegion.response;
-
       const title = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
       const headers = getConfigSetting().responseViewHeader;
       if (headers) {
@@ -77,10 +87,9 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   }
 
   provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
-    if (position.line === 0) {
+    if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem) {
-
         const responseHover = toMarkdown(cacheItem.httpRegion);
         return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/) || new vscode.Range(0, 0, 0, 100));
       }
@@ -88,111 +97,55 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     return undefined;
   }
 
-  public async show(httpRegion: HttpRegion, httpFile: HttpFile): Promise<void> {
+  public async show(httpRegion: HttpRegion): Promise<void> {
     if (httpRegion.request && httpRegion.response) {
 
+      const responseHandlers: Array<ResponseHandler> = [
+        saveFileResponseHandler,
+        openWithResponseHandler,
+        previewDocumentResponseHandler,
+        reuseDocumentResponseHandler,
+        openDocumentResponseHandler,
+      ];
 
-      const openWith = this.getOpenWith(httpRegion);
-      if (httpRegion.metaData.save && httpRegion.response.rawBody) {
-        const filters: Record<string, Array<string>> = {
-          'All Files': ['*']  // eslint-disable-line @typescript-eslint/naming-convention
-        };
-        const ext = httpRegion.metaData.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream');
-        if (ext) {
-          filters[ext] = [ext];
-        }
-        const uri = await vscode.window.showSaveDialog({
-          filters
-        });
-        await this.saveAndOpenWith(uri, httpRegion.response.rawBody, openWith);
-      }else if (openWith && httpRegion.response.rawBody) {
-        const { path } = await file({ postfix: `.${httpRegion.metaData.extension || extension(httpRegion.response.contentType?.contentType || 'application/octet-stream')}` });
-        await this.saveAndOpenWith(vscode.Uri.file(path), httpRegion.response.rawBody, openWith);
-      } else {
-        await this.showTextDocument(httpRegion);
-      }
-    }
-  }
-
-  private getOpenWith(httpRegion: HttpRegion): string | undefined{
-    if (httpRegion.response) {
-      if (httpRegion.metaData.openWith) {
-        return httpRegion.metaData.openWith;
-      } else if(utils.isMimeTypeImage(httpRegion.response.contentType)) {
-        return 'imagePreview.previewEditor';
-      } else if (utils.isMimeTypePdf(httpRegion.response.contentType)
-        && vscode.extensions.getExtension('tomoki1207.pdf')) {
-        return 'pdf.preview';
-      }
-    }
-    return undefined;
-  }
+      const visibleDocuments = this.outputCache.map(obj => obj.document);
+      for (const responseHandler of responseHandlers) {
+        const result = await responseHandler(httpRegion, visibleDocuments);
+        if (result) {
 
 
-  private async saveAndOpenWith(uri: vscode.Uri | undefined, buffer: Buffer, openWith: string | undefined) {
-    if (uri) {
-      await fs.writeFile(uri.fsPath, new Uint8Array(buffer));
-      if (openWith) {
-        await vscode.commands.executeCommand('vscode.openWith', uri, openWith);
-      }
-    }
-  }
+          if (result !== true) {
+            const prettyPrintNeeded = await this.prettyPrint(result.editor);
 
-  private async showTextDocument(httpRegion: HttpRegion) {
-    const config = getConfigSetting();
-    const response = httpRegion.response;
-    if (response) {
-      let content: string;
-      if (utils.isString(response.body)) {
-        content = response.body;
-        if (utils.isMimeTypeJSON(response.contentType)
-          && config.responseViewPreserveFocus
-          && config.responseViewPrettyPrint) {
-          // vscode only formats on focus
-          try {
-            content = JSON.stringify(JSON.parse(content), null, 2);
-          } catch (err) {
-            log.error(err);
+            const cacheItem = this.outputCache.find(obj => obj.document === result.document);
+            if (cacheItem) {
+              cacheItem.httpRegion = httpRegion;
+              cacheItem.prettyPrintNeeded = prettyPrintNeeded;
+            } else {
+              this.outputCache.push({
+                document: result.document,
+                httpRegion,
+                prettyPrintNeeded,
+                deleteFile: !!result.deleteFile
+              });
+            }
           }
-        }
-      } else {
-        content = JSON.stringify(response.body, null, 2);
-      }
-      const language = httpRegion.metaData.language || this.getLanguageId(httpRegion.response?.contentType);
-
-      if (config.responseViewReuseEditor) {
-        const cacheItem = this.outputCache.find(obj => obj.document.languageId === language && obj.document.isUntitled);
-        if (cacheItem) {
-          const lineCount = cacheItem.document.lineCount;
-          let editor = vscode.window.visibleTextEditors.find(obj => obj.document === cacheItem.document);
-          if (editor !== vscode.window.activeTextEditor) {
-            editor = await this.showTextEditor(cacheItem.document);
-          }
-          if (editor) {
-            await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
-            cacheItem.httpRegion = httpRegion;
-            cacheItem.prettyPrintNeeded = await this.prettyPrint(editor);
-            return;
-          }
+          return;
         }
       }
-      const { document, editor } = await this.createEditor(content, language);
-      const prettyPrintNeeded = await this.prettyPrint(editor);
-      this.outputCache.push({
-        document,
-        httpRegion,
-        prettyPrintNeeded
-      });
     }
   }
-
 
   private async prettyPrint(editor: vscode.TextEditor) {
-
-    let result = false;
+    let result: boolean = false;
     if (getConfigSetting().responseViewPrettyPrint) {
       if (editor === vscode.window.activeTextEditor) {
-        result = await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor) || false;
+        const prettyPrint = await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor);
+        if (prettyPrint === undefined) {
+          result = true;
+        } else {
+          result = prettyPrint;
+        }
       } else {
         result = true;
       }
@@ -201,54 +154,20 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     return result;
   }
 
-  private async createEditor(content: string, language: string) {
-    const document = await vscode.workspace.openTextDocument({ language, content });
-
-    const editor = await this.showTextEditor(document);
-    return { document, editor };
-  }
-
-  private async showTextEditor(document: vscode.TextDocument) {
-    let viewColumn = vscode.ViewColumn.Beside;
-    if (getConfigSetting().responseViewColumn === 'current') {
-      viewColumn = vscode.ViewColumn.Active;
-    }
-    return await vscode.window.showTextDocument(document, {
-      viewColumn,
-      preserveFocus: getConfigSetting().responseViewPreserveFocus,
-      preview: getConfigSetting().responseViewPreview,
-    });
-  }
-
-  remove(document: vscode.TextDocument) {
+  async remove(document: vscode.TextDocument) {
     const index = this.outputCache.findIndex(obj => obj.document === document);
     if (index >= 0) {
+      const cacheItem = this.outputCache[index];
+      if (cacheItem.deleteFile) {
+        try {
+          const fileName = cacheItem.document.fileName;
+          await fs.unlink(fileName);
+        } catch (err) {
+          log.error(err);
+        }
+      }
       this.outputCache.splice(index, 1);
     }
-  }
-
-  private getLanguageId(contentType: ContentType | undefined) {
-    if (contentType) {
-
-      const languageMap = getConfigSetting().responseViewLanguageMap;
-      if (languageMap && languageMap[contentType.mimeType]) {
-        return languageMap[contentType.mimeType];
-      }
-      if (utils.isMimeTypeJSON(contentType)) {
-        return 'json';
-      } else if (utils.isMimeTypeJavascript(contentType)) {
-        return 'javascript';
-      } else if (utils.isMimeTypeXml(contentType)) {
-        return 'html';
-      } else if (utils.isMimeTypeHtml(contentType)) {
-        return 'html';
-      } else if (utils.isMimeTypeCSS(contentType)) {
-        return 'css';
-      } else if (utils.isMimeTypeMarkdown(contentType)) {
-        return 'markdown';
-      }
-    }
-    return 'plaintext';
   }
 }
 

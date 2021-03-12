@@ -206,7 +206,6 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
           if (result && utils.isHttpRegionSendContext(context)) {
             await httpYacApi.show(context.httpRegion,context.httpFile);
           }
-
       });
     }
 

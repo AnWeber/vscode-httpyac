@@ -1,5 +1,5 @@
 
-import { HttpRegion, HttpRegionParserResult,  HttpRegionParser, ParserContext } from 'httpyac';
+import { HttpRegionParserResult,  HttpRegionParser, ParserContext, utils } from 'httpyac';
 import { window } from 'vscode';
 
 
@@ -12,7 +12,7 @@ export class NoteMetaHttpRegionParser implements HttpRegionParser{
 
   close({httpRegion}: ParserContext): void {
     if (httpRegion.metaData.note) {
-      const note = httpRegion.metaData.note || `Are you sure you want to send the request ${httpRegion.metaData.name}?`;
+      const note = httpRegion.metaData.note || `Are you sure you want to send the request ${utils.getName(httpRegion)}?`;
       httpRegion.actions.splice(0, 0, {
         type: 'note',
         processor: async () => {
