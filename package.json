@@ -1,6 +1,6 @@
 {
 	"name": "vscode-httpyac",
-	"displayName": "httpYac - Yet Anoter Client",
+	"displayName": "httpYac - Rest Client",
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
@@ -38,10 +38,9 @@
 	"contributes": {
 		"languages": [
 			{
-				"id": "http",
+				"id": "Http",
 				"aliases": [
 					"http",
-					"Http",
 					"HTTP"
 				],
 				"extensions": [
