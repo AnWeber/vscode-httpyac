@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "1.19.0",
+	"version": "1.19.1",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -38,9 +38,9 @@
 	"contributes": {
 		"languages": [
 			{
-				"id": "Http",
+				"id": "http",
 				"aliases": [
-					"http",
+					"Http",
 					"HTTP"
 				],
 				"extensions": [
@@ -318,13 +318,14 @@
 		"commands": [
 			{
 				"command": "httpyac.new",
-				"title": "create empty http file",
+				"title": "Create empty http file",
 				"category": "httpYac"
 			},
 			{
 				"command": "httpyac.send",
 				"title": "Send",
-				"category": "httpYac"
+				"category": "httpYac",
+				"icon": "$(debug-start)"
 			},
 			{
 				"command": "httpyac.sendRepeat",
@@ -334,17 +335,19 @@
 			{
 				"command": "httpyac.sendall",
 				"title": "Send all",
-				"category": "httpYac"
+				"category": "httpYac",
+				"icon": "$(run-all)"
 			},
 			{
 				"command": "httpyac.generateCode",
-				"title": "generate Code",
+				"title": "Generate Code",
 				"category": "httpYac"
 			},
 			{
 				"command": "httpyac.resend",
 				"title": "Resend last",
-				"category": "httpYac"
+				"category": "httpYac",
+				"icon": "$(redo)"
 			},
 			{
 				"command": "httpyac.show",
@@ -369,7 +372,8 @@
 			{
 				"command": "httpyac.toggle-env",
 				"title": "Toggle environment",
-				"category": "httpYac"
+				"category": "httpYac",
+				"icon": "$(settings-gear)"
 			},
 			{
 				"command": "httpyac.toggle-allenv",
@@ -378,35 +382,82 @@
 			},
 			{
 				"command": "httpyac.reset",
-				"title": "reset environments",
+				"title": "Reset environments",
 				"category": "httpYac"
 			},
 			{
 				"command": "httpyac.logout",
-				"title": "logout usersessions",
+				"title": "Logout user sessions",
 				"category": "httpYac"
 			}
 		],
 		"menus": {
 			"editor/title": [
 				{
-					"command": "httpyac.sendall",
+					"command": "httpyac.send",
 					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
+					"group": "1_run@1"
 				},
 				{
-					"command": "httpyac.clearall",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
+					"command": "httpyac.sendall",
+					"when": "editorLangId == http",
+					"group": "1_run@1"
 				},
 				{
 					"command": "httpyac.toggle-env",
-					"when": "editorTextFocus && editorLangId == http",
+					"when": "editorLangId == http",
+					"group": "1_run@1"
+				},
+				{
+					"command": "httpyac.clearall",
+					"when": "editorLangId == http",
 					"group": "httpyac@1"
 				},
 				{
 					"command": "httpyac.toggle-allenv",
 					"when": "editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.logout",
+					"when": "editorLangId == 'http'",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.resend",
+					"when": "editorTextFocus && editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.generateCode",
+					"when": "editorTextFocus && editorLangId == 'http'",
+					"group": "httpyac@1"
+				}
+			],
+			"editor/context":[
+				{
+					"command": "httpyac.send",
+					"when": "editorTextFocus && editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.sendRepeat",
+					"when": "editorTextFocus && editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.resend",
+					"when": "editorTextFocus && editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.toggle-env",
+					"when": "editorLangId == http",
+					"group": "httpyac@1"
+				},
+				{
+					"command": "httpyac.generateCode",
+					"when": "editorTextFocus && editorLangId == 'http'",
 					"group": "httpyac@1"
 				}
 			]

@@ -113,7 +113,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
 
   @errorHandler()
   async toogleEnv(doc?: vscode.TextDocument) {
-    const document = doc || vscode.window.activeTextEditor?.document;
+    const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
       if (httpFile) {

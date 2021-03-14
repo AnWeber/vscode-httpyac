@@ -4,7 +4,7 @@
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
 </p>
 
-# Http Yac - Yet another Client
+# Http Yac - Yet another Rest Client
 
 Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code
 

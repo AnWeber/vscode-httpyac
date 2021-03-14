@@ -11,6 +11,7 @@ import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
 import { openDocumentResponseHandler } from './openDocumentResponseHandler';
 import { promises as fs } from 'fs';
 import { ResponseHandler } from './responseHandler';
+import { TempPathFolder } from './responseHandlerUtils';
 
 
 interface OutputCacheItem{
@@ -31,6 +32,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       scheme: 'untitled',
     },{
       scheme: 'file',
+      pattern: `**/${TempPathFolder}/**`
     }];
 
     this.subscriptions = [

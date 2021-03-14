@@ -6,6 +6,7 @@ import { promises as fs } from 'fs';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 
+export const TempPathFolder = 'httpyac_tmp';
 
 export function getExtension(httpRegion: HttpRegion) {
   if (httpRegion.metaData.extension) {
@@ -29,7 +30,8 @@ export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion)
   const ext = getExtension(httpRegion);
   const { path } = await dir();
   const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getName(httpRegion, 'response')));
-  const fileName = join(path, `${name}.${ext}`);
+  await fs.mkdir(join(path, TempPathFolder));
+  const fileName = join(path, TempPathFolder, `${name}.${ext}`);
   await fs.writeFile(fileName, content || content);
   return fileName;
 }

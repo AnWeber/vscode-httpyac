@@ -1,3 +1,10 @@
+## 1.19.1 (2021-03-14)
+
+#### Feature
+
+* performance improvement on preview mode with better documentselector
+* send and sendAll in editor title
+
 ## 1.19.0 (2021-03-12)
 
 #### Fix
