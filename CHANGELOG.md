@@ -1,3 +1,9 @@
+## 1.19.2 (2021-03-18)
+
+#### Fix
+
+* Variable with string empty could not be replaced
+
 ## 1.19.1 (2021-03-14)
 
 #### Feature
