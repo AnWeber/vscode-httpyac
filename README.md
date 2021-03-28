@@ -1,4 +1,4 @@
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Downloads](https://vsmarketplacebadge.apphb.com/downloads/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Installs](https://vsmarketplacebadge.apphb.com/installs/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)
+[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Installs](https://vsmarketplacebadge.apphb.com/installs/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
@@ -10,27 +10,92 @@ Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual 
 
 ![example](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/oauth.gif)
 
+
+## Examples
+
+```html
+@user = doe
+@password = 12345678
+
+GET https://httpbin.org/basic-auth/{{user}}/{{password}}
+Authorization: Basic {{user}} {{password}}
+
+```
+
+```html
+
+fragment IOParts on Repository {
+  description
+  diskUsage
+}
+
+POST https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer {{git_api_key}}
+
+
+query test($name: String!, $owner: String!) {
+  repository(name: $name, owner: $owner) {
+    name
+    fullName: nameWithOwner
+    ...IOParts
+    forkCount
+    stargazers(first: 5) {
+        totalCount
+        nodes {
+            login
+            name
+        }
+    }
+    watchers {
+        totalCount
+    }
+  }
+}
+
+{
+    "name": "vscode-httpyac",
+    "owner": "AnWeber"
+}
+```
+
+> [more examples and specification](https://github.com/AnWeber/httpyac/tree/main/examples)
+
+A complete specification / documentation can be found [here](https://github.com/AnWeber/httpyac/tree/main/examples/README.md)
+
 ## Features
 
-#### send/ resend
+### send/ resend
 
 Create and execute any REST, SOAP, and GraphQL queries from within VS Code and view response in other TextDocument.
 
   * view response header and timings
   * quick view configurable header list
+  * view complete request and response in output channel `httpyac - Requests`
 
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/send.gif)
 
-#### variables
+### variables
 
 Built in support for variables and enviroments.
   * Quickly switch environments
   * [dotenv](https://www.npmjs.com/package/dotenv) support
+  * [intellij variable support](https://www.jetbrains.com/help/idea/exploring-http-syntax.html#environment-variables)
   * provide custom variables with scripts
 
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
 
-#### script support
+### Manage Authentication
+
+There are many authentications already built in
+* OAuth2 / Open Id Connect
+* Basic
+* Digest
+* AWS
+
+Others can be added independently by means of scripting
+
+### script support
 
 enrich requests with custom scripts
   * create custom variables
@@ -41,19 +106,14 @@ enrich requests with custom scripts
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/scripting.gif)
 
 
-#### preview feature
+### preview feature
 auto open custom preview editor
   * auto preview images and pdf ([vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) needed)
   * support custom editor with openWith Meta Tag
 
  > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/preview.gif)
 
-#### reference other *.http files
-it is possible to reference other http files and create requeste cascades
-
-> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/import.gif)
-
-#### It's Extensible
+### It's Extensible
 
 Due to the NodeJS support the client can be extended arbitrarily. In addition, the extension supports an Api with which, all components can be changed arbitrarily (parser, processing, output).
 
@@ -79,9 +139,13 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
   ```
 
 
-#### Intellij HTTP Client compatibility
+### Intellij HTTP Client compatibility
 
 *.http files of [Intellij HTTP Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) can be parsed and executed
+
+### ci support
+
+Check the returns of the responses and execute them automatically using the [httpyac cli](https://www.npmjs.com/package/httpyac) in your ci environment
 
 
 ## Feature comparisons
@@ -93,555 +157,19 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 | Custom Scripting support | ✓ | ✓ | - ([pull request](https://github.com/Huachao/vscode-restclient/pull/674)) | partially |
 | Test/ Assert Response | ✓ | ✓ | - | ✓ |
 | Authorization support | ✓ | ✓ | partially (no custom auth flow) | - |
-| - OAuth2/ OpenId Connect | ✓ | ✓ | - | - |
-| - AWS Signnature v4 | ✓ | ✓ | ✓ | - |
-| - Basic Authentication | ✓ | ✓ | ✓ | ✓ |
-| - Digest Authentication | ✓ | ✓ | ✓ | ✓ |
-| - Custom Authentication | ✓ | ✓ | - | - |
+| -- OAuth2/ OpenId Connect | ✓ | ✓ | - | - |
+| -- AWS Signnature v4 | ✓ | ✓ | ✓ | - |
+| -- Basic Authentication | ✓ | ✓ | ✓ | ✓ |
+| -- Digest Authentication | ✓ | ✓ | ✓ | ✓ |
+| -- Custom Authentication | ✓ | ✓ | - | - |
 | Code Generation | ✓ | ✓ | ✓ | - |
 | Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
 | Share workspace | ✓ | paywall | ✓ | ✓ |
 | extensible/ plugin support | ✓ | partially | - | - |
-| cli support | in development | ✓ | - | - |
+| cli support | ✓ | ✓ | - | - |
 
-## Http Language
 
-All Features are enabled if language of TextDocument is http. By default the language will be activated in two cases:
-* file extension is .http or .rest
-* First line of file follows standard request line in [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html) (e.g GET www.google.de)
 
-Or manually
-
-> see [switch language](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/language.gif)
-
-#### Request
-
-Http language supports multiple Requests in one file. Requests get delimited with `###`. The first line in one region is interpreted as request-line. All Parts of a request supports replacement with dynamic variables (`{{variable}}`)
-
-##### Request-Line
-
-```html
-GET https://www.google.de HTTP/1.1
-```
-
-Request Method and Http Version is optional. If no Request Method is provided GET is used.
-##### Query Strings
-Query Params can be added in the request-line
-
-```html
-GET https://www.google.de?q=httpyac HTTP/1.1
-```
-or can attached immediatly after the request-line
-
-
-```html
-GET https://www.google.de HTTP/1.1
-  ?q=httpyac
-  &ie=UTF-8
-```
-##### Headers
-
-The next lines after the Request Line is parsed as request headers
-```html
-GET https://www.google.de HTTP/1.1
-Content-Type: text/html
-Authorization: Bearer {{token}}
-```
-
-If you use the same headers several times, it is possible to store them in a variable and reuse them.
-
-```html
-{{
-  exports.defaultHeaders = {
-    'Content-Type': 'text/html',
-    'Authorization': `Bearer ${token}`
-  };
-}}
-GET https://www.google.de HTTP/1.1
-...defaultHeaders
-```
-
-##### Request Body
-All content separated with a blank line after the request-line gets parsed as request body
-
-```html
-POST {{host}}/auth
-Content-Type: application/x-www-form-urlencoded
-Authorization: Basic {{authorization}}
-
-grant_type=client_credentials
-```
-
-You can also import contents of other files into the body (relative and absolute paths are supported).
-```html
-POST {{host}}/auth
-Authorization: Basic {{authorization}}
-
-< ./body.json
-```
-
-If you want to replace variables in the file please import it with `<@`
-```html
-POST {{host}}/auth
-Authorization: Basic {{authorization}}
-
-<@ ./body.json
-```
-All files are read with UTF-8 encoding. If a different encoding is desired, provide it.
-```html
-POST {{host}}/auth
-Authorization: Basic {{authorization}}
-
-<@latin1 ./body.json
-```
-
-Inline Text and file imports can be mixed
-
-```html
-POST {{host}}/auth
-Content-Type: multipart/form-data; boundary=--WebKitFormBoundary
-
---WebKitFormBoundary
-Content-Disposition: form-data; name="text"
-
-invoice
---WebKitFormBoundary
-Content-Disposition: form-data; name="invoice"; filename="invoice.pdf"
-Content-Type: application/pdf
-
-< ./invoice.pdf
---WebKitFormBoundary
-```
-
-GraphQL queries are supported. Parsing Logic will automatically generate a GraphQL request body from the query and the optional variables. GraphQL fragments are also supported and are included in the body by name.
-
-```html
-fragment IOParts on Repository {
-  description
-  diskUsage
-}
-
-POST https://api.github.com/graphql
-Content-Type: application/json
-Authorization: Bearer {{git_api_key}}
-
-
-query repositoryQuery($name: String!, $owner: String!) {
-  repository(name: $name, owner: $owner) {
-    name
-    fullName: nameWithOwner
-    ...IOParts
-    forkCount
-    watchers {
-        totalCount
-    }
-  }
-}
-
-{
-    "name": "vscode-httpyac",
-    "owner": "AnWeber"
-}
-```
-
-To import GraphQL File you need to use special GraphQL Import Directive. Operationname foo is optional
-
-```html
-POST https://api.github.com/graphql
-Content-Type: application/json
-Authorization: Bearer {{git_api_key}}
-
-
-gql foo < ./bar.gql
-
-{
-    "name": "vscode-httpyac",
-    "owner": "AnWeber"
-}
-```
-
-
-#### Meta Data
-
-All lines starting with `#` are interpreted as comment lines. Lines starting with `###` starts a new region. Lines with `# @property value` are meta data and tags the request with the property.
-
-
-##### regions
-All lines starting with a `###` are interpreted as new region. Only one request per region is supported.
-
-```html
-https:/www.google.de
-
-###
-
-https://www.google.de
-```
-
-If the requests are provided in [RFC 2616](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html) format, separation with `###` is not required. All scripts between the two requests are interpreted as post scripts.
-```html
-GET https:/www.google.de
-
-
-GET https://www.google.de
-```
-
-##### name
-responses of a requests with a name are automatically added as variables and can be reused by other requests
-```html
-# @name keycloak
-POST {{host}}/auth
-
-###
-GET {{host}}/tasks
-Authorization: Bearer {{keycloak.access_token}}
-```
-
-> name must be unique in all imported files, there is no scope support and first found request with name will be used.
-
-##### ref and forceRef
-requests can reference other requests. When the request is called, it is ensured that the referenced request is called beforehand. `forceRef` always call the other request. `ref` only calls if no response is cached
-
-```html
-# @name keycloak
-POST {{host}}/auth
-
-###
-GET {{host}}/tasks
-# @ref keycloak
-Authorization: Bearer {{keycloak.access_token}}
-```
-
-##### import
-To reference requests from other files, these must first be imported. Imported files are enabled for all requests in one file.
-```html
-GET {{host}}/tasks
-# @import ./keycloak.http
-# @ref keycloak
-Authorization: Bearer {{keycloak.access_token}}
-```
-
-##### disabled
-requests can be disabled. It is possible to disable requests dynamically with `{{httpRegion.metaParams.disabled=true}}` in script
-```html
-# @disabled
-POST {{host}}/auth
-```
-
-##### jwt
-jwt meta data supports auto decode of jwt token. just provide property in response to decode and it is added to the promise with ${property}_parsed
-```html
-# @jwt access_secret
-
-POST {{keycloak}}/auth/realms/test/protocol/openid-connect/token
-
-```
-
-
-##### language
-[Language Id](https://code.visualstudio.com/docs/languages/overview) of the response view. If language is not specified, it will be generated from the content-type header of the response
-
-```html
-# @language json
-POST {{host}}/auth
-```
-
-##### note
-shows a confirmation dialog before sending request
-
-```html
-# @note are you sure?
-DELETE /invoices
-```
-
-##### save
-
-If `@save` is specified, the response will not be displayed but saved directly.
-##### openWith
-
-Provide viewType of custom editor to preview files. If content-type header of the response is image, files will be previewed automatically with built-in image preview. If content-type is `application/pdf` and extension [vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) is installed, it will be used for preview.
-```html
-# @openWith imagePreview.previewEditor
-https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png
-```
-##### extension
-
-extension of file for save or openWith.
-
-#### Variables
-
-Variables can be easily created with the following scheme.
-```
-@host = http://elastic:9200
-```
-
-These are valid from definition for all subsequent requests and scripts. The variables are saved per file after creation. The variables are also imported from other files using @import meta param.
-
-```
-# @import ./variables.http
-
-@host = {{keycloak_url}}
-```
-
-> Variables definition in this format also allows variables substitution
-
-#### Node JS Scripts
-It is possible to create NodeJS scripts. All scripts before the request line are executed before the request is called. All scripts after the request line are executed as soon as the response is received. All exports of the script are stored as variables. External scripts can be imported using require, but you need to install dependencies yourself.
-
-> Variables already defined can be accessed via the global scope.
-
-```
-{{
-  const CryptoJS = require('crypto-js');
-  const request = httpRegion.request;
-  const authDate = new Date();
-  let requestUri = request.url.substring(request.url.indexOf('/v1'), request.url.indexOf('?') > 0 ? request.url.indexOf('?') : request.url.length);
-  let timeInMillis = authDate.getTime() - authDate.getMilliseconds();
-
-  let signature = request.method + "|" + requestUri + "|" + timeInMillis;
-
-  let signatureHmac = CryptoJS.HmacSHA256(signature, accessSecret);
-  let signatureBase64 = CryptoJS.enc.Base64.stringify(signatureHmac);
-  exports.authentcation = serviceToken + " " + accessKey + ":" + signatureBase64;
-}}
-@host = https://www.mydomain.de
-# @name admin
-GET {{host}}/admin
-Authentication: {{authentcation}}
-
-{{
-  const assert = require('assert');
-  assert.equal(admin.name, "Mario", "name is valid");
-}}
-```
-
-> Since all variables are placed on the global scope of the script, they may overwrite other variables. Please use unique variable names
-
-Scripts with no request in the same region are always executed (Global Scripts). Global Scripts initialized with `{{+` are executed for every region.
-
-```
-{{+
-  log.info(httpRegion.request.url)
-}}
-```
-
-
-> External dependencies must be installed independently, exceptions are [vscode](https://www.npmjs.com/package/@types/vscode), [got](https://www.npmjs.com/package/got) and [httpYac](https://www.npmjs.com/package/httpyac) Dependency, which are provided from the extension.
-
-#### Variable Substitution in Request
-
-Before the request is sent, all variables in the request are replaced.
-
-##### NodeJs Script Replacement
-All entries of the form {{...}} are interpreted as NodeJS Javascript which returns exactly one value. Since all variables can be easily accessed on the global scope, this allows for simple substitution.
-
-```
-@searchVal = test
-
-GET https://www.google.de?q={{searchVal}}
-```
-
-> It is possible to create more complex scripts, but this is not recommended and you should use a separate script block instead.
-
-
-##### Intellij Dynamic Variables
-Intellij dynamic variables are supported.
-
-| Name | Description |
-| - | - |
-| $uuid | generates a universally unique identifier (UUID-v4) |
-| $timestamp | generates the current UNIX timestamp |
-| $randomInt| generates a random integer between 0 and 1000. |
-
-```
-GET https://www.google.de?q={{$timestamp}}&q2={{$uuid}}&q2={{$randomInt}}
-```
-
-##### Host Replacment
-If the url starts with / and a variable host is defined the URL of this host will be prepended
-
-```html
-@host = http://elastic:9200
-
-
-GET /.kibana
-
-GET /_cat/indices
-```
-
-
-##### Input und QuickPick Replacement
-Dynamic Variable Resolution with VS Code showInputBox and showQuickPick is supported
-
-```html
-@app = {{$pick select app? $value: foo,bar}}
-@app2 = {{$input input app? $value: foo}}
-
-```
-
-##### OAuth2 / OpenID Connect Replacemen
-The following [Open ID Connect](https://openid.net/specs/openid-connect-basic-1_0.html) flows are supported.
-
-* Authentication (or Basic) Flow (grant_type = authorization_code)
-* Implicit (or Hybrid) Flow (grant_type = implicit)
-* Resource Owner Password Grant (grant_type = password)
-* Client Credentials Grant (grant_type = client_credentials)
-
-```html
-
-GET /secured_service
-Authorization: openid {{grant_type}} {{variable_prefix}}
-
-# example
-
-GET /secured_service
-Authorization: openid client_credentials auth
-```
-To configure the flow, the following variables must be specified
-
-| variable | flow | description |
-| - | - | - |
-| {{prefix}}_tokenEndpoint | authorization_code, implicit, password, client_credentials | Token Endpoint URI |
-| {{prefix}}_clientId | authorization_code, implicit, password, client_credentials | OAuth 2.0 Client Identifier |
-| {{prefix}}_clientSecret | authorization_code, implicit, password, client_credentials | OAuth 2.0 Client Secret |
-| {{prefix}}_authorizationEndpoint | authorization_code, implicit | Authorization Endpoint URI |
-| {{prefix}}_scope | authorization_code, implicit, password, client_credentials | Scope |
-| {{prefix}}_responseType | authorization_code, implicit | response type of auth server |
-| {{prefix}}_audience | authorization_code, implicit | audience |
-| {{prefix}}_port | authorization_code, implicit | http server port used for Authorization Flow |
-| {{prefix}}_username | password | username for password flow |
-| {{prefix}}_password | password | password for password flow |
-| {{prefix}}_keepAlive | authorization_code, password, client_credentials | AccessToken is automatically renewed in the background before expiration with RequestToken |
-| {{prefix}}_noLog | authorization_code, implicit, password, client_credentials | do not log http requests and responses |
-
-> To get the code from the Open ID server, a http server must be started for the Authorization Flow and Implicit Flow on port 3000 (default). The server is stopped immediatly after receiving the code. You need to configure your OpenId Provider to allow localhost:3000 as valid redirect url
-
-
-It is possible to convert the generated token into a token of another realm using [Token Exchange](https://tools.ietf.org/html/rfc8693)
-
-
-```html
-
-GET /secured_service
-Authorization: openid {{grant_type}} {{variable_prefix}} token_exchange {{token_exchange_prefix}}
-
-# example
-
-GET /secured_service
-Authorization: openid client_credentials auth token_exchange realm_auth
-```
-
-> All calls made can be traced in the output channel httpyac
-
-Functionality was tested using [keycloak](https://www.keycloak.org/docs/latest/getting_started/)
-
-##### AWS Signnature v4 Replacment
-
-AWS Signature v4 authenticates requests to AWS services.
-
-```html
-GET https://httpbin.org/aws
-Authorization: AWS {{accessKeyId}} {{secretAccessKey}} token:{{token}} region:{{region}} service:{{serviceName}}
-```
-##### BasicAuth Replacment
-A support method is provided for using Basic Authentication. Just specify the username and password separated by spaces and the base64 encoding will be applied automatically
-
-```html
-@host = https://httpbin.org
-@user=doe
-@password=12345678
-
-
-GET /basic-auth/{{user}}/{{password}}
-Authorization: Basic {{user}} {{password}}
-
-```
-##### DigestAuth Replacment
-A support method is provided for using Digest Authentication. Just specify the username and password separated by spaces and the digest access authentication will be applied automatically
-
-```html
-@host = https://httpbin.org
-@user=doe
-@password=12345678
-
-
-GET /digest-auth/auth/{{user}}/{{password}}
-Authorization: Digest {{user}} {{password}}
-
-```
-
-#### Intellij Script
-
-Intellij Scripts are supported. An Http client and response object corresponding to the interface is created and are available in the script. Possibly the behavior (order of test execution, not described internal Api, ...) is not completely identical, to Intellij Execution. If needed, please let us know.
-
-```
-GET https://www.google.de?q={{$uuid}}
-Accept: text/html
-
-> {%
-    client.global.set("search", "test");
-    client.test("Request executed successfully", function() {
-
-        client.assert(response.status === 200, "Response status is not 200");
-    });
-%}
-###
-```
-
-> Intellij scripts are always executed after request. Scripts before Request Line are ignored
-
-
-## Environment Support
-
-The extension supports switching to different environments. Several environments can be active at the same time. A different environment can be selected per file. Newly opened files are opened with the last active environment.
-All environment variables are expanded automatically.
-
-```
-# .env
-auth_tokenEndpoint={{authHost}}/auth/realms/test/protocol/openid-connect/token
-
-# 9.env
-authHost=https://my.openid.de
-
-# resolved variables
-authHost=https://my.openid.de
-auth_tokenEndpoint=https://my.openid.de/auth/realms/test/protocol/openid-connect/token
-```
-
-> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
-
-##### VS Code Setting
-Environments can be provided with VS Code setting `httpyac.environmentVariables`. All settings with key `$shared` are shared between all environments
-
-```json
-{
-  "$shared": {
-    "host": "https://mydoman"
-  },
-  "dev": {
-    "user": "mario",
-    "password": "123456"
-  },
-  "prod": {
-    "user": "mario",
-    "password": "password$ecure123"
-  }
-}
-```
-> VS Code settings are automatically monitored and when changes are made, the environment is reinitialized.
-
-##### Dotenv File Support
-[dotenv](https://www.npmjs.com/package/dotenv) support is enabled by default.  This automatically scans the root folder of the project and a configurable folder for .env file. All files with the {{name}}.env or .env.{{name}} scheme are interpreted as different environment and can be picked while switching environments
-
-> .env files are automatically monitored by File Watcher and when changes are made, the environment is reinitialized.
-
-> it is possible to enable a dotenvVariableProvider, which scans the directory of the current *.http file. The default for this setting is disabled.
-
-##### Intellij Environment Variables
-[intellij environment variables support](https://www.jetbrains.com/help/idea/exploring-http-syntax.html#environment-variables) support is enabled by default. This automatically scans the root folder of the project and a configurable folder for http-client.env.json/ http-client.private.env.json file.
-
-> http-client.env.json files are automatically monitored by File Watcher and when changes are made, the environment is reinitialized.
-
-> it is possible to enable a intellijVariableProvider, which scans the directory of the current *.http file. The default for this setting is disabled.
 ## Commands
 
 ![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/commands.png)
@@ -678,11 +206,9 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.requestDefaultHeaders` | default request headers if not overwritten | `{ "User-Agent": "httpyac"}`|
-| `httpyac.requestSslCertficateValidation`  | enable ssl certificate validation | `true`|
-| `httpyac.requestFollowRedirect`  | Defines if redirect responses should be followed automatically.| `true`|
-| `httpyac.requestTimeout`  | Milliseconds to wait for the server to end the response before aborting the request. (0 = Infity)| `0`|
+| `httpyac.requestOptions`  | [request options](https://github.com/sindresorhus/got/blob/main/source/types.ts#L96) used for [got](https://www.npmjs.com/package/got) | - |
 
-> HttpYac extension uses the proxy settings made for Visual Studio Code (`http.proxy`).
+> HttpYac extension uses the proxy settings of Visual Studio Code (`http.proxy`).
 
 #### Environment Settings
 | Name | Description | Default |
@@ -723,9 +249,7 @@ keybindings are only active in files with language http
 
 ## Next Steps
 
-* debugging and sanding edges
-* import OpenApi
-* CLI support
+* import OpenApi / Postman
 
 ## License
 [MIT License](LICENSE)

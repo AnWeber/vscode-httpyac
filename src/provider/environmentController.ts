@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, HttpFile, EnvironmentConfig ,log } from 'httpyac';
+import { AppConfig, APP_NAME , watchConfigSettings} from '../config';
+import { httpFileStore, environmentStore, HttpFile, EnvironmentConfig ,log, toLogLevel } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting, httpDocumentSelector } from '../config';
@@ -41,29 +41,43 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   }
 
   @errorHandler()
-  async initEnvironmentProvider(configs: Record<string, any>) {
-    this.config = configs;
+  async initEnvironmentProvider(appConfig: AppConfig) {
+
+
+    this.config = appConfig;
 
     if (this.disposeEnvironment) {
       this.disposeEnvironment();
     }
 
-    const config: EnvironmentConfig = {
-      environments: configs.environmentVariables,
+    const environmentConfig: EnvironmentConfig = {
+      environments: appConfig.environmentVariables,
     };
-    if (configs.intellijEnvEnabled) {
-      config.intellijVariableProviderEnabled = configs.intellijVariableProviderEnabled;
-      config.intellijDirs = this.getWorkspaceDirs(configs.intellijDirname);
+    if (appConfig.intellijEnvEnabled) {
+      environmentConfig.intellij = {
+        variableProviderEnabled: appConfig.intellijVariableProviderEnabled,
+        dirs: this.getWorkspaceDirs(appConfig.intellijDirname),
+      };
     }
-    if (configs.dotenvEnabled) {
-      config.dotenvVariableProviderEnabled = configs.dotenvVariableProviderEnabled;
-      config.dotenvDefaultFiles = configs.dotenvDefaultFiles;
-      config.dotenvDirs = this.getWorkspaceDirs(configs.dotenvDirname);
+    if (appConfig.dotenvEnabled) {
+      environmentConfig.dotenv = {
+        variableProviderEnabled: appConfig.dotenvVariableProviderEnabled,
+        defaultFiles: appConfig.dotenvDefaultFiles,
+        dirs: this.getWorkspaceDirs(appConfig.dotenvDirname),
+      };
     }
-    this.disposeEnvironment = await environmentStore.configure(config);
+
+    environmentConfig.log = {
+      level: toLogLevel(appConfig.logLevel),
+      supportAnsiColors: false,
+      isRequestLogEnabled: !!appConfig.logRequest,
+      responseBodyLength: appConfig.logResponseBodyLength || 0
+    };
+
+    this.disposeEnvironment = await environmentStore.configure(environmentConfig);
   }
 
-  private getWorkspaceDirs(additionalDirName: string): Array<string> {
+  private getWorkspaceDirs(additionalDirName: string | undefined): Array<string> {
     const result: Array<string> = [];
 
     if (additionalDirName && isAbsolute(additionalDirName)) {

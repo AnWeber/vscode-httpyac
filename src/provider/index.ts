@@ -1,5 +1,5 @@
 export * from './decorationProvider';
-export * from './enviromentController';
+export * from './environmentController';
 export * from './harCommandsController';
 export * from './httpCompletionItemProvider';
 export * from './httpDocumentSymbolProvider';

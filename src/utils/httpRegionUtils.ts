@@ -1,6 +1,8 @@
 
 import * as vscode from 'vscode';
-import { httpFileStore, httpYacApi } from 'httpyac';
+import { httpFileStore } from 'httpyac';
+import { initHttpClient } from '../config';
+
 
 export async function getHttpRegionFromLine(doc: vscode.TextDocument  | undefined, line: number | undefined) {
   const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
@@ -11,10 +13,12 @@ export async function getHttpRegionFromLine(doc: vscode.TextDocument  | undefine
       if (currentLine !== undefined) {
         const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine);
         if (httpRegion) {
-          return { httpRegion, httpFile, httpClient: httpYacApi.httpClient };
+          return { httpRegion, httpFile, httpClient: initHttpClient() };
         }
       }
     }
   }
   return undefined;
 }
+
+

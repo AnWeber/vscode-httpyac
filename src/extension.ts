@@ -1,28 +1,33 @@
 
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, gotHttpClientFactory, actionProcessor, HttpFile, LogLevel, log, popupService } from 'httpyac';
+import { httpYacApi, httpFileStore, actionProcessor, HttpFile, popupService, log, parser, variables } from 'httpyac';
 import { ResponseOutputProcessor } from './view/responseOutputProcessor';
-import { watchConfigSettings, httpDocumentSelector } from './config';
+import { watchConfigSettings, httpDocumentSelector, getConfigSetting } from './config';
 import { initVscodeLogger } from './logger';
-import { HttpProxyAgent } from 'http-proxy-agent';
-import { HttpsProxyAgent } from 'https-proxy-agent';
 import { promises as fs } from 'fs';
-import { isAbsolute } from 'path';
-import * as parser from './parser';
-import { showInputBoxVariableReplacer } from './replacer/showInputBoxVariableReplacer';
-import { showQuickpickVariableReplacer } from './replacer/showQuickpickVariableReplacer';
+import { isAbsolute, join } from 'path';
 
 
 
 
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
-	httpYacApi.httpRegionParsers.push(new parser.DefaultHeadersHttpRegionParser());
-	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser());
+	httpYacApi.httpRegionParsers.push(new parser.DefaultHeadersHttpRegionParser(() => getConfigSetting().requestDefaultHeaders));
+	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser(async (note: string) => {
+		const buttonTitle = 'Execute';
+		const result = await vscode.window.showWarningMessage(note, { modal: true}, buttonTitle);
+		return result === buttonTitle;
+	}));
 
-	httpYacApi.variableReplacers.splice(0,0,showInputBoxVariableReplacer);
-	httpYacApi.variableReplacers.splice(0,0,showQuickpickVariableReplacer);
+	httpYacApi.variableReplacers.splice(0, 0, variables.replacer.showInputBoxVariableReplacerFactory(async (message: string, defaultValue: string) => await vscode.window.showInputBox({
+		placeHolder: message,
+		value: defaultValue,
+		prompt: message
+	})));
+	httpYacApi.variableReplacers.splice(0,0, variables.replacer.showQuickpickVariableReplacerFactory(async (message: string, values: string[]) => await vscode.window.showQuickPick(values,{
+		placeHolder: message
+	})));
 
 	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
@@ -38,29 +43,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		new provider.HttpCompletionItemProvider(),
 		new ResponseOutputProcessor(),
 		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStoreController)),
-		watchConfigSettings((config, httpConfig) => {
-			const options: Record<string, any> = {
-				timeout: config.requestTimeout > 0 ? config.requestTimeout : undefined,
-				https: {
-					rejectUnauthorized: !!config.requestSslCertficateValidation
-				},
-				followRedirect: !!config.followRedirect,
-			};
-			if (httpConfig.proxy) {
-				options.agent = {
-					http: new HttpProxyAgent(httpConfig.proxy),
-					https: new HttpsProxyAgent(httpConfig.proxy)
-				};
-			}
-			httpYacApi.httpClient = gotHttpClientFactory(options);
-		}, 'http'),
-		watchConfigSettings((config) => {
-			for (const level in LogLevel) {
-				if (config.logLevel === LogLevel[level]) {
-					log.level = +level;
-				}
-			}
-		}),
 		watchConfigSettings((config) => {
 			httpFileStore.clear();
 			const index = httpYacApi.httpRegionParsers.findIndex(obj => obj instanceof parser.SettingsScriptHttpRegionParser);
@@ -68,7 +50,33 @@ export async function activate(context: vscode.ExtensionContext) {
 				httpYacApi.httpRegionParsers.splice(index, 1);
 			}
 			if (config.httpRegionScript) {
-				httpYacApi.httpRegionParsers.push(new parser.SettingsScriptHttpRegionParser());
+				httpYacApi.httpRegionParsers.push(new parser.SettingsScriptHttpRegionParser(async () => {
+					const fileName = getConfigSetting().httpRegionScript;
+					if (fileName) {
+						if (isAbsolute(fileName)) {
+							try {
+								const script = await fs.readFile(fileName, 'utf-8');
+								return { script, lineOffset: 0 };
+							} catch (err) {
+								log.trace(`file not found: ${fileName}`);
+							}
+						} else if (vscode.workspace.workspaceFolders) {
+							for (const workspaceFolder of vscode.workspace.workspaceFolders) {
+								const file = join(workspaceFolder.uri.fsPath, fileName);
+								try {
+									const script = await fs.readFile(file, 'utf-8');
+									return {
+										script,
+										lineOffset: 0
+									};
+								} catch (err) {
+									log.trace(`file not found: ${file}`);
+								}
+							}
+						}
+					}
+						return undefined;
+				}));
 			}
 		}),
 		initExtensionScript(),

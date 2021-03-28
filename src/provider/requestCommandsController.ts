@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { httpFileStore, HttpRegion, HttpFile, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils, RepeatOrder } from 'httpyac';
-import { APP_NAME, getConfigSetting } from '../config';
+import { httpFileStore, HttpRegion, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils, RepeatOrder } from 'httpyac';
+import { APP_NAME, initHttpClient } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
@@ -8,10 +8,6 @@ import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
 import { getHttpRegionFromLine, toMarkdown } from '../utils';
 
-interface CommandData{
-  httpRegion: HttpRegion;
-  httpFile: HttpFile
-}
 export const commands = {
   send: `${APP_NAME}.send`,
   sendRepeat: `${APP_NAME}.sendRepeat`,
@@ -177,7 +173,10 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     const document  = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
-      await this.sendRequest({httpFile, httpClient: httpYacApi.httpClient});
+      await this.sendRequest({
+        httpFile,
+        httpClient: initHttpClient()
+      });
 
     }
   }

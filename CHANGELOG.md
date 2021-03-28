@@ -1,3 +1,15 @@
+## 2.0.0 (2021-03-27)
+
+#### Feature
+
+* cli support with [httpyac cli](https://www.npmjs.com/package/httpyac)
+
+#### Fix
+
+* error if not existing file is imported
+* error with meta data note fixed
+* error in signing request with aws
+
 ## 1.19.2 (2021-03-18)
 
 #### Fix

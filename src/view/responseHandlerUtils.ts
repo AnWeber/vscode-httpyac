@@ -1,4 +1,4 @@
-import { ContentType, HttpRegion, utils } from 'httpyac';
+import { ContentType, HttpFile, HttpRegion, utils } from 'httpyac';
 import { extension } from 'mime-types';
 import { dir } from 'tmp-promise';
 import { join, extname } from 'path';
@@ -29,7 +29,7 @@ export function getExtension(httpRegion: HttpRegion) {
 export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion) {
   const ext = getExtension(httpRegion);
   const { path } = await dir();
-  const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getName(httpRegion, 'response')));
+  const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getRegionName(httpRegion, 'response')));
   await fs.mkdir(join(path, TempPathFolder));
   const fileName = join(path, TempPathFolder, `${name}.${ext}`);
   await fs.writeFile(fileName, content || content);

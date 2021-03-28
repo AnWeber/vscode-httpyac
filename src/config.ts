@@ -1,22 +1,18 @@
 
+import { gotHttpClientFactory, HttpDefaultOptions } from 'httpyac';
 import {workspace, WorkspaceConfiguration} from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
 export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
-
-
-
 export interface AppConfig {
   requestDefaultHeaders?: Record<string, string>
 
-  requestSslCertficateValidation?: boolean,
-  requestFollowRedirect?:boolean,
-  requestTimeout?:number,
+  requestOptions?: HttpDefaultOptions,
   environmentSelectedOnStart?: Array<string>,
   environmentPickMany?:boolean,
-  environmentVariables?:object,
+  environmentVariables?: Record<string, Record<string, any>>,
   dotenvEnabled?:boolean,
   dotenvDirname?:string,
   dotenvDefaultFiles?:Array<string>,
@@ -31,6 +27,8 @@ export interface AppConfig {
   responseViewLanguageMap?:Record<string,string>,
   responseViewColumn?:string,
   logLevel?:string,
+  logResponseBodyLength?:number,
+  logRequest?:boolean,
   useMethodInSendCodeLens?:boolean,
   showGutterIcon?:boolean,
   showNotificationPopup?:boolean,
@@ -56,24 +54,23 @@ export function getConfigSetting() : AppConfig {
 }
 
 
-export function watchConfigSettings(watcher: (...config: Array<Record<string, any>>) => void, ...sections: Array<string>) {
-  const rootSections = [APP_NAME, ...sections];
-  watcher(...rootSections.map(section => workspace.getConfiguration(section)));
+export function watchConfigSettings(watcher: (appConfig: AppConfig, ...config: Array<Record<string, any>>) => void, ...sections: Array<string>) {
+  const rootSections = [...sections];
+  watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
   return workspace.onDidChangeConfiguration((changeEvent) => {
     if (rootSections.some(section => changeEvent.affectsConfiguration(section))) {
-      watcher(...rootSections.map(section => workspace.getConfiguration(section)));
+      watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
     }
   });
 }
 
-function getConfigs(sections: Array<string>, config: WorkspaceConfiguration) {
-  const result: Record<string, any> = {};
-  for (const section of sections) {
-    result[section] = config.get<any>(section);
-  }
-  return result;
-}
 
 export const httpDocumentSelector = [
 	{ language: 'http', scheme: '*' }
 ];
+
+export function initHttpClient(){
+  const config = getConfigSetting();
+  const httpConfig = workspace.getConfiguration('http');
+  return gotHttpClientFactory(config.requestOptions, httpConfig.proxy);
+}

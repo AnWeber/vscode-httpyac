@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "1.19.2",
+	"version": "2.0.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -26,8 +26,12 @@
 		"HTTP",
 		"REST",
 		"GraphQL",
+		"Intellij Http Client",
+		"Postman",
 		"Soap",
-		"Client"
+		"ci",
+		"api",
+		"rest-client"
 	],
 	"activationEvents": [
 		"onCommand:httpyac.send",
@@ -76,23 +80,10 @@
 					"scope": "resource",
 					"description": "default request headers if not overwritten"
 				},
-				"httpyac.requestSslCertficateValidation": {
-					"type": "boolean",
-					"default": true,
+				"httpyac.requestGotOptions": {
+					"type": "objct",
 					"scope": "resource",
-					"description": "enable ssl certificate validation"
-				},
-				"httpyac.requestFollowRedirect": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "Defines if redirect responses should be followed automatically."
-				},
-				"httpyac.requestTimeout": {
-					"type": "integer",
-					"default": 0,
-					"scope": "resource",
-					"description": "Timeout in milliseconds. 0 for infinity"
+					"description": "got options used as default"
 				},
 				"httpyac.environmentSelectedOnStart": {
 					"type": "array",
@@ -224,6 +215,18 @@
 						"info"
 					],
 					"description": "log level of output channel"
+				},
+				"httpyac.logResponseBodyLength": {
+					"type": "number",
+					"default": 0,
+					"scope": "resource",
+					"description": "length of response body in output channel requests"
+				},
+				"httpyac.logRequest": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "log request in output channel requests"
 				},
 				"httpyac.useMethodInSendCodeLens": {
 					"type": "boolean",
@@ -505,33 +508,23 @@
 	"devDependencies": {
 		"@types/lodash": "^4.14.168",
 		"@types/mime-types": "^2.1.0",
-		"@types/node": "^14.14.32",
+		"@types/node": "^14.14.35",
 		"@types/uuid": "^8.3.0",
 		"@types/vscode": "^1.50.0",
-		"@typescript-eslint/eslint-plugin": "^4.16.1",
-		"@typescript-eslint/parser": "^4.16.1",
-		"eslint": "^7.21.0",
+		"@typescript-eslint/eslint-plugin": "^4.18.0",
+		"@typescript-eslint/parser": "^4.18.0",
+		"eslint": "^7.22.0",
 		"mkdirp": "^1.0.4",
-		"ts-loader": "^8.0.17",
+		"ts-loader": "^8.0.18",
 		"typescript": "^4.2.3",
-		"vsce": "^1.85.1",
-		"webpack": "^5.24.3",
+		"vsce": "^1.87.0",
+		"webpack": "^5.27.1",
 		"webpack-cli": "^4.5.0"
 	},
 	"dependencies": {
-		"aws4": "^1.11.0",
-		"dotenv": "^8.2.0",
-		"encodeurl": "^1.0.2",
-		"filesize": "^6.1.0",
-		"got": "^11.8.2",
-		"http-proxy-agent": "^4.0.1",
-		"https-proxy-agent": "^5.0.0",
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^1.19.1",
-		"lodash": "^4.17.21",
+		"httpyac": "^2.0.1",
 		"mime-types": "^2.1.29",
-		"open": "^8.0.2",
-		"tmp-promise": "^3.0.2",
-		"uuid": "^8.3.2"
+		"tmp-promise": "^3.0.2"
 	}
 }
