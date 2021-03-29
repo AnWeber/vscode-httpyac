@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME , watchConfigSettings} from '../config';
-import { httpFileStore, environmentStore, HttpFile, EnvironmentConfig ,log, toLogLevel } from 'httpyac';
+import { httpFileStore, environmentStore, HttpFile, EnvironmentConfig ,log, toLogLevel, utils } from 'httpyac';
 import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
 import { getConfigSetting, httpDocumentSelector } from '../config';
+import merge from 'lodash/merge';
 
 const commands = {
-  toogleEnv: `${APP_NAME}.toggle-env`,
-  toogleAllEnv: `${APP_NAME}.toggle-allenv`,
+  toggleEnv: `${APP_NAME}.toggle-env`,
+  toggleAllEnv: `${APP_NAME}.toggle-allenv`,
   reset: `${APP_NAME}.reset`,
   logout: `${APP_NAME}.logout`,
 };
@@ -23,8 +24,8 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     environmentStore.activeEnvironments =getConfigSetting().environmentSelectedOnStart;
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
-      vscode.commands.registerCommand(commands.toogleEnv, this.toogleEnv, this),
-      vscode.commands.registerCommand(commands.toogleAllEnv, this.toogleAllEnv, this),
+      vscode.commands.registerCommand(commands.toggleEnv, this.toggleEnv, this),
+      vscode.commands.registerCommand(commands.toggleAllEnv, this.toggleAllEnv, this),
       vscode.commands.registerCommand(commands.reset, this.reset, this),
       vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
@@ -50,6 +51,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       this.disposeEnvironment();
     }
 
+
     const environmentConfig: EnvironmentConfig = {
       environments: appConfig.environmentVariables,
     };
@@ -74,22 +76,32 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       responseBodyLength: appConfig.logResponseBodyLength || 0
     };
 
-    this.disposeEnvironment = await environmentStore.configure(environmentConfig);
+    this.disposeEnvironment = await environmentStore.configure(merge(environmentConfig, ...(await this.loadFileEnvironemntConfigs())));
+  }
+
+  private async loadFileEnvironemntConfigs() : Promise<Array<EnvironmentConfig>>{
+    const environmentConfigs: Array<EnvironmentConfig> = [];
+    if (vscode.workspace.workspaceFolders) {
+      for (const workspaceFolder of vscode.workspace.workspaceFolders) {
+        const environmentConfig = await utils.getHttpacJsonConfig(workspaceFolder.uri.fsPath);
+        if (environmentConfig) {
+          environmentConfigs.push(environmentConfig);
+        }
+      }
+    }
+    return environmentConfigs;
   }
 
   private getWorkspaceDirs(additionalDirName: string | undefined): Array<string> {
     const result: Array<string> = [];
-
-    if (additionalDirName && isAbsolute(additionalDirName)) {
-      result.push(additionalDirName);
-    }
     if (vscode.workspace.workspaceFolders) {
-      for (const workspace of vscode.workspace.workspaceFolders) {
-        result.push(workspace.uri.fsPath);
-        if (additionalDirName && !isAbsolute(additionalDirName)) {
-          const relativePath = join(workspace.uri.fsPath, additionalDirName);
-          result.push(relativePath);
-        }
+      result.push(...vscode.workspace.workspaceFolders.map(obj => obj.uri.fsPath));
+    }
+    if (additionalDirName) {
+      if (isAbsolute(additionalDirName)) {
+        result.push(additionalDirName);
+      } else if (vscode.workspace.workspaceFolders) {
+        result.push(...vscode.workspace.workspaceFolders.map(obj => join(obj.uri.fsPath, additionalDirName)));
       }
     }
     return result;
@@ -101,7 +113,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     if (this.config.showCodeLensEnvironment) {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-          command: commands.toogleEnv,
+          command: commands.toggleEnv,
           title: `env: ${httpFile.activeEnvironment || '-'}`,
         }));
       }
@@ -126,7 +138,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   }
 
   @errorHandler()
-  async toogleEnv(doc?: vscode.TextDocument) {
+  async toggleEnv(doc?: vscode.TextDocument) {
     const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
@@ -165,7 +177,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     return environmentStore.activeEnvironments;
   }
 
-  async toogleAllEnv() {
+  async toggleAllEnv() {
     const env = await this.pickEnv();
     const httpFiles = httpFileStore.getAll();
     for (const httpFile of httpFiles) {
