@@ -1,9 +1,5 @@
 ## 2.1.0 (2021-03-30)
 
-#### Feature
-
-* --version option in cli command
-
 ### Fix
 
 * error in signing request with aws
