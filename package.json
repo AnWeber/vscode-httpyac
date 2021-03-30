@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -502,28 +502,29 @@
 		"compile": "webpack --config ./webpack.config.js",
 		"watch": "webpack --watch --config ./webpack.config.js",
 		"package": "webpack --mode production --devtool hidden-source-map --config ./webpack.config.js",
+		"pack": "vsce package",
 		"lint": "eslint src --ext ts",
 		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.168",
 		"@types/mime-types": "^2.1.0",
-		"@types/node": "^14.14.35",
+		"@types/node": "^14.14.37",
 		"@types/uuid": "^8.3.0",
 		"@types/vscode": "^1.50.0",
-		"@typescript-eslint/eslint-plugin": "^4.18.0",
-		"@typescript-eslint/parser": "^4.18.0",
-		"eslint": "^7.22.0",
+		"@typescript-eslint/eslint-plugin": "^4.20.0",
+		"@typescript-eslint/parser": "^4.20.0",
+		"eslint": "^7.23.0",
 		"mkdirp": "^1.0.4",
-		"ts-loader": "^8.0.18",
+		"ts-loader": "^8.1.0",
 		"typescript": "^4.2.3",
 		"vsce": "^1.87.0",
-		"webpack": "^5.27.1",
-		"webpack-cli": "^4.5.0"
+		"webpack": "^5.28.0",
+		"webpack-cli": "^4.6.0"
 	},
 	"dependencies": {
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^2.0.1",
+		"httpyac": "^2.1.0",
 		"mime-types": "^2.1.29",
 		"tmp-promise": "^3.0.2"
 	}
