@@ -1,29 +1,29 @@
 import { OutputChannel, window } from 'vscode';
 import { APP_NAME, getConfigSetting } from './config';
-import { outputProvider, LogLevel, PopupChannel, RequestChannel } from 'httpyac';
+import { logOutputProvider, LogLevel, LogChannels } from 'httpyac';
 
 
 const outputChannels: Record<string, OutputChannel> = {};
 
-function getOutputChannel(channel: string) {
+function getOutputChannel(channel: LogChannels) {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);
+    outputChannel = window.createOutputChannel(`${APP_NAME} - ${LogChannels[channel]}`);
     outputChannels[channel] = outputChannel;
     outputChannel.show(true);
   }
   return outputChannel;
 }
 
-function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) {
-  if (channel === PopupChannel) {
+function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: any[]) {
+  if (channel === LogChannels.PopupChannel) {
     showMessage(level, ...params);
     return;
   }
 
   const outputChannel = getOutputChannel(channel);
   if (params) {
-    if (channel !== RequestChannel) {
+    if (channel !== LogChannels.Request) {
       outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
     }
     for (const param of params) {
@@ -38,7 +38,7 @@ function logToOutputChannel(channel: string, level: LogLevel, ...params: any[]) 
         outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
       }
     }
-    if (level === LogLevel.error || channel !== RequestChannel) {
+    if (level === LogLevel.error || channel !== LogChannels.Request) {
       outputChannel.show(true);
     }
   }
@@ -69,7 +69,7 @@ function showMessage(level: LogLevel, ...params: any[]) {
 
 
 export function initVscodeLogger() {
-  outputProvider.log = logToOutputChannel;
+  logOutputProvider.log = logToOutputChannel;
   return {
     dispose: function dispose() {
       for (const [key, value] of Object.entries(outputChannels)) {
