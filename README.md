@@ -1,12 +1,10 @@
-[![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac) [![Installs](https://vsmarketplacebadge.apphb.com/installs/anweber.vscode-httpyac.svg)](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)
-
 <p align="center">
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
 </p>
 
 # Http Yac - Yet another Rest Client
 
-Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code
+Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
 
 ![example](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/oauth.gif)
 
