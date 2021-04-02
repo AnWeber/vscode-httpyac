@@ -7,6 +7,7 @@ import { promises as fs } from 'fs';
 import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
 import { getHttpRegionFromLine, toMarkdown } from '../utils';
+import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 
 export const commands = {
   send: `${APP_NAME}.send`,
@@ -28,7 +29,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   subscriptions: Array<vscode.Disposable>;
   onDidChangeCodeLenses: vscode.Event<void>;
 
-  constructor(private readonly refreshCodeLens: vscode.EventEmitter<void>) {
+  constructor(private readonly refreshCodeLens: vscode.EventEmitter<void>,
+    private readonly responseOutputProcessor: ResponseOutputProcessor) {
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       watchConfigSettings((config) => this.config = config),
@@ -203,7 +205,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             this.refreshCodeLens.fire();
           }
           if (result && utils.isHttpRegionSendContext(context)) {
-            await httpYacApi.show(context.httpRegion,context.httpFile);
+            await this.responseOutputProcessor.show(context.httpRegion);
           }
       });
     }
@@ -228,7 +230,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   async show(document?: vscode.TextDocument, line?: number) {
     const parsedDocument = await getHttpRegionFromLine(document, line);
     if (parsedDocument) {
-      await httpYacApi.show(parsedDocument.httpRegion, parsedDocument.httpFile);
+      await this.responseOutputProcessor.show(parsedDocument.httpRegion);
     }
   }
 

@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import * as provider from './provider';
 import { httpYacApi, httpFileStore, actionProcessor, HttpFile, popupService, log, parser, variables } from 'httpyac';
-import { ResponseOutputProcessor } from './view/responseOutputProcessor';
+import { responseHandlers, ResponseOutputProcessor } from './view/responseOutputProcessor';
 import { watchConfigSettings, httpDocumentSelector, getConfigSetting } from './config';
 import { initVscodeLogger } from './logger';
 import { promises as fs } from 'fs';
@@ -29,6 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		placeHolder: message
 	})));
 
+	const responseOutputProcessor = new ResponseOutputProcessor();
 	const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
 	const refreshCodeLens = new vscode.EventEmitter<void>();
 
@@ -37,11 +38,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		refreshCodeLens,
 		httpFileStoreController,
 		new provider.HarCommandsController(),
-		new provider.RequestCommandsController(refreshCodeLens),
+		new provider.RequestCommandsController(refreshCodeLens, responseOutputProcessor),
 		new provider.EnvironmentController(refreshCodeLens),
 		new provider.DecorationProvider(context, httpFileEmitter),
 		new provider.HttpCompletionItemProvider(),
-		new ResponseOutputProcessor(),
+		responseOutputProcessor,
 		vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStoreController)),
 		watchConfigSettings((config) => {
 			httpFileStore.clear();
@@ -85,7 +86,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	return {
 		httpYacApi,
-		httpFileStoreController
+		httpFileStoreController,
+		responseHandlers
 	};
 }
 

@@ -192,12 +192,14 @@
 					"enum": [
 						"preview",
 						"reuse",
+						"open",
 						"none"
 					],
 					"markdownEnumDescriptions": [
 						"open editor in preview mode. The value is ignored when workbench.editor.previewEnabled is disabled",
 						"reuse editor with same language",
-						"always open in new editor"
+						"always open in new editor",
+						"use only output console"
 					],
 					"default": "preview",
 					"scope": "resource",

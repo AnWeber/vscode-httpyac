@@ -13,6 +13,13 @@ import { promises as fs } from 'fs';
 import { ResponseHandler } from './responseHandler';
 import { TempPathFolder } from './responseHandlerUtils';
 
+export const responseHandlers: Array<ResponseHandler> = [
+  saveFileResponseHandler,
+  openWithResponseHandler,
+  previewDocumentResponseHandler,
+  reuseDocumentResponseHandler,
+  openDocumentResponseHandler,
+];
 
 interface OutputCacheItem{
   document: vscode.TextDocument;
@@ -26,7 +33,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   private subscriptions: Array<vscode.Disposable> = [];
 
   constructor() {
-    httpYacApi.httpOutputProcessors.push(this.show.bind(this));
 
     const documentFilter = [{
       scheme: 'untitled',
@@ -102,13 +108,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   public async show(httpRegion: HttpRegion): Promise<void> {
     if (httpRegion.request && httpRegion.response) {
 
-      const responseHandlers: Array<ResponseHandler> = [
-        saveFileResponseHandler,
-        openWithResponseHandler,
-        previewDocumentResponseHandler,
-        reuseDocumentResponseHandler,
-        openDocumentResponseHandler,
-      ];
+
 
       const visibleDocuments = this.outputCache.map(obj => obj.document);
       for (const responseHandler of responseHandlers) {

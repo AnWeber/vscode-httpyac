@@ -21,7 +21,7 @@ export interface AppConfig {
   intellijDirname?:string,
   intellijVariableProviderEnabled?:boolean,
   responseViewHeader?:Array<string>,
-  responseViewMode?: 'preview' | 'reuse' | 'open',
+  responseViewMode?: 'preview' | 'reuse' | 'open' | 'none',
   responseViewPrettyPrint?:boolean,
   responseViewPreserveFocus?:boolean,
   responseViewLanguageMap?:Record<string,string>,
