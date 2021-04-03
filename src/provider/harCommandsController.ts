@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Progress as httpProgress, httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpClientOptions, HttpResponse, HttpClientContext } from 'httpyac';
+import { httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { getHttpRegionFromLine } from '../utils';
@@ -52,9 +52,9 @@ export class HarCommandsController {
 
           const httpClient = context.httpClient;
 
-          context.httpClient = async (options: HttpClientOptions, context: HttpClientContext): Promise<HttpResponse | false> => {
+          context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
             if (context.showProgressBar) {
-              const harRequest: any = this.getHarRequest(options);
+              const harRequest: any = this.getHarRequest(request);
               const snippet = new HttpSnippet(harRequest);
               const content = snippet.convert(target.target, target.client);
               const document = await vscode.workspace.openTextDocument({
@@ -63,7 +63,7 @@ export class HarCommandsController {
               await vscode.window.showTextDocument(document);
               return false;
             }
-            return await httpClient(options, context);
+            return await httpClient(request, context);
           };
           await httpYacApi.send(context);
       });
@@ -90,11 +90,11 @@ export class HarCommandsController {
 
 
 
-  getHarRequest(options: HttpClientOptions) {
+  getHarRequest(options: HttpRequest) {
     const harRequest: any = {
       method: options.method,
       url: options.url,
-      headers: Object.entries(options.headers).map(([name, value]) => {
+      headers: Object.entries(options.headers || {}).map(([name, value]) => {
         return {
           name,
           value
@@ -102,20 +102,21 @@ export class HarCommandsController {
       }),
     };
 
-    const indexOfQuery = options.url.indexOf('?');
-    if (indexOfQuery > 0) {
-      harRequest.url = options.url.substring(0, indexOfQuery);
-      harRequest.queryString = options.url.substring(indexOfQuery + 1).split('&').reduce((prev, current) => {
-        const [key, value] = current.split('=');
-        prev.push({ key, value });
-        return prev;
-      }, [] as Array<{ key: string, value: string }>);
+    if (options.url) {
+      const indexOfQuery = options.url.indexOf('?');
+      if (indexOfQuery > 0) {
+        harRequest.url = options.url.substring(0, indexOfQuery);
+        harRequest.queryString = options.url.substring(indexOfQuery + 1).split('&').reduce((prev, current) => {
+          const [key, value] = current.split('=');
+          prev.push({ key, value });
+          return prev;
+        }, [] as Array<{ key: string, value: string }>);
+      }
     }
-
     if (options.body) {
       harRequest.postData = {
         text: options.body,
-        mimeType: utils.getHeader(options.headers, 'content-type') || 'application/json'
+        mimeType: options.contentType?.mimeType || 'application/json'
       };
 
       if (utils.isMimeTypeFormUrlEncoded(harRequest.postData.mimeType) && utils.isString(options.body)) {
@@ -127,10 +128,6 @@ export class HarCommandsController {
       }
     }
     return harRequest;
-  }
-
-  toString() {
-    return 'harCommandsController';
   }
 }
 

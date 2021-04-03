@@ -1,3 +1,9 @@
+## 2.2.0 (2021-04-xx)
+
+#### Feature
+
+* support for ssl client certficates
+
 ## 2.1.0 (2021-03-30)
 
 ### Fix

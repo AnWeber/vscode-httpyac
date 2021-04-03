@@ -1,5 +1,5 @@
 
-import { gotHttpClientFactory, HttpDefaultOptions } from 'httpyac';
+import { ClientCertificateOptions, gotHttpClientFactory, HttpRequest } from 'httpyac';
 import {workspace, WorkspaceConfiguration} from 'vscode';
 
 export const APP_NAME = 'httpyac';
@@ -9,7 +9,8 @@ export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
 export interface AppConfig {
   requestDefaultHeaders?: Record<string, string>
 
-  requestOptions?: HttpDefaultOptions,
+  requestOptions?: HttpRequest,
+  clientCertficates?: Record<string, ClientCertificateOptions>
   environmentSelectedOnStart?: Array<string>,
   environmentPickMany?:boolean,
   environmentVariables?: Record<string, Record<string, any>>,
@@ -72,5 +73,9 @@ export const httpDocumentSelector = [
 export function initHttpClient(){
   const config = getConfigSetting();
   const httpConfig = workspace.getConfiguration('http');
-  return gotHttpClientFactory(config.requestOptions, httpConfig.proxy);
+  const request = {
+    ...config.requestOptions,
+    proxy: httpConfig.proxy
+  };
+  return gotHttpClientFactory(request);
 }

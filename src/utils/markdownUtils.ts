@@ -17,15 +17,16 @@ export function toMarkdown(httpRegion: HttpRegion) {
     if (httpRegion.response.request) {
       result.push('');
       result.push('');
-      result.push('# Request');
+      result.push('## Request');
       result.push('');
       const request = httpRegion.response.request;
       result.push(`${request.method} ${request.url}`);
-      result.push('');
-      result.push(...Object.entries(request.headers)
-        .map(([key, value]) => `**${key}**: ${value}`)
-        .sort()
-      );
+      if (request.headers) {
+        result.push(...Object.entries(request.headers)
+          .map(([key, value]) => `**${key}**: ${value}`)
+          .sort()
+        );
+      }
       if (utils.isString(request.body)) {
         result.push('');
         result.push('');
@@ -37,7 +38,7 @@ export function toMarkdown(httpRegion: HttpRegion) {
 
       result.push('');
       result.push('');
-      result.push('# Timings');
+      result.push('## Timings');
       result.push('');
       result.push(`|  |  |`);
       result.push(`| --- | --- |`);
@@ -49,7 +50,7 @@ export function toMarkdown(httpRegion: HttpRegion) {
       if (!!httpRegion.response.meta) {
         result.push('');
         result.push('');
-        result.push('# Data');
+        result.push('## Data');
         result.push('');
         result.push(`|  |  |`);
         result.push(`| --- | --- |`);
