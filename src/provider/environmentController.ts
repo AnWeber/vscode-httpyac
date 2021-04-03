@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME , watchConfigSettings, getConfigSetting, httpDocumentSelector} from '../config';
 import { httpFileStore, environments, HttpFile, EnvironmentConfig ,log, toLogLevel, utils } from 'httpyac';
-import { join, isAbsolute } from 'path';
 import { errorHandler } from './errorHandler';
-import merge from 'lodash/merge';
 
 const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,
@@ -47,86 +45,40 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       this.disposeEnvironment();
     }
 
-    const settingsConfig: EnvironmentConfig = {
+    const environmentConfig: EnvironmentConfig = {
       environments: appConfig.environmentVariables,
     };
     if (appConfig.intellijEnvEnabled) {
-      settingsConfig.intellij = {
+      environmentConfig.intellij = {
         variableProviderEnabled: appConfig.intellijVariableProviderEnabled,
-        dirs: this.getWorkspaceDirs(appConfig.intellijDirname),
+        dirname: appConfig.intellijDirname,
       };
     }
     if (appConfig.dotenvEnabled) {
-      settingsConfig.dotenv = {
+      environmentConfig.dotenv = {
         variableProviderEnabled: appConfig.dotenvVariableProviderEnabled,
         defaultFiles: appConfig.dotenvDefaultFiles,
-        dirs: this.getWorkspaceDirs(appConfig.dotenvDirname),
+        dirname: appConfig.dotenvDirname
       };
     }
 
     if (appConfig.clientCertficates) {
-      settingsConfig.clientCertificates = appConfig.clientCertficates;
+      environmentConfig.clientCertificates = appConfig.clientCertficates;
     }
 
-    settingsConfig.log = {
+    environmentConfig.log = {
       level: toLogLevel(appConfig.logLevel),
       supportAnsiColors: false,
       isRequestLogEnabled: !!appConfig.logRequest,
       responseBodyLength: appConfig.logResponseBodyLength || 0
     };
 
-    const environmentConfig: EnvironmentConfig = merge({}, ...(await this.loadFileEnvironemntConfigs()), settingsConfig);
-    if (environmentConfig.clientCertificates) {
-      for (const [, value] of Object.entries(environmentConfig.clientCertificates)) {
-        value.cert = await this.findFileName(value.cert);
-        value.key = await this.findFileName(value.key);
-        value.pfx = await this.findFileName(value.pfx);
-      }
-    }
-    this.disposeEnvironment = await environments.environmentStore.configure(environmentConfig);
-  }
+    const rootDirs: string[] = [];
 
-  private async loadFileEnvironemntConfigs() : Promise<Array<EnvironmentConfig>>{
-    const environmentConfigs: Array<EnvironmentConfig> = [];
     if (vscode.workspace.workspaceFolders) {
-      for (const workspaceFolder of vscode.workspace.workspaceFolders) {
-        const environmentConfig = await utils.getHttpacJsonConfig(workspaceFolder.uri.fsPath);
-        if (environmentConfig) {
-          environmentConfigs.push(environmentConfig);
-        }
-      }
+      rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath));
     }
-    return environmentConfigs;
-  }
-
-  private getWorkspaceDirs(additionalDirName: string | undefined): Array<string> {
-    const result: Array<string> = [];
-    if (vscode.workspace.workspaceFolders) {
-      result.push(...vscode.workspace.workspaceFolders.map(obj => obj.uri.fsPath));
-    }
-    if (additionalDirName) {
-      if (isAbsolute(additionalDirName)) {
-        result.push(additionalDirName);
-      } else if (vscode.workspace.workspaceFolders) {
-        result.push(...vscode.workspace.workspaceFolders.map(obj => join(obj.uri.fsPath, additionalDirName)));
-      }
-    }
-    return result;
-  }
-
-  private async findFileName(fileName: string | undefined): Promise<string | undefined> {
-    if (fileName && vscode.workspace.workspaceFolders) {
-      if (isAbsolute(fileName)) {
-        return fileName;
-      }
-      for (const workspaceFolder of vscode.workspace.workspaceFolders) {
-        const absolute = await utils.toAbsoluteFilename(fileName, workspaceFolder.uri.fsPath, true);
-        if (absolute) {
-          return absolute;
-        }
-      }
-    }
-    return fileName;
+    this.disposeEnvironment = await environments.environmentStore.configure(environmentConfig, rootDirs);
   }
 
   provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
