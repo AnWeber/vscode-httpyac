@@ -150,7 +150,7 @@ Check the returns of the responses and execute them automatically using the [htt
 
 | Feature | httpYac | [Postman](https://www.postman.com/) | [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) | [Intellij Idea](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) |
 | - | :-: | :-: | :-: | :-: |
-| Send Request and View| ✓ | ✓ | ✓ | ✓ |
+| Send Request and View | ✓ | ✓ | ✓ | ✓ |
 | Variable support | ✓ | ✓ | ✓ | ✓ |
 | Custom Scripting support | ✓ | ✓ | - ([pull request](https://github.com/Huachao/vscode-restclient/pull/674)) | partially |
 | Test/ Assert Response | ✓ | ✓ | - | ✓ |
@@ -159,14 +159,13 @@ Check the returns of the responses and execute them automatically using the [htt
 | -- AWS Signnature v4 | ✓ | ✓ | ✓ | - |
 | -- Basic Authentication | ✓ | ✓ | ✓ | ✓ |
 | -- Digest Authentication | ✓ | ✓ | ✓ | ✓ |
+| -- SSL Client Certificate | ✓ | ✓ | ✓ | - |
 | -- Custom Authentication | ✓ | ✓ | - | - |
 | Code Generation | ✓ | ✓ | ✓ | - |
 | Built-in Preview Support (Image, PDF, ...) | ✓ | - | ✓ (only Image) | - |
 | Share workspace | ✓ | paywall | ✓ | ✓ |
 | extensible/ plugin support | ✓ | partially | - | - |
 | cli support | ✓ | ✓ | - | - |
-
-
 
 ## Commands
 
@@ -184,8 +183,9 @@ Check the returns of the responses and execute them automatically using the [htt
 | `httpyac.toggle-env` | toggle environment of active text document |
 | `httpyac.toggle-allenv` | toggle environment of all files |
 | `httpyac.generateCode` | generate code of request in ActiveTextEditor in active line |
-| `httpyac.reset` | reset environments |
-| `httpyac.logout` | see current sessions and logout |
+| `httpyac.reset` | reset environments, oauth sessions and cookies |
+| `httpyac.logout` | see current oauth2 sessions and logout |
+| `httpyac.removeCookies` | remove received cookies |
 | `httpyac.new` | create empty http file |
 
 ## Keybindings
@@ -204,7 +204,9 @@ keybindings are only active in files with language http
 | Name | Description | Default |
 | - | - | - |
 | `httpyac.requestDefaultHeaders` | default request headers if not overwritten | `{ "User-Agent": "httpyac"}`|
-| `httpyac.requestOptions`  | [request options](https://github.com/sindresorhus/got/blob/main/source/types.ts#L96) used for [got](https://www.npmjs.com/package/got) | - |
+| `httpyac.requestGotOptions`  | [request options](https://github.com/sindresorhus/got/blob/main/source/types.ts#L96) used for [got](https://www.npmjs.com/package/got) | - |
+| `httpyac.cookieJarEnabled` | is cookiejar support enabled | `true`|
+
 
 > HttpYac extension uses the proxy settings of Visual Studio Code (`http.proxy`).
 

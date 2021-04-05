@@ -106,10 +106,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   }
 
   public async show(httpRegion: HttpRegion): Promise<void> {
-    if (httpRegion.request && httpRegion.response) {
-
-
-
+    if (httpRegion.request && httpRegion.response?.body) {
       const visibleDocuments = this.outputCache.map(obj => obj.document);
       for (const responseHandler of responseHandlers) {
         const result = await responseHandler(httpRegion, visibleDocuments);

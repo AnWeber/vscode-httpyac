@@ -38,9 +38,12 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: an
         outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
       }
     }
-    if (level === LogLevel.error || channel !== LogChannels.Request) {
+    if (level === LogLevel.error) {
+      outputChannel.show(true);
+    }else if(getConfigSetting().logRequest && channel === LogChannels.Request){
       outputChannel.show(true);
     }
+
   }
 }
 

@@ -10,6 +10,7 @@ export interface AppConfig {
   requestDefaultHeaders?: Record<string, string>
 
   requestOptions?: HttpRequest,
+  cookieJarEnabled?: boolean,
   clientCertficates?: Record<string, ClientCertificateOptions>
   environmentSelectedOnStart?: Array<string>,
   environmentPickMany?:boolean,
@@ -36,6 +37,7 @@ export interface AppConfig {
   showCodeLensEnvironment?:boolean,
   showCodeLensResetEnvironment?:boolean,
   showCodeLensLogoutUserSession?:boolean,
+  showCodeLensRemoveCookies?:boolean,
   showCodeLensSendAll?: boolean,
   showCodeLensSend?:boolean,
   showCodeLensSendRepeat?:boolean,

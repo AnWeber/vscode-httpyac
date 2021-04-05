@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { AppConfig, APP_NAME , watchConfigSettings, getConfigSetting, httpDocumentSelector} from '../config';
-import { httpFileStore, environments, HttpFile, EnvironmentConfig ,log, toLogLevel, utils } from 'httpyac';
+import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
+import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel, utils } from 'httpyac';
 import { errorHandler } from './errorHandler';
 
 const commands = {
@@ -8,9 +8,10 @@ const commands = {
   toggleAllEnv: `${APP_NAME}.toggle-allenv`,
   reset: `${APP_NAME}.reset`,
   logout: `${APP_NAME}.logout`,
+  removeCookies: `${APP_NAME}.removeCookies`,
 };
 
-export class EnvironmentController implements vscode.CodeLensProvider{
+export class EnvironmentController implements vscode.CodeLensProvider {
 
   private config: Record<string, any> = {};
   private subscriptions: Array<vscode.Disposable> = [];
@@ -18,13 +19,14 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(refreshCodeLens: vscode.EventEmitter<void>) {
-    environments.environmentStore.activeEnvironments =getConfigSetting().environmentSelectedOnStart;
+    environments.environmentStore.activeEnvironments = getConfigSetting().environmentSelectedOnStart;
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toggleEnv, this.toggleEnv, this),
       vscode.commands.registerCommand(commands.toggleAllEnv, this.toggleAllEnv, this),
       vscode.commands.registerCommand(commands.reset, this.reset, this),
       vscode.commands.registerCommand(commands.logout, this.logout, this),
+      vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
       watchConfigSettings(this.initEnvironmentProvider.bind(this))
     ];
@@ -47,6 +49,14 @@ export class EnvironmentController implements vscode.CodeLensProvider{
 
     const environmentConfig: EnvironmentConfig = {
       environments: appConfig.environmentVariables,
+      log: {
+        level: toLogLevel(appConfig.logLevel),
+        supportAnsiColors: false,
+        isRequestLogEnabled: !!appConfig.logRequest,
+        responseBodyLength: appConfig.logResponseBodyLength || 0
+      },
+      cookieJarEnabled: appConfig.cookieJarEnabled,
+      clientCertificates: appConfig.clientCertficates
     };
     if (appConfig.intellijEnvEnabled) {
       environmentConfig.intellij = {
@@ -62,19 +72,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
       };
     }
 
-    if (appConfig.clientCertficates) {
-      environmentConfig.clientCertificates = appConfig.clientCertficates;
-    }
-
-    environmentConfig.log = {
-      level: toLogLevel(appConfig.logLevel),
-      supportAnsiColors: false,
-      isRequestLogEnabled: !!appConfig.logRequest,
-      responseBodyLength: appConfig.logResponseBodyLength || 0
-    };
-
     const rootDirs: string[] = [];
-
     if (vscode.workspace.workspaceFolders) {
       rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath));
     }
@@ -105,7 +103,14 @@ export class EnvironmentController implements vscode.CodeLensProvider{
     if (environments.userSessionStore.userSessions.length > 0 && this.config.showCodeLensLogoutUserSession) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.logout,
-        title: `logout usersession (${environments.userSessionStore.userSessions.length})`,
+        title: `oauth2 session (${environments.userSessionStore.userSessions.length})`,
+      }));
+    }
+    const cookies = environments.cookieStore.cookies;
+    if (cookies.length > 0 && this.config.showCodeLensRemoveCookies) {
+      result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+        command: commands.removeCookies,
+        title: `cookies (${cookies.length})`,
       }));
     }
     return result;
@@ -164,6 +169,7 @@ export class EnvironmentController implements vscode.CodeLensProvider{
   async reset() {
     await environments.environmentStore.reset();
     await environments.userSessionStore.reset();
+    await environments.cookieStore.reset();
   }
 
   async logout() {
@@ -175,11 +181,11 @@ export class EnvironmentController implements vscode.CodeLensProvider{
         data: userSession
       };
     }), {
-      placeHolder: 'select user sessions to logout',
-        canPickMany: true,
-        onDidSelectItem: (item: any) => {
-          log.info(JSON.stringify(item.data, null, 2));
-        }
+      placeHolder: 'select oauth2 sessions to logout',
+      canPickMany: true,
+      onDidSelectItem: (item: any) => {
+        log.info(JSON.stringify(item.data, null, 2));
+      }
     });
 
     if (userSessions) {
@@ -187,6 +193,37 @@ export class EnvironmentController implements vscode.CodeLensProvider{
         environments.userSessionStore.removeUserSession(userSession.id);
         log.info(`${userSession.label} removed`);
       }
+    }
+  }
+
+  async removeCookies() {
+    const cookies = await vscode.window.showQuickPick(environments.cookieStore.cookies.map(cookie => {
+      return {
+        label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
+          .filter(([key]) => ['key', 'value'].indexOf(key) < 0)
+          .map(([key, value]) => {
+            if (value) {
+              if (value instanceof Date) {
+                return `${key}: ${value.toISOString()}`;
+              }
+              return `${key}: ${value}`;
+            }
+            return undefined;
+          })
+          .filter(obj => obj)
+          .join(' ')}`,
+        data: cookie
+      };
+    }), {
+      placeHolder: 'select cookies to remove',
+      canPickMany: true,
+      onDidSelectItem: (item: any) => {
+        log.info(JSON.stringify(item.data, null, 2));
+      }
+    });
+
+    if (cookies) {
+      environments.cookieStore.removeCookies(cookies.map(obj => obj.data));
     }
   }
 }

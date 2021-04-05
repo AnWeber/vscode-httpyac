@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -85,47 +85,52 @@
 					"scope": "resource",
 					"description": "got options used as default"
 				},
-
+				"httpyac.cookieJarEnabled": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "is cookiejar support enabled"
+				},
 				"httpyac.clientCertficates": {
 					"type": "object",
 					"scope": "resource",
 					"description": "Certificate paths for different hosts. The path can be absolute path or relative path to workspace",
 					"pattern": "^(?!http(s?)://)",
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "type": "object",
-                "default": {},
-                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
-                "properties": {
-                  "cert": {
-                    "type": "string",
-                    "description": "Absolute or relative path of Public x509 certificate"
-                  },
-                  "key": {
-                    "type": "string",
-                    "description": "Absolute or relative path of Private key"
-                  },
-                  "pfx": {
-                    "type": "string",
-                    "description": "Absolute or relative path of PKCS #12 certificate"
-                  },
-                  "passphrase": {
-                    "type": "string",
-                    "description": "[Optional] A string of passphrase for the private key or pfx"
-                  }
-                },
-                "dependencies": {
-                  "cert": [
-                    "key"
-                  ],
-                  "key": [
-                    "cert"
-                  ]
-                }
-              }
-            ]
-          }
+					"additionalProperties": {
+						"anyOf": [
+							{
+								"type": "object",
+								"default": {},
+								"description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+								"properties": {
+									"cert": {
+										"type": "string",
+										"description": "Absolute or relative path of Public x509 certificate"
+									},
+									"key": {
+										"type": "string",
+										"description": "Absolute or relative path of Private key"
+									},
+									"pfx": {
+										"type": "string",
+										"description": "Absolute or relative path of PKCS #12 certificate"
+									},
+									"passphrase": {
+										"type": "string",
+										"description": "[Optional] A string of passphrase for the private key or pfx"
+									}
+								},
+								"dependencies": {
+									"cert": [
+										"key"
+									],
+									"key": [
+										"cert"
+									]
+								}
+							}
+						]
+					}
 				},
 				"httpyac.environmentSelectedOnStart": {
 					"type": "array",
@@ -308,6 +313,12 @@
 					"scope": "resource",
 					"description": "show code lens for 'logout usersession'"
 				},
+				"httpyac.showCodeLensRemoveCookies": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'remove cookies'"
+				},
 				"httpyac.showCodeLensSendAll": {
 					"type": "boolean",
 					"default": true,
@@ -435,6 +446,11 @@
 			{
 				"command": "httpyac.logout",
 				"title": "Logout user sessions",
+				"category": "httpYac"
+			},
+			{
+				"command": "httpyac.removeCookies",
+				"title": "remove cookies",
 				"category": "httpYac"
 			}
 		],
@@ -565,7 +581,7 @@
 	},
 	"dependencies": {
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^2.1.0",
+		"httpyac": "^2.2.1",
 		"mime-types": "^2.1.29",
 		"tmp-promise": "^3.0.2"
 	}
