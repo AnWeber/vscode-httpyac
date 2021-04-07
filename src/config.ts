@@ -39,6 +39,7 @@ export interface AppConfig {
   showCodeLensLogoutUserSession?:boolean,
   showCodeLensRemoveCookies?:boolean,
   showCodeLensSendAll?: boolean,
+  showCodeLensSendSelected?: boolean,
   showCodeLensSend?:boolean,
   showCodeLensSendRepeat?:boolean,
   showCodeLensShowResponse?:boolean,

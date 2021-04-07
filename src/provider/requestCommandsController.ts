@@ -13,6 +13,7 @@ export const commands = {
   send: `${APP_NAME}.send`,
   sendRepeat: `${APP_NAME}.sendRepeat`,
   resend: `${APP_NAME}.resend`,
+  sendSelected:`${APP_NAME}.sendSelected`,
   sendAll:`${APP_NAME}.sendall`,
   clearAll:`${APP_NAME}.clearall`,
   show: `${APP_NAME}.show`,
@@ -38,6 +39,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),
       vscode.commands.registerCommand(commands.clearAll, this.clearAll, this),
       vscode.commands.registerCommand(commands.sendAll, this.sendAll, this),
+      vscode.commands.registerCommand(commands.sendSelected, this.sendSelected, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
       vscode.commands.registerCommand(commands.show, this.show, this),
       vscode.commands.registerCommand(commands.save, this.save, this),
@@ -78,6 +80,13 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendAll,
           title: 'send all'
+        }));
+      }
+
+      if (this.config.showCodeLensSendSelected) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.sendSelected,
+          title: 'send selected'
         }));
       }
 
@@ -179,6 +188,35 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         httpFile,
         httpClient: initHttpClient()
       });
+
+    }
+  }
+
+  @errorHandler()
+  async sendSelected() {
+    const document  = vscode.window.activeTextEditor?.document;
+    if (document) {
+      const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
+
+      const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
+
+      const pickedObjs = await vscode.window.showQuickPick(httpRegions.map(httpRegion => {
+        return {
+          label: utils.getRegionName(httpRegion),
+          data: httpRegion
+        };
+      }), {
+        placeHolder: "select requests",
+        canPickMany: true,
+      });
+
+      if (pickedObjs) {
+        await this.sendRequest({
+          httpFile,
+          httpClient: initHttpClient(),
+          httpRegionPredicate: (httpRegion) => pickedObjs.some(obj => obj.data === httpRegion)
+        });
+      }
 
     }
   }

@@ -325,6 +325,12 @@
 					"scope": "resource",
 					"description": "show code lens for 'send all' requests"
 				},
+				"httpyac.showCodeLensSendSelected": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for 'send selected' requests"
+				},
 				"httpyac.showCodeLensClearAll": {
 					"type": "boolean",
 					"default": false,
@@ -393,6 +399,12 @@
 			{
 				"command": "httpyac.sendall",
 				"title": "Send all",
+				"category": "httpYac",
+				"icon": "$(run-all)"
+			},
+			{
+				"command": "httpyac.sendSelected",
+				"title": "Send selected",
 				"category": "httpYac",
 				"icon": "$(run-all)"
 			},

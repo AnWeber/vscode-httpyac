@@ -1,3 +1,9 @@
+## 2.3.0 (2021-04-xx)
+
+#### Feature
+
+* send many http regions at once (select per picker)
+
 ## 2.2.0 (2021-04-05)
 
 #### Feature
