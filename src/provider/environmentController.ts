@@ -53,24 +53,23 @@ export class EnvironmentController implements vscode.CodeLensProvider {
         level: toLogLevel(appConfig.logLevel),
         supportAnsiColors: false,
         isRequestLogEnabled: !!appConfig.logRequest,
-        responseBodyLength: appConfig.logResponseBodyLength || 0
+        responseBodyLength: appConfig.logResponseBodyLength || 0,
+        prettyPrint: appConfig.responseViewPrettyPrint,
       },
       cookieJarEnabled: appConfig.cookieJarEnabled,
-      clientCertificates: appConfig.clientCertficates
-    };
-    if (appConfig.intellijEnvEnabled) {
-      environmentConfig.intellij = {
+      clientCertificates: appConfig.clientCertficates,
+      intellij: {
+        enabled: appConfig.intellijEnvEnabled,
         variableProviderEnabled: appConfig.intellijVariableProviderEnabled,
         dirname: appConfig.intellijDirname,
-      };
-    }
-    if (appConfig.dotenvEnabled) {
-      environmentConfig.dotenv = {
+      },
+      dotenv: {
+        enabled: appConfig.dotenvEnabled,
         variableProviderEnabled: appConfig.dotenvVariableProviderEnabled,
         defaultFiles: appConfig.dotenvDefaultFiles,
         dirname: appConfig.dotenvDirname
-      };
-    }
+      },
+    };
 
     const rootDirs: string[] = [];
     if (vscode.workspace.workspaceFolders) {
