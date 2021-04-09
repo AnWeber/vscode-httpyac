@@ -1,8 +1,16 @@
-## 2.3.0 (2021-04-xx)
+## 2.3.0 (2021-04-09)
 
-#### Feature
+#### Features
 
+* define global script executed after every request
+* set ssl client certifcates per request
+* intellij syntax support for metadata (`// @no-cookie-jar`)
 * send many http regions at once (select per picker)
+
+#### Fix
+
+* priority of config initialization adjusted ([#3](https://github.com/AnWeber/httpyac/issues/3))
+
 
 ## 2.2.0 (2021-04-05)
 
