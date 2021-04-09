@@ -13,7 +13,6 @@ import { isAbsolute, join } from 'path';
 
 export async function activate(context: vscode.ExtensionContext) {
 	httpYacApi.additionalRequire.vscode = vscode;
-	httpYacApi.httpRegionParsers.push(new parser.DefaultHeadersHttpRegionParser(() => getConfigSetting().requestDefaultHeaders));
 	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser(async (note: string) => {
 		const buttonTitle = 'Execute';
 		const result = await vscode.window.showWarningMessage(note, { modal: true}, buttonTitle);

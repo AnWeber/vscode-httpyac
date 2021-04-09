@@ -58,6 +58,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       },
       cookieJarEnabled: appConfig.cookieJarEnabled,
       clientCertificates: appConfig.clientCertficates,
+      defaultHeaders: appConfig.requestDefaultHeaders,
       intellij: {
         enabled: appConfig.intellijEnvEnabled,
         variableProviderEnabled: appConfig.intellijVariableProviderEnabled,
