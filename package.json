@@ -327,7 +327,7 @@
 				},
 				"httpyac.showCodeLensSendSelected": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"scope": "resource",
 					"description": "show code lens for 'send selected' requests"
 				},
