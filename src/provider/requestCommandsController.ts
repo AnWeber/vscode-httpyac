@@ -6,7 +6,7 @@ import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
 import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
-import { getHttpRegionFromLine, toMarkdown } from '../utils';
+import { getHttpRegionFromLine } from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 
 export const commands = {
@@ -285,8 +285,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         }
       }
 
-      if (httpRegion) {
-        const content = toMarkdown(httpRegion);
+      if (httpRegion?.response) {
+        const content = utils.toMarkdownPreview(httpRegion.response);
         const { path } = await file({ postfix: `.md` });
         const uri = vscode.Uri.file(path);
         if (uri) {

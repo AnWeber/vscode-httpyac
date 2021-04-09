@@ -1,9 +1,8 @@
-import { httpYacApi, HttpRegion, HttpFile, ContentType, utils,log } from 'httpyac';
+import { HttpRegion, utils,log } from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 import { commands } from '../provider/requestCommandsController';
-import { toMarkdown } from '../utils';
 import { saveFileResponseHandler } from './saveFileResponseHandler';
 import { openWithResponseHandler } from './openWithResponseHandler';
 import { previewDocumentResponseHandler } from './previewDocumentResponseHandler';
@@ -97,8 +96,8 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
     if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
-      if (cacheItem) {
-        const responseHover = toMarkdown(cacheItem.httpRegion);
+      if (cacheItem?.httpRegion?.response) {
+        const responseHover = utils.toMarkdownPreview(cacheItem.httpRegion.response);
         return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/) || new vscode.Range(0, 0, 0, 100));
       }
     }
