@@ -75,7 +75,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     if (vscode.workspace.workspaceFolders) {
       rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath));
     }
-    this.disposeEnvironment = await environments.environmentStore.configure(environmentConfig, rootDirs);
+    this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
   }
 
   provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
