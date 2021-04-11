@@ -73,6 +73,10 @@ function showMessage(level: LogLevel, ...params: any[]) {
 
 export function initVscodeLogger() {
   logOutputProvider.log = logToOutputChannel;
+  logOutputProvider.clear = (channel: LogChannels) => {
+    const outputChannel = getOutputChannel(channel);
+    outputChannel.clear();
+  };
   return {
     dispose: function dispose() {
       for (const [key, value] of Object.entries(outputChannels)) {

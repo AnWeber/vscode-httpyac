@@ -70,10 +70,10 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
   if (!viewContent || viewContent !== 'headers') {
     if (response?.body) {
       if (utils.isString(response.body)) {
-        if (utils.isMimeTypeJSON(response.contentType)
+        if (response.parsedBody
           && getConfigSetting().responseViewPrettyPrint
           && getConfigSetting().responseViewPreserveFocus) {
-          result.push(JSON.stringify(JSON.parse(response.body), null, 2));
+          result.push(JSON.stringify(response.parsedBody, null, 2));
         } else {
           result.push(response.body);
         }
