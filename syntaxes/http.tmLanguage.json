@@ -142,10 +142,10 @@
       "include": "#comments"
     },
     {
-      "include": "#request-line"
+      "include": "#response-line"
     },
     {
-      "include": "#response-line"
+      "include": "#request-line"
     }
   ],
   "repository": {
@@ -228,6 +228,25 @@
       },
       "match": "^\\s*(?:(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
       "name": "http.requestline"
+    },
+    "response-line": {
+      "captures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#protocol"
+            }
+          ]
+        },
+        "2": {
+          "name": "constant.numeric.http"
+        },
+        "3": {
+          "name": "string.other.http"
+        }
+      },
+      "match": "^\\s*(HTTP\\/\\S+)\\s*([1-5][0-9][0-9])\\s*(.*)$",
+      "name": "http.responseLine"
     },
     "protocol": {
       "patterns": [
