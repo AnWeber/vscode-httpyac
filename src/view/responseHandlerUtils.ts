@@ -1,10 +1,10 @@
-import { ContentType, HttpFile, HttpRegion, utils } from 'httpyac';
+import { ContentType, HttpFile, HttpRegion, HttpResponse, utils } from 'httpyac';
 import { extension } from 'mime-types';
 import { dir } from 'tmp-promise';
 import { join, extname } from 'path';
 import { promises as fs } from 'fs';
 import * as vscode from 'vscode';
-import { getConfigSetting } from '../config';
+import { getConfigSetting, ResponseViewContent } from '../config';
 
 export const TempPathFolder = 'httpyac_tmp';
 
@@ -26,8 +26,8 @@ export function getExtension(httpRegion: HttpRegion) {
 }
 
 
-export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion) {
-  const ext = getExtension(httpRegion);
+export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion, extension?: string | undefined) {
+  const ext = extension || getExtension(httpRegion);
   const { path } = await dir();
   const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getRegionName(httpRegion, 'response')));
   await fs.mkdir(join(path, TempPathFolder));
@@ -36,25 +36,60 @@ export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion)
   return fileName;
 }
 
-export function getContent(httpRegion: HttpRegion) {
-  let content: string = '';
-  if (httpRegion.response?.body) {
-    if (utils.isString(httpRegion.response.body)) {
-      content = httpRegion.response.body;
-      if (utils.isMimeTypeJSON(httpRegion.response.contentType)
-        && getConfigSetting().responseViewPrettyPrint
-        && getConfigSetting().responseViewPreserveFocus) {
-        content = JSON.stringify(JSON.parse(content), null, 2);
+export function getContent(response: HttpResponse, viewContent?: ResponseViewContent | undefined) {
+  const result = [];
+
+  if (viewContent === 'exchange' && response.request) {
+    result.push(`${response.request.method} ${response.request.url}`);
+    result.push(...Object.entries(response.request.headers)
+      .filter(([key]) => !key.startsWith(':'))
+      .map(([key, value]) => `${key}: ${value}`)
+      .sort()
+    );
+    if (response.request.body) {
+      result.push('');
+      if (utils.isString(response.request.body)) {
+        result.push(response.request.body);
+      } else if (Buffer.isBuffer(response.request.body)) {
+        result.push(`buffer<${response.request.body.byteLength}>`);
       }
-    } else {
-      content = JSON.stringify(httpRegion.response.body, null, 2);
+    }
+    result.push('');
+  }
+
+  if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0 ) {
+    result.push(`HTTP/${response.httpVersion || ''} ${response.statusCode} ${response.statusMessage}`);
+    result.push(...Object.entries(response.headers)
+      .filter(([key]) => !key.startsWith(':'))
+      .map(([key, value]) => `${key}: ${value}`)
+      .sort()
+    );
+    result.push('');
+  }
+
+  if (!viewContent || viewContent !== 'headers') {
+    if (response?.body) {
+      if (utils.isString(response.body)) {
+        if (utils.isMimeTypeJSON(response.contentType)
+          && getConfigSetting().responseViewPrettyPrint
+          && getConfigSetting().responseViewPreserveFocus) {
+          result.push(JSON.stringify(JSON.parse(response.body), null, 2));
+        } else {
+          result.push(response.body);
+        }
+      } else {
+        result.push(JSON.stringify(response.body, null, 2));
+      }
     }
   }
-  return content;
+  return utils.toMultiLineString(result);
 }
 
 
-export function getLanguageId(contentType: ContentType | undefined) {
+export function getLanguageId(contentType: ContentType | undefined, viewContent?: ResponseViewContent | undefined) {
+  if (viewContent && viewContent !== 'body') {
+    return 'http';
+  }
   if (contentType) {
     const languageMap = getConfigSetting().responseViewLanguageMap;
     if (languageMap && languageMap[contentType.mimeType]) {

@@ -11,7 +11,7 @@ export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visib
   if (httpRegion.response?.body
     && config.responseViewMode
     && ['preview', 'reuse'].indexOf(config.responseViewMode) >= 0) {
-    const language = getLanguageId(httpRegion.response.contentType);
+    const language = getLanguageId(httpRegion.response.contentType, config.responseViewContent);
 
     const document = visibleDocuments.find(document => document.languageId === language && document.isUntitled);
     if (document) {
@@ -21,8 +21,7 @@ export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visib
         editor = await showTextEditor(document, false);
       }
       if (editor) {
-
-        const content = getContent(httpRegion);
+        const content = getContent(httpRegion.response, config.responseViewContent);
         await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
 
         return {

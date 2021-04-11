@@ -252,6 +252,24 @@
 					"scope": "resource",
 					"description": "response view mode of file"
 				},
+				"httpyac.responseViewContent": {
+					"type": "string",
+					"enum": [
+						"body",
+						"headers",
+						"full",
+						"exchange"
+					],
+					"markdownEnumDescriptions": [
+						"only view response body",
+						"view only response headers",
+						"view response (statusline, header, body)",
+						"view request and response"
+					],
+					"default": "body",
+					"scope": "resource",
+					"description": "content of respnse view"
+				},
 				"httpyac.logLevel": {
 					"type": "string",
 					"default": "warn",
@@ -593,7 +611,7 @@
 	},
 	"dependencies": {
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^2.3.0",
+		"httpyac": "^2.3.1",
 		"mime-types": "^2.1.30",
 		"tmp-promise": "^3.0.2"
 	}

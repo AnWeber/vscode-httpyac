@@ -6,6 +6,7 @@ export const APP_NAME = 'httpyac';
 
 export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
+export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
 export interface AppConfig {
   requestDefaultHeaders?: Record<string, string>
 
@@ -23,6 +24,7 @@ export interface AppConfig {
   intellijDirname?:string,
   intellijVariableProviderEnabled?:boolean,
   responseViewHeader?:Array<string>,
+  responseViewContent?: ResponseViewContent,
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none',
   responseViewPrettyPrint?:boolean,
   responseViewPreserveFocus?:boolean,
