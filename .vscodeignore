@@ -3,7 +3,6 @@
 out/**
 src/**
 examples/**
-assets/**
 node_modules/**
 .gitignore
 .yarnrc
