@@ -107,10 +107,10 @@ export class HarCommandsController {
       if (indexOfQuery > 0) {
         harRequest.url = options.url.substring(0, indexOfQuery);
         harRequest.queryString = options.url.substring(indexOfQuery + 1).split('&').reduce((prev, current) => {
-          const [key, value] = current.split('=');
-          prev.push({ key, value });
+          const [name, value] = current.split('=');
+          prev.push({ name, value });
           return prev;
-        }, [] as Array<{ key: string, value: string }>);
+        }, [] as Array<{ name: string, value: string }>);
       }
     }
     if (options.body) {
