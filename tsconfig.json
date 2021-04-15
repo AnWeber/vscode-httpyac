@@ -7,7 +7,7 @@
 			"es6"
 		],
 		"sourceMap": true,
-		"rootDirs": ["src"],
+		"rootDirs": ["src", "node_modules/httpyac/src"],
 		"strict": true,
 	  "noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,

@@ -70,10 +70,14 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     const cacheItem = this.outputCache.find(obj => obj.document === document);
     if (cacheItem && cacheItem.httpRegion.response) {
       const response = cacheItem.httpRegion.response;
-      const title = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
+      const lenses = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
+
+      if (cacheItem.httpRegion.testResults) {
+        lenses.push(`TestResults ${cacheItem.httpRegion.testResults.filter(obj => obj.result).length}/${cacheItem.httpRegion.testResults.length}`);
+      }
       const headers = getConfigSetting().responseViewHeader;
       if (headers) {
-        title.push(...headers.map(headerName => {
+        lenses.push(...headers.map(headerName => {
           const val = utils.getHeader(response.headers, headerName);
           if (val) {
             return `${headerName}: ${val}`;
@@ -82,12 +86,11 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         }).filter(obj => obj.length > 0));
       }
       result.push(
-        new vscode.CodeLens(
-          new vscode.Range(0, 0, 0, 0), {
+        ...lenses.map(title => new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           arguments: [cacheItem.httpRegion],
-          title: title.join(' | '),
-            command: commands.viewHeader
-        }));
+          title,
+          command: commands.viewHeader
+        })));
     }
 
     return Promise.resolve(result);

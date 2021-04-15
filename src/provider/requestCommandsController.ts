@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { httpFileStore, HttpRegion, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils, RepeatOrder } from 'httpyac';
-import { APP_NAME, initHttpClient } from '../config';
+import { AppConfig, APP_NAME, initHttpClient } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { promises as fs } from 'fs';
@@ -24,7 +24,7 @@ export const commands = {
 
 export class RequestCommandsController implements vscode.CodeLensProvider {
 
-  private config: Record<string, any> = {};
+  private config: AppConfig | undefined;
   private tmpFiles: Array<string> = [];
 
   subscriptions: Array<vscode.Disposable>;
@@ -76,21 +76,21 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     if (httpFile && httpFile.httpRegions.length > 0) {
 
 
-      if (this.config.showCodeLensSendAll) {
+      if (this.config?.showCodeLensSendAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendAll,
           title: 'send all'
         }));
       }
 
-      if (this.config.showCodeLensSendSelected) {
+      if (this.config?.showCodeLensSendSelected) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendSelected,
           title: 'send selected'
         }));
       }
 
-      if (this.config.showCodeLensClearAll) {
+      if (this.config?.showCodeLensClearAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.clearAll,
           title: 'clear all'
@@ -103,24 +103,32 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         const args = [document, requestLine];
 
         if (!!httpRegion.request && !httpRegion.metaData.disabled) {
-          if (this.config.showCodeLensSend) {
+          if (this.config?.showCodeLensSend) {
             result.push(new vscode.CodeLens(range, {
               command: commands.send,
               arguments: args,
-              title: this.config.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
+              title: this.config?.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
             }));
           }
-          if (this.config.showCodeLensSendRepeat) {
+          if (this.config?.showCodeLensSendRepeat) {
             result.push(new vscode.CodeLens(range, {
               command: commands.sendRepeat,
               arguments: args,
-              title: this.config.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
+              title: this.config?.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
             }));
           }
         }
 
+        if (httpRegion.testResults && this.config?.showCodeLensTestResult) {
+          result.push(new vscode.CodeLens(range, {
+            arguments: [httpRegion],
+            title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${httpRegion.testResults.length}`,
+            command: commands.viewHeader
+          }));
+        }
+
         if (httpRegion.response) {
-          if (this.config.showCodeLensShowResponse) {
+          if (this.config?.showCodeLensShowResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.show,
               arguments: args,
@@ -128,7 +136,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             }));
           }
 
-          if (this.config.showCodeLensSaveResponse) {
+          if (this.config?.showCodeLensSaveResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.save,
               arguments: args,
@@ -136,7 +144,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             }));
           }
 
-          if (this.config.showCodeLensShowResponseHeaders) {
+          if (this.config?.showCodeLensShowResponseHeaders) {
             result.push(new vscode.CodeLens(range, {
               command: commands.viewHeader,
               arguments: args,
@@ -286,7 +294,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       }
 
       if (httpRegion?.response) {
-        const content = utils.toMarkdownPreview(httpRegion.response);
+        const content = utils.toMarkdownPreview(httpRegion.response, httpRegion.testResults);
         const { path } = await file({ postfix: `.md` });
         const uri = vscode.Uri.file(path);
         if (uri) {

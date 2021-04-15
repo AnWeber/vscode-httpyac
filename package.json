@@ -367,6 +367,12 @@
 					"scope": "resource",
 					"description": "show code lens for 'send repeat' requests"
 				},
+				"httpyac.showCodeLensTestResult": {
+					"type": "boolean",
+					"default": true,
+					"scope": "resource",
+					"description": "show code lens for Test Results"
+				},
 				"httpyac.showCodeLensShowResponse": {
 					"type": "boolean",
 					"default": true,
