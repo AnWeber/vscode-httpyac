@@ -17,34 +17,18 @@ Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
 
 GET https://httpbin.org/basic-auth/{{user}}/{{password}}
 Authorization: Basic {{user}} {{password}}
-
 ```
 
 ```html
-
-fragment IOParts on Repository {
-  description
-  diskUsage
-}
-
 POST https://api.github.com/graphql
 Content-Type: application/json
 Authorization: Bearer {{git_api_key}}
-
 
 query test($name: String!, $owner: String!) {
   repository(name: $name, owner: $owner) {
     name
     fullName: nameWithOwner
-    ...IOParts
     forkCount
-    stargazers(first: 5) {
-        totalCount
-        nodes {
-            login
-            name
-        }
-    }
     watchers {
         totalCount
     }
@@ -73,38 +57,48 @@ Create and execute any REST, SOAP, and GraphQL queries from within VS Code and v
 
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/send.gif)
 
-### variables
+
+### Manage Authentication
+
+There are many authentications already built in
+* [OAuth2 / Open Id Connect](https://github.com/AnWeber/httpyac/blob/main/examples/auth/oauth2.http)
+* [Basic](https://github.com/AnWeber/httpyac/blob/main/examples/auth/basicAuth.http)
+* [Digest](https://github.com/AnWeber/httpyac/blob/main/examples/auth/digest.http)
+* [AWS](https://github.com/AnWeber/httpyac/blob/main/examples/auth/aws.http)
+* [SSL Client Certificate](https://github.com/AnWeber/httpyac/blob/main/examples/auth/clientCertifcate.http)
+* [Custom Authentication](https://github.com/AnWeber/httpyac/blob/main/examples/auth/custom.http) support with NodeJS Scripts
+
+
+### Variables
 
 Built in support for variables and enviroments.
-  * Quickly switch environments
   * [dotenv](https://www.npmjs.com/package/dotenv) support
   * [intellij variable support](https://www.jetbrains.com/help/idea/exploring-http-syntax.html#environment-variables)
   * provide custom variables with scripts
 
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/variables.gif)
 
-### Manage Authentication
-
-There are many authentications already built in
-* OAuth2 / Open Id Connect
-* Basic
-* Digest
-* AWS
-
-Others can be added independently by means of scripting
-
-### script support
+### Node JS Scripting Support
 
 enrich requests with custom scripts
-  * create custom variables
   * add Custom Authentication to the requests
   * Node JS scripting support (pre request and post request)
-  * require any library
 
 > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/scripting.gif)
 
 
-### preview feature
+
+
+### Intellij HTTP Client compatibility
+
+*.http files of [Intellij HTTP Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) can be parsed and executed
+
+### CLI support
+
+Check the returns of the responses and execute them automatically using the [httpyac cli](https://www.npmjs.com/package/httpyac) in your ci environment
+
+
+### Preview Feature
 auto open custom preview editor
   * auto preview images and pdf ([vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) needed)
   * support custom editor with openWith Meta Tag
@@ -135,17 +129,6 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
     }
   });
   ```
-
-
-### Intellij HTTP Client compatibility
-
-*.http files of [Intellij HTTP Client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) can be parsed and executed
-
-### ci support
-
-Check the returns of the responses and execute them automatically using the [httpyac cli](https://www.npmjs.com/package/httpyac) in your ci environment
-
-
 ## Feature comparisons
 
 | Feature | httpYac | [Postman](https://www.postman.com/) | [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) | [Intellij Idea](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html) |
@@ -153,7 +136,7 @@ Check the returns of the responses and execute them automatically using the [htt
 | Send Request and View | ✓ | ✓ | ✓ | ✓ |
 | Variable support | ✓ | ✓ | ✓ | ✓ |
 | Custom Scripting support | ✓ | ✓ | - ([pull request](https://github.com/Huachao/vscode-restclient/pull/674)) | partially |
-| Test/ Assert Response | ✓ | ✓ | - | ✓ |
+| Test/ Assert Response | ✓ | ✓ | - ([pull request](https://github.com/Huachao/vscode-restclient/pull/773)) | ✓ |
 | Authorization support | ✓ | ✓ | partially (no custom auth flow) | - |
 | -- OAuth2/ OpenId Connect | ✓ | ✓ | - | - |
 | -- AWS Signnature v4 | ✓ | ✓ | ✓ | - |
@@ -249,6 +232,8 @@ keybindings are only active in files with language http
 
 ## Next Steps
 
+* plugins like @vue/cli
+* vscode notebook support
 * import OpenApi / Postman
 
 ## License
