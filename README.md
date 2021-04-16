@@ -6,7 +6,7 @@
 
 Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
 
-![example](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/oauth.gif)
+![example](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/oauth.gif)
 
 
 ## Examples
@@ -71,7 +71,7 @@ Create and execute any REST, SOAP, and GraphQL queries from within VS Code and v
   * quick view configurable header list
   * view complete request and response in output channel `httpyac - Requests`
 
-> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/send.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/send.gif)
 
 ### variables
 
@@ -81,7 +81,7 @@ Built in support for variables and enviroments.
   * [intellij variable support](https://www.jetbrains.com/help/idea/exploring-http-syntax.html#environment-variables)
   * provide custom variables with scripts
 
-> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/variables.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/variables.gif)
 
 ### Manage Authentication
 
@@ -101,7 +101,7 @@ enrich requests with custom scripts
   * Node JS scripting support (pre request and post request)
   * require any library
 
-> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/scripting.gif)
+> see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/scripting.gif)
 
 
 ### preview feature
@@ -109,7 +109,7 @@ auto open custom preview editor
   * auto preview images and pdf ([vscode-pdf](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf) needed)
   * support custom editor with openWith Meta Tag
 
- > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/preview.gif)
+ > see [gif](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/preview.gif)
 
 ### It's Extensible
 
@@ -169,7 +169,7 @@ Check the returns of the responses and execute them automatically using the [htt
 
 ## Commands
 
-![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/assets/commands.png)
+![Commands](https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/examples/commands.png)
 
 | Name | Description |
 | - | - |

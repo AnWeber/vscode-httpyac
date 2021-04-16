@@ -5,6 +5,7 @@
 * better [test](https://github.com/AnWeber/httpyac/blob/main/examples/README.md#node-js-scripts) method support
 * refactored response in script to [http response](https://github.com/AnWeber/httpyac/blob/main/src/models/httpResponse.ts) instead of body
 * multiple output formats for response view (body, header, full, exchange)
+
 #### Fix
 
 * unnecessary file parse when using ref in vscode
