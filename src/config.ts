@@ -1,6 +1,6 @@
 
 import { ClientCertificateOptions, gotHttpClientFactory, HttpRequest } from 'httpyac';
-import {workspace, WorkspaceConfiguration} from 'vscode';
+import {workspace} from 'vscode';
 
 export const APP_NAME = 'httpyac';
 

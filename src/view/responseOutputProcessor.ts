@@ -96,7 +96,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     return Promise.resolve(result);
   }
 
-  provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
+  provideHover(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
     if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem?.httpRegion?.response) {

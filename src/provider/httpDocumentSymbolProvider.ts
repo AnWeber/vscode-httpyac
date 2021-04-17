@@ -1,4 +1,4 @@
-import { HttpSymbol, HttpSymbolKind, HttpFile } from 'httpyac';
+import { HttpSymbol, HttpSymbolKind } from 'httpyac';
 import {HttpFileStoreController} from './httpFileStoreController';
 import * as vscode from 'vscode';
 
@@ -6,7 +6,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
 
   constructor(private readonly httpFileStoreController: HttpFileStoreController){}
 
-  async provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken) : Promise<vscode.DocumentSymbol[]>{
+  async provideDocumentSymbols(document: vscode.TextDocument, _token: vscode.CancellationToken) : Promise<vscode.DocumentSymbol[]>{
     const httpFile = await this.httpFileStoreController.getHttpFile(document);
 
     const symbols: Array<vscode.DocumentSymbol> = [];

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel, utils } from 'httpyac';
+import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel } from 'httpyac';
 import { errorHandler } from './errorHandler';
 
 const commands = {
@@ -79,7 +79,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
   }
 
-  provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
+  provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
     const httpFile = httpFileStore.get(document.fileName);
     if (this.config.showCodeLensEnvironment) {

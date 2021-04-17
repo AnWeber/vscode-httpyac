@@ -27,7 +27,7 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
   };
 }
 
-async function handleError(target: any, propertyKey: string | symbol, err: any) {
+async function handleError(_target: unknown, _propertyKey: string | symbol, err: any) {
   log.error(err);
 
   if (getConfigSetting().showNotificationPopup) {

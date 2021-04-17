@@ -1,5 +1,4 @@
 import { HttpRegion } from 'httpyac';
-import { extension } from 'mime-types';
 import { window } from 'vscode';
 import { promises as fs } from 'fs';
 import {getExtension} from './responseHandlerUtils';
