@@ -6,12 +6,18 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
+        language: [ 'javascript' ]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
     - name: Install Node.js
       uses: actions/setup-node@v2
       with:
@@ -19,3 +25,5 @@ jobs:
     - run: npm install
     - run: npm run lint
     - run: npm run package
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
