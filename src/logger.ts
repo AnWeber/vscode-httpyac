@@ -22,28 +22,26 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: un
   }
 
   const outputChannel = getOutputChannel(channel);
-  if (params) {
-    if (channel !== LogChannels.Request) {
-      outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
-    }
-    for (const param of params) {
-      if (typeof param === 'string') {
-        outputChannel.appendLine(param);
-      } else if (param instanceof Error) {
-        outputChannel.appendLine(`${param.name} - ${param.message}`);
-        if (param.stack) {
-          outputChannel.appendLine(param.stack);
-        }
-      } else {
-        outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
-      }
-    }
-    if (level === LogLevel.error) {
-      outputChannel.show(true);
-    }else if(getConfigSetting().logRequest && channel === LogChannels.Request){
-      outputChannel.show(true);
-    }
 
+  if (channel !== LogChannels.Request) {
+    outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
+  }
+  for (const param of params) {
+    if (typeof param === 'string') {
+      outputChannel.appendLine(param);
+    } else if (param instanceof Error) {
+      outputChannel.appendLine(`${param.name} - ${param.message}`);
+      if (param.stack) {
+        outputChannel.appendLine(param.stack);
+      }
+    } else {
+      outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
+    }
+  }
+  if (level === LogLevel.error) {
+    outputChannel.show(true);
+  } else if (getConfigSetting().logRequest && channel === LogChannels.Request) {
+    outputChannel.show(true);
   }
 }
 
