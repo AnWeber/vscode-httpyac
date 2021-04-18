@@ -1,4 +1,4 @@
-import { OutputChannel, window } from 'vscode';
+import { Disposable, OutputChannel, window } from 'vscode';
 import { APP_NAME, getConfigSetting } from './config';
 import { logOutputProvider, LogLevel, LogChannels } from 'httpyac';
 
@@ -15,7 +15,7 @@ function getOutputChannel(channel: LogChannels) {
   return outputChannel;
 }
 
-function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: any[]) {
+function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: unknown[]) {
   if (channel === LogChannels.PopupChannel) {
     showMessage(level, ...params);
     return;
@@ -48,9 +48,9 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: an
 }
 
 
-function showMessage(level: LogLevel, ...params: any[]) {
+function showMessage(level: LogLevel, ...params: unknown[]) {
   if (getConfigSetting().showNotificationPopup) {
-    const [message, ...args] = params;
+    const [message, ...args] = params.map(obj => `${obj}`);
     if (message) {
       switch (level) {
         case LogLevel.error:
@@ -71,7 +71,7 @@ function showMessage(level: LogLevel, ...params: any[]) {
 
 
 
-export function initVscodeLogger() {
+export function initVscodeLogger() : Disposable {
   logOutputProvider.log = logToOutputChannel;
   logOutputProvider.clear = (channel: LogChannels) => {
     const outputChannel = getOutputChannel(channel);

@@ -598,7 +598,13 @@
 		"compile": "webpack --config ./webpack.config.js",
 		"watch": "webpack --watch --config ./webpack.config.js",
 		"package": "webpack --mode production --devtool hidden-source-map --config ./webpack.config.js",
-		"lint": "eslint src --ext ts"
+		"lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
+		"eslint": "eslint src --ext ts",
+		"lint": "npm run eslint && npm run lockfile-lint",
+		"prepare": "husky install"
+	},
+	"lint-staged": {
+		"*.ts": "eslint --cache --fix"
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.168",
@@ -609,6 +615,10 @@
 		"@typescript-eslint/eslint-plugin": "^4.22.0",
 		"@typescript-eslint/parser": "^4.22.0",
 		"eslint": "^7.24.0",
+		"eslint-webpack-plugin": "^2.5.3",
+		"husky": "^6.0.0",
+		"lint-staged": "^10.5.4",
+		"lockfile-lint": "^4.6.2",
 		"mkdirp": "^1.0.4",
 		"ts-loader": "^8.1.0",
 		"typescript": "^4.2.4",

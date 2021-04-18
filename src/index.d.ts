@@ -2,7 +2,7 @@
 
 declare module 'httpsnippet' {
   export default class HttpSnippet {
-    constructor(obj: any);
+    constructor(obj: unknown);
     convert(target: string, client: string): string;
   }
   export function availableTargets(): Array<{

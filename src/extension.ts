@@ -7,11 +7,17 @@ import { watchConfigSettings, httpDocumentSelector, getConfigSetting } from './c
 import { initVscodeLogger } from './logger';
 import { promises as fs } from 'fs';
 import { isAbsolute, join } from 'path';
+import { HttpFileStoreController } from './provider';
 
 
+export interface HttpYacExtensionApi{
+	httpYacApi: typeof httpYacApi,
+	httpFileStoreController: HttpFileStoreController,
+	responseHandlers: typeof responseHandlers,
+}
 
 
-export async function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi {
 	httpYacApi.additionalRequire.vscode = vscode;
 	httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser(async (note: string) => {
 		const buttonTitle = 'Execute';
@@ -92,8 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
 function initExtensionScript() {
-	let disposable: vscode.Disposable;
-	disposable = watchConfigSettings(async (config) => {
+	const disposable = watchConfigSettings(async (config) => {
 		try {
 			const extensionScript = config.extensionScript;
 			if (extensionScript) {
@@ -122,6 +127,6 @@ function initExtensionScript() {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate() : void {
 	httpFileStore.clear();
 }

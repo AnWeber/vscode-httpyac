@@ -8,7 +8,7 @@ import { getConfigSetting, ResponseViewContent } from '../config';
 
 export const TempPathFolder = 'httpyac_tmp';
 
-export function getExtension(httpRegion: HttpRegion) {
+export function getExtension(httpRegion: HttpRegion) : string {
   if (httpRegion.metaData.extension) {
     return httpRegion.metaData.extension;
   } else if (httpRegion.request?.url) {
@@ -26,7 +26,7 @@ export function getExtension(httpRegion: HttpRegion) {
 }
 
 
-export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion, extension?: string | undefined) {
+export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion, extension?: string | undefined) : Promise<string> {
   const ext = extension || getExtension(httpRegion);
   const { path } = await dir();
   const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getRegionName(httpRegion, 'response')));
@@ -36,7 +36,7 @@ export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion,
   return fileName;
 }
 
-export function getContent(response: HttpResponse, viewContent?: ResponseViewContent | undefined) {
+export function getContent(response: HttpResponse, viewContent?: ResponseViewContent | undefined) : string {
   const result = [];
 
   if (viewContent === 'exchange' && response.request) {
@@ -86,7 +86,7 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
 }
 
 
-export function getLanguageId(contentType: ContentType | undefined, viewContent?: ResponseViewContent | undefined) {
+export function getLanguageId(contentType: ContentType | undefined, viewContent?: ResponseViewContent | undefined) : string {
   if (viewContent && viewContent !== 'body') {
     return 'http';
   }
@@ -112,7 +112,7 @@ export function getLanguageId(contentType: ContentType | undefined, viewContent?
   return 'plaintext';
 }
 
-export async function showTextEditor(document: vscode.TextDocument, preview: boolean) {
+export async function showTextEditor(document: vscode.TextDocument, preview: boolean) : Promise<vscode.TextEditor> {
   const config = getConfigSetting();
   let viewColumn = vscode.ViewColumn.Beside;
   if (config.responseViewColumn === 'current') {

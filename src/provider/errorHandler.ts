@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { log, utils } from 'httpyac';
 import { window } from 'vscode';
 import { getConfigSetting } from '../config';
 
 export function errorHandler(): MethodDecorator {
-  return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
+  return (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
     //@ts-ignore-line
@@ -12,8 +13,8 @@ export function errorHandler(): MethodDecorator {
   };
 }
 
-export function errorHandlerWrapper(target: any, propertyKey: string | symbol, method: (...args: any[]) => any) {
-  return function (...args: any[]) {
+export function errorHandlerWrapper(target: unknown, propertyKey: string | symbol, method: (...args: unknown[]) => unknown) {
+  return function (...args: unknown[]) : unknown{
     try {
       //@ts-ignore-line
       const result = method.apply(this, args);
@@ -24,10 +25,11 @@ export function errorHandlerWrapper(target: any, propertyKey: string | symbol, m
     } catch (err) {
       handleError(target, propertyKey, err);
     }
+    return undefined;
   };
 }
 
-async function handleError(_target: unknown, _propertyKey: string | symbol, err: any) {
+async function handleError(_target: unknown, _propertyKey: string | symbol, err: unknown) {
   log.error(err);
 
   if (getConfigSetting().showNotificationPopup) {

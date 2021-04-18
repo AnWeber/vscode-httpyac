@@ -57,14 +57,14 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       }),
     ];
   }
-  dispose() {
+  dispose() : void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose);
       this.subscriptions = [];
     }
   }
 
-  public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
+  public provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
 
     const cacheItem = this.outputCache.find(obj => obj.document === document);
@@ -96,7 +96,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     return Promise.resolve(result);
   }
 
-  provideHover(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
+  provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
     if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem?.httpRegion?.response) {
@@ -138,7 +138,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
   }
 
   private async prettyPrint(editor: vscode.TextEditor) {
-    let result: boolean = false;
+    let result = false;
     if (getConfigSetting().responseViewPrettyPrint) {
       if (editor === vscode.window.activeTextEditor) {
         const prettyPrint = await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor);
@@ -155,7 +155,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     return result;
   }
 
-  async remove(document: vscode.TextDocument) {
+  private async remove(document: vscode.TextDocument): Promise<void> {
     const index = this.outputCache.findIndex(obj => obj.document === document);
     if (index >= 0) {
       const cacheItem = this.outputCache[index];

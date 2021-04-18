@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "es6",
-		"outDir": "out",
+		"outDir": "dist",
 		"lib": [
 			"es6"
 		],
@@ -19,6 +19,6 @@
 		"esModuleInterop": true
 	},
 	"exclude": [
-		"node_modules"
+		"node_modules", "dist", "webpack.config.js"
 	]
 }

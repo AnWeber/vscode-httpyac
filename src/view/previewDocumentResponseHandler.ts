@@ -1,11 +1,12 @@
 import { HttpRegion, utils } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
+import { ResponseHandlerResult } from './responseHandler';
 import {writeTempFileName, showTextEditor, getContent} from './responseHandlerUtils';
 
 
 
-export async function previewDocumentResponseHandler(httpRegion: HttpRegion) {
+export async function previewDocumentResponseHandler(httpRegion: HttpRegion) :Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
 
   const editorConfig = vscode.workspace.getConfiguration('workbench.editor');
@@ -38,4 +39,4 @@ export async function previewDocumentResponseHandler(httpRegion: HttpRegion) {
     }
   }
   return false;
-};
+}

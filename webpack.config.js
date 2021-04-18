@@ -1,9 +1,8 @@
-//@ts-check
-
 'use strict';
 
 const path = require('path');
 const webpack = require('webpack');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -37,7 +36,8 @@ const config = {
     ]
   },
   plugins: [
-    new webpack.ContextReplacementPlugin(/keyv/)
+    new webpack.ContextReplacementPlugin(/keyv/),
+    new ESLintPlugin({extensions: ['js', 'ts']})
   ]
 };
 module.exports = config;

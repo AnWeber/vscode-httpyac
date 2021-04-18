@@ -1,11 +1,12 @@
 import { HttpRegion } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
+import { ResponseHandlerResult } from './responseHandler';
 import {getLanguageId, showTextEditor, getContent} from './responseHandlerUtils';
 
 
 
-export async function openDocumentResponseHandler(httpRegion: HttpRegion) {
+export async function openDocumentResponseHandler(httpRegion: HttpRegion) : Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
   if (httpRegion.response?.body
     && (config.responseViewMode === 'open' || config.responseViewMode === 'reuse')) {
@@ -22,4 +23,4 @@ export async function openDocumentResponseHandler(httpRegion: HttpRegion) {
     };
   }
   return false;
-};
+}

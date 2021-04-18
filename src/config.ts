@@ -1,6 +1,6 @@
 
-import { ClientCertificateOptions, gotHttpClientFactory, HttpRequest } from 'httpyac';
-import {workspace} from 'vscode';
+import { ClientCertificateOptions, gotHttpClientFactory, HttpClient, HttpRequest, Variables } from 'httpyac';
+import {Disposable, workspace} from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
@@ -15,7 +15,7 @@ export interface AppConfig {
   clientCertficates?: Record<string, ClientCertificateOptions>
   environmentSelectedOnStart?: Array<string>,
   environmentPickMany?:boolean,
-  environmentVariables?: Record<string, Record<string, any>>,
+  environmentVariables?: Record<string, Variables>,
   dotenvEnabled?:boolean,
   dotenvDirname?:string,
   dotenvDefaultFiles?:Array<string>,
@@ -51,9 +51,9 @@ export interface AppConfig {
   extensionScript?:string,
   httpRegionScript?: string,
 
-  readonly [key: string]: any;
+  readonly [key: string]: unknown;
 
-};
+}
 
 
 export function getConfigSetting() : AppConfig {
@@ -61,7 +61,7 @@ export function getConfigSetting() : AppConfig {
 }
 
 
-export function watchConfigSettings(watcher: (appConfig: AppConfig, ...config: Array<Record<string, any>>) => void, ...sections: Array<string>) {
+export function watchConfigSettings(watcher: (appConfig: AppConfig, ...config: Array<Record<string, unknown>>) => void, ...sections: Array<string>) : Disposable {
   const rootSections = [...sections];
   watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
   return workspace.onDidChangeConfiguration((changeEvent) => {
@@ -76,7 +76,7 @@ export const httpDocumentSelector = [
 	{ language: 'http', scheme: '*' }
 ];
 
-export function initHttpClient(){
+export function initHttpClient() : HttpClient{
   const config = getConfigSetting();
   const httpConfig = workspace.getConfiguration('http');
   const request = {

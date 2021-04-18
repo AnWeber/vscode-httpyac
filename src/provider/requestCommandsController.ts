@@ -60,7 +60,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     ];
   }
 
-  dispose() {
+  public dispose(): void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];
@@ -68,7 +68,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  public provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
+  public provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const httpFile = httpFileStore.get(document.fileName);
 
     const result: Array<vscode.CodeLens> = [];
@@ -160,13 +160,13 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   private httpRegionSendContext: HttpRegionSendContext | undefined;
 
   @errorHandler()
-  async send(document?: vscode.TextDocument, line?: number) {
+  private async send(document?: vscode.TextDocument, line?: number) : Promise<void> {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line);
     await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
-  async sendRepeat(document?: vscode.TextDocument, line?: number) {
+  private async sendRepeat(document?: vscode.TextDocument, line?: number) : Promise<void> {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line);
     const repeatOrder = await vscode.window.showQuickPick([{label: 'parallel', value: RepeatOrder.parallel}, {label: 'sequential', value: RepeatOrder.sequential}]);
     const count = await vscode.window.showInputBox({
@@ -183,12 +183,12 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async resend() {
+  private async resend() : Promise<void> {
     await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
-  async sendAll() {
+  private async sendAll() : Promise<void> {
     const document  = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
@@ -201,7 +201,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async sendSelected() {
+  private async sendSelected() : Promise<void> {
     const document  = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
@@ -260,8 +260,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
 
   @errorHandler()
-  async clearAll() {
-    let document = vscode.window.activeTextEditor?.document;
+  private async clearAll() : Promise<void> {
+    const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
       if (httpFile) {
@@ -273,7 +273,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async show(document?: vscode.TextDocument, line?: number) {
+  private async show(document?: vscode.TextDocument, line?: number) : Promise<void> {
     const parsedDocument = await getHttpRegionFromLine(document, line);
     if (parsedDocument) {
       await this.responseOutputProcessor.show(parsedDocument.httpRegion);
@@ -281,7 +281,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async viewHeader(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) {
+  private async viewHeader(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) : Promise<void> {
     if (document) {
       let httpRegion: HttpRegion | undefined;
       if (this.isHttpRegion(document)) {
@@ -307,7 +307,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async save(document?: vscode.TextDocument, line?: number) {
+  private async save(document?: vscode.TextDocument, line?: number) : Promise<void> {
     const parsedDocument = await getHttpRegionFromLine(document, line);
     if (parsedDocument && parsedDocument.httpRegion.response) {
       const ext = parsedDocument.httpRegion.metaData.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
@@ -325,18 +325,14 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async newHttpFile() {
+  private async newHttpFile(): Promise<void> {
     const language = 'http';
     const document = await vscode.workspace.openTextDocument({ language, content: '' });
     await vscode.window.showTextDocument(document);
   }
 
-
-
-  toString() {
-    return 'requestCommandsController';
-  }
-  isHttpRegion(obj: any): obj is HttpRegion{
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  private isHttpRegion(obj: any): obj is HttpRegion{
     return obj.actions && obj.symbol && obj.metaData;
   }
 }

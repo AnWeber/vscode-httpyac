@@ -23,4 +23,4 @@ export async function saveFileResponseHandler(httpRegion: HttpRegion): Promise<b
     }
   }
   return false;
-};
+}

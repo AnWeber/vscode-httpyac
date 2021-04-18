@@ -53,7 +53,7 @@ export class DecorationProvider{
     }
   }
 
-  dispose() {
+  dispose() : void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];

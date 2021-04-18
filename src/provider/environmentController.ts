@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel } from 'httpyac';
+import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession } from 'httpyac';
 import { errorHandler } from './errorHandler';
 
 const commands = {
@@ -13,7 +13,7 @@ const commands = {
 
 export class EnvironmentController implements vscode.CodeLensProvider {
 
-  private config: Record<string, any> = {};
+  private config: AppConfig = {};
   private subscriptions: Array<vscode.Disposable> = [];
   private disposeEnvironment: (() => void) | false = false;
   onDidChangeCodeLenses: vscode.Event<void>;
@@ -33,7 +33,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
 
   }
 
-  dispose() {
+  dispose(): void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];
@@ -41,7 +41,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async initEnvironmentProvider(appConfig: AppConfig) {
+  private async initEnvironmentProvider(appConfig: AppConfig) : Promise<void> {
     this.config = appConfig;
     if (this.disposeEnvironment) {
       this.disposeEnvironment();
@@ -79,7 +79,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
   }
 
-  provideCodeLenses(document: vscode.TextDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.CodeLens[]> {
+  provideCodeLenses(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
     const httpFile = httpFileStore.get(document.fileName);
     if (this.config.showCodeLensEnvironment) {
@@ -117,7 +117,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  async toggleEnv(doc?: vscode.TextDocument) {
+  private async toggleEnv(doc?: vscode.TextDocument) : Promise<void> {
     const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = httpFileStore.get(document.fileName);
@@ -156,7 +156,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     return environments.environmentStore.activeEnvironments;
   }
 
-  async toggleAllEnv() {
+  private async toggleAllEnv() : Promise<void> {
     const env = await this.pickEnv();
     const httpFiles = httpFileStore.getAll();
     for (const httpFile of httpFiles) {
@@ -166,13 +166,13 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     }
   }
 
-  async reset() {
+  private async reset() : Promise<void> {
     await environments.environmentStore.reset();
     await environments.userSessionStore.reset();
     await environments.cookieStore.reset();
   }
 
-  async logout() {
+  private async logout() : Promise<void> {
     const userSessions = await vscode.window.showQuickPick(environments.userSessionStore.userSessions.map(userSession => {
       return {
         id: userSession.id,
@@ -183,7 +183,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     }), {
       placeHolder: 'select oauth2 sessions to logout',
       canPickMany: true,
-      onDidSelectItem: (item: any) => {
+      onDidSelectItem: (item: vscode.QuickPickItem & {data: UserSession}) => {
         log.info(JSON.stringify(item.data, null, 2));
       }
     });
@@ -196,7 +196,8 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     }
   }
 
-  async removeCookies() {
+  @errorHandler()
+  private async removeCookies() : Promise<void> {
     const cookies = await vscode.window.showQuickPick(environments.cookieStore.cookies.map(cookie => {
       return {
         label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
@@ -217,7 +218,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     }), {
       placeHolder: 'select cookies to remove',
       canPickMany: true,
-      onDidSelectItem: (item: any) => {
+      onDidSelectItem: (item: vscode.QuickPickItem & {data: unknown}) => {
         log.info(JSON.stringify(item.data, null, 2));
       }
     });

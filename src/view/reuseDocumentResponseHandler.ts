@@ -1,11 +1,12 @@
 import { HttpRegion } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
+import { ResponseHandlerResult } from './responseHandler';
 import { getLanguageId, showTextEditor, getContent } from './responseHandlerUtils';
 
 
 
-export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visibleDocuments: Array<vscode.TextDocument>) {
+export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visibleDocuments: Array<vscode.TextDocument>): Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
 
   if (httpRegion.response?.body
@@ -32,4 +33,4 @@ export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visib
     }
   }
   return false;
-};
+}

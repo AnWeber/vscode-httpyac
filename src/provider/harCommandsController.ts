@@ -5,6 +5,8 @@ import { errorHandler } from './errorHandler';
 import { getHttpRegionFromLine } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
+import { Request, Header, Param, QueryString } from './harRequest';
+
 const commands = {
   generateCode: `${APP_NAME}.generateCode`,
 };
@@ -20,7 +22,7 @@ export class HarCommandsController {
     ];
   }
 
-  dispose() {
+  dispose(): void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];
@@ -28,44 +30,45 @@ export class HarCommandsController {
   }
 
   @errorHandler()
-  async generateCode(document?: vscode.TextDocument, line?: number) {
+  private async generateCode(document?: vscode.TextDocument, line?: number) {
     const httpRegionSendContext = await getHttpRegionFromLine(document, line);
     await this.generateCodeRequest(httpRegionSendContext);
   }
 
   private async generateCodeRequest(context: HttpRegionSendContext | HttpFileSendContext | undefined) {
-    const target = await  this.pickHttpSnippetResult();
+    const target = await this.pickHttpSnippetResult();
     if (target && context) {
       await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         cancellable: true,
         title: "create har",
       }, async (progress, token) => {
-          context.progress = {
-            isCanceled: () => token.isCancellationRequested,
-            register: (event: () => void) => {
-              const dispose = token.onCancellationRequested(event);
-              return () => dispose.dispose();
-            },
-            report: (data) => progress.report(data),
-          };
+        context.progress = {
+          isCanceled: () => token.isCancellationRequested,
+          register: (event: () => void) => {
+            const dispose = token.onCancellationRequested(event);
+            return () => dispose.dispose();
+          },
+          report: (data) => progress.report(data),
+        };
 
-          const httpClient = context.httpClient;
+        const httpClient = context.httpClient;
 
-          context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
-            if (context.showProgressBar) {
-              const harRequest: any = this.getHarRequest(request);
-              const snippet = new HttpSnippet(harRequest);
-              const content = snippet.convert(target.target, target.client);
-              const document = await vscode.workspace.openTextDocument({
-                content
-              });
-              await vscode.window.showTextDocument(document);
-              return false;
-            }
-            return await httpClient(request, context);
-          };
-          await httpYacApi.send(context);
+        context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
+
+          if (context.showProgressBar) {
+            const harRequest: Request = this.getHarRequest(request);
+            const snippet = new HttpSnippet(harRequest);
+            const content = snippet.convert(target.target, target.client);
+            const document = await vscode.workspace.openTextDocument({
+              content
+            });
+            await vscode.window.showTextDocument(document);
+            return false;
+          }
+          return await httpClient(request, context);
+        };
+        await httpYacApi.send(context);
       });
     }
 
@@ -90,48 +93,73 @@ export class HarCommandsController {
 
 
 
-  getHarRequest(options: HttpRequest) {
-    const harRequest: any = {
-      method: options.method,
-      url: options.url,
-      headers: Object.entries(options.headers || {}).map(([name, value]) => {
-        return {
-          name,
-          value
-        };
-      }),
+  getHarRequest(options: HttpRequest): Request {
+
+    const initHeader: Header[] = [];
+
+    const url = options.url || '';
+    const indexOfQuery = url.indexOf('?');
+
+    const harRequest: Request = {
+      method: options.method || 'GET',
+      url,
+      headers: Object.entries(options.headers || {}).reduce((prev, current) => {
+        const [name, value] = current;
+        if (Array.isArray(value)) {
+          prev.push(...value.map(val => {
+            return {
+              name,
+              value: val,
+            };
+          }));
+        } else {
+          prev.push({
+            name,
+            value: value || ''
+          });
+        }
+        return prev;
+      }, initHeader)
     };
 
-    if (options.url) {
-      const indexOfQuery = options.url.indexOf('?');
-      if (indexOfQuery > 0) {
-        harRequest.url = options.url.substring(0, indexOfQuery);
-        harRequest.queryString = options.url.substring(indexOfQuery + 1).split('&').reduce((prev, current) => {
-          const [name, value] = current.split('=');
-          prev.push({ name, value });
-          return prev;
-        }, [] as Array<{ name: string, value: string }>);
-      }
+    if (indexOfQuery > 0) {
+      harRequest.url = harRequest.url.substring(0, indexOfQuery);
+      const initQueryString: QueryString[] = [];
+      harRequest.queryString = url.substring(url.indexOf('?') + 1).split('&').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+        prev.push({ name, value });
+        return prev;
+      }, initQueryString);
     }
-    if (options.body) {
-      harRequest.postData = {
-        text: options.body,
-        mimeType: options.contentType?.mimeType || 'application/json'
-      };
 
-      if (utils.isMimeTypeFormUrlEncoded(harRequest.postData.mimeType) && utils.isString(options.body)) {
-        harRequest.postData.params = options.body.split('&').reduce((prev, current) => {
-          const [key, value] = current.split('=');
-          prev.push({ key, value });
-          return prev;
-        }, [] as Array<{ key: string, value: string }>);
+    if (utils.isString(options.body)) {
+      let mimeType = 'application/json';
+      const header = utils.getHeader(options.headers || {}, 'content-type');
+      if (utils.isString(header)) {
+        mimeType = header;
+      }
+      if (mimeType === 'application/x-www-form-urlencoded') {
+        const initParams: Param[] = [];
+        harRequest.postData = {
+          params: options.body.split('&').reduce((prev, current) => {
+            const [name, value] = current.split('=');
+            prev.push({ name, value });
+            return prev;
+          }, initParams),
+          mimeType
+        };
+      } else {
+        harRequest.postData = {
+          text: options.body,
+          mimeType
+        };
       }
     }
     return harRequest;
   }
 }
 
-interface GenerationTarget{
+interface GenerationTarget {
   label: string;
   target: string;
   client: string;

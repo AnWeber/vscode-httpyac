@@ -20,7 +20,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
     ];
   }
 
-  public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.CompletionItem[] | undefined> {
+  public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[] | undefined> {
 
     const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character)).trim();
     const httpFile = httpFileStore.get(document.fileName);
@@ -285,7 +285,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
     return [];
   }
 
-  dispose() {
+  dispose(): void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];

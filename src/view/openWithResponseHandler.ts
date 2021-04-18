@@ -14,7 +14,7 @@ export async function openWithResponseHandler(httpRegion: HttpRegion): Promise<b
     }
   }
   return false;
-};
+}
 
 function getOpenWith(httpRegion: HttpRegion): string | undefined{
   if (httpRegion.response) {

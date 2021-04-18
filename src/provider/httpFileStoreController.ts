@@ -51,7 +51,7 @@ export class HttpFileStoreController {
     return undefined;
   }
 
-  async getHttpFile(document: vscode.TextDocument) {
+  async getHttpFile(document: vscode.TextDocument) : Promise<HttpFile> {
     if (this.syncParseHttpFile[document.fileName]) {
       return this.syncParseHttpFile[document.fileName];
     }
@@ -63,7 +63,7 @@ export class HttpFileStoreController {
   }
 
 
-  dispose() {
+  dispose() : void{
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];
