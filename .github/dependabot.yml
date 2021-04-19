@@ -3,6 +3,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "@types/vscode"
+      interval: "daily"
+    allowed_updates:
+      - match:
+          update_type: "security"
