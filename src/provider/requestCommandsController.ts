@@ -331,8 +331,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     await vscode.window.showTextDocument(document);
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
-  private isHttpRegion(obj: any): obj is HttpRegion{
-    return obj.actions && obj.symbol && obj.metaData;
+  private isHttpRegion(obj: unknown): obj is HttpRegion{
+    const guard = obj as HttpRegion;
+    return Array.isArray(guard.actions) && !!guard.symbol && !!guard.metaData;
   }
 }
