@@ -1,22 +1,20 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import { log, utils } from 'httpyac';
 import { window } from 'vscode';
 import { getConfigSetting } from '../config';
 
-export function errorHandler(): MethodDecorator {
+export function errorHandler(this: unknown): MethodDecorator {
   return (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
-    //@ts-ignore-line
     descriptor.value = errorHandlerWrapper.bind(this)(target, propertyKey, originalMethod);
     return descriptor;
   };
 }
 
 export function errorHandlerWrapper(target: unknown, propertyKey: string | symbol, method: (...args: unknown[]) => unknown) {
-  return function (...args: unknown[]) : unknown{
+  return function (this: unknown, ...args: unknown[]) : unknown{
     try {
-      //@ts-ignore-line
       const result = method.apply(this, args);
       if (utils.isPromise(result)) {
         return result.catch(err => handleError(target, propertyKey, err));
