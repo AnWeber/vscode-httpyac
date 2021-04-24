@@ -1,5 +1,3 @@
-
-
 declare module 'httpsnippet' {
   export default class HttpSnippet {
     constructor(obj: unknown);

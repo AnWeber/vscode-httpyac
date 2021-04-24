@@ -95,7 +95,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.reset,
-          title: `reset environment`,
+          title: 'reset environment',
         }));
       }
     }
@@ -132,13 +132,11 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   private async pickEnv(httpFile?: HttpFile) {
     const envs = await environments.environmentStore.getEnviroments(httpFile);
     if (envs) {
-      const pickedObj = await vscode.window.showQuickPick(envs.map(env => {
-        return {
-          label: env,
-          picked: environments.environmentStore.activeEnvironments && environments.environmentStore.activeEnvironments.indexOf(env) >= 0
-        };
-      }), {
-        placeHolder: "select environment",
+      const pickedObj = await vscode.window.showQuickPick(envs.map(env => ({
+        label: env,
+        picked: environments.environmentStore.activeEnvironments && environments.environmentStore.activeEnvironments.indexOf(env) >= 0
+      })), {
+        placeHolder: 'select environment',
         canPickMany: getConfigSetting().environmentPickMany,
       });
       if (pickedObj) {
@@ -151,7 +149,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
         environments.environmentStore.activeEnvironments = undefined;
       }
     } else {
-      vscode.window.showInformationMessage("no environment found");
+      vscode.window.showInformationMessage('no environment found');
     }
     return environments.environmentStore.activeEnvironments;
   }
@@ -173,14 +171,12 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   }
 
   private async logout() : Promise<void> {
-    const userSessions = await vscode.window.showQuickPick(environments.userSessionStore.userSessions.map(userSession => {
-      return {
-        id: userSession.id,
-        description: userSession.description,
-        label: userSession.title,
-        data: userSession
-      };
-    }), {
+    const userSessions = await vscode.window.showQuickPick(environments.userSessionStore.userSessions.map(userSession => ({
+      id: userSession.id,
+      description: userSession.description,
+      label: userSession.title,
+      data: userSession
+    })), {
       placeHolder: 'select oauth2 sessions to logout',
       canPickMany: true,
       onDidSelectItem: (item: vscode.QuickPickItem & {data: UserSession}) => {
@@ -198,24 +194,22 @@ export class EnvironmentController implements vscode.CodeLensProvider {
 
   @errorHandler()
   private async removeCookies() : Promise<void> {
-    const cookies = await vscode.window.showQuickPick(environments.cookieStore.cookies.map(cookie => {
-      return {
-        label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
-          .filter(([key]) => ['key', 'value'].indexOf(key) < 0)
-          .map(([key, value]) => {
-            if (value) {
-              if (value instanceof Date) {
-                return `${key}: ${value.toISOString()}`;
-              }
-              return `${key}: ${value}`;
+    const cookies = await vscode.window.showQuickPick(environments.cookieStore.cookies.map(cookie => ({
+      label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
+        .filter(([key]) => ['key', 'value'].indexOf(key) < 0)
+        .map(([key, value]) => {
+          if (value) {
+            if (value instanceof Date) {
+              return `${key}: ${value.toISOString()}`;
             }
-            return undefined;
-          })
-          .filter(obj => obj)
-          .join(' ')}`,
-        data: cookie
-      };
-    }), {
+            return `${key}: ${value}`;
+          }
+          return undefined;
+        })
+        .filter(obj => obj)
+        .join(' ')}`,
+      data: cookie
+    })), {
       placeHolder: 'select cookies to remove',
       canPickMany: true,
       onDidSelectItem: (item: vscode.QuickPickItem & {data: unknown}) => {

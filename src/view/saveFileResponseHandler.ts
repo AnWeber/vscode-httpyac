@@ -1,8 +1,7 @@
 import { HttpRegion } from 'httpyac';
 import { window } from 'vscode';
 import { promises as fs } from 'fs';
-import {getExtension} from './responseHandlerUtils';
-
+import { getExtension } from './responseHandlerUtils';
 
 
 export async function saveFileResponseHandler(httpRegion: HttpRegion): Promise<boolean> {

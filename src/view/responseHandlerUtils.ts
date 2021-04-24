@@ -11,15 +11,16 @@ export const TempPathFolder = 'httpyac_tmp';
 export function getExtension(httpRegion: HttpRegion) : string {
   if (httpRegion.metaData.extension) {
     return httpRegion.metaData.extension;
-  } else if (httpRegion.request?.url) {
+  }
+  if (httpRegion.request?.url) {
     const indexQuery = httpRegion.request.url.indexOf('?');
     let url = httpRegion.request.url;
     if (indexQuery >= 0) {
-      url = url.substring(0, indexQuery);
+      url = url.slice(0, indexQuery);
     }
     const ext = extname(url);
-    if (ext && [4,5].indexOf(ext.length) >= 0) {
-      return ext.substring(1);
+    if (ext && [4, 5].indexOf(ext.length) >= 0) {
+      return ext.slice(1);
     }
   }
   return extension(httpRegion?.response?.contentType?.contentType || 'application/octet-stream') || 'json';
@@ -44,8 +45,7 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
     result.push(...Object.entries(response.request.headers)
       .filter(([key]) => !key.startsWith(':'))
       .map(([key, value]) => `${key}: ${value}`)
-      .sort()
-    );
+      .sort());
     if (response.request.body) {
       result.push('');
       if (utils.isString(response.request.body)) {
@@ -57,13 +57,12 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
     result.push('');
   }
 
-  if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0 ) {
+  if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0) {
     result.push(`HTTP/${response.httpVersion || ''} ${response.statusCode} ${response.statusMessage}`);
     result.push(...Object.entries(response.headers)
       .filter(([key]) => !key.startsWith(':'))
       .map(([key, value]) => `${key}: ${value}`)
-      .sort()
-    );
+      .sort());
     result.push('');
   }
 
@@ -97,15 +96,20 @@ export function getLanguageId(contentType: ContentType | undefined, viewContent?
     }
     if (utils.isMimeTypeJSON(contentType)) {
       return 'json';
-    } else if (utils.isMimeTypeJavascript(contentType)) {
+    }
+    if (utils.isMimeTypeJavascript(contentType)) {
       return 'javascript';
-    } else if (utils.isMimeTypeXml(contentType)) {
+    }
+    if (utils.isMimeTypeXml(contentType)) {
       return 'html';
-    } else if (utils.isMimeTypeHtml(contentType)) {
+    }
+    if (utils.isMimeTypeHtml(contentType)) {
       return 'html';
-    } else if (utils.isMimeTypeCSS(contentType)) {
+    }
+    if (utils.isMimeTypeCSS(contentType)) {
       return 'css';
-    } else if (utils.isMimeTypeMarkdown(contentType)) {
+    }
+    if (utils.isMimeTypeMarkdown(contentType)) {
       return 'markdown';
     }
   }

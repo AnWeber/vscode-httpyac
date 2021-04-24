@@ -2,7 +2,7 @@ import { HttpFile, HttpSymbolKind, httpFileStore } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting, httpDocumentSelector } from '../config';
 
-export class DecorationProvider{
+export class DecorationProvider {
 
   private subscriptions: Array<vscode.Disposable>;
   private decoration: vscode.TextEditorDecorationType;
@@ -10,12 +10,12 @@ export class DecorationProvider{
   constructor(context: vscode.ExtensionContext, httpFileEmitter: vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>) {
     this.decoration = vscode.window.createTextEditorDecorationType({
       gutterIconPath: context.asAbsolutePath('./assets/gutter.svg'),
-      gutterIconSize: "70%",
+      gutterIconSize: '70%',
     });
 
     this.subscriptions = [
       httpFileEmitter.event(({ document, httpFile }) => this.showGutterIcon(document, httpFile)),
-      vscode.window.onDidChangeActiveTextEditor((editor) => {
+      vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor && vscode.languages.match(httpDocumentSelector, editor.document)) {
           const httpFile = httpFileStore.get(editor.document.fileName);
           if (httpFile) {
@@ -28,10 +28,10 @@ export class DecorationProvider{
 
 
   private showGutterIcon(document: vscode.TextDocument, httpFile: HttpFile) {
-      const editor = vscode.window.visibleTextEditors.find(obj => obj.document === document);
-      if (editor) {
-        this.setDecoration(httpFile, editor);
-      }
+    const editor = vscode.window.visibleTextEditors.find(obj => obj.document === document);
+    if (editor) {
+      this.setDecoration(httpFile, editor);
+    }
 
   }
 

@@ -1,6 +1,5 @@
-
 import { ClientCertificateOptions, gotHttpClientFactory, HttpClient, HttpRequest, Variables } from 'httpyac';
-import {Disposable, workspace} from 'vscode';
+import { Disposable, workspace } from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
@@ -28,7 +27,7 @@ export interface AppConfig {
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none',
   responseViewPrettyPrint?:boolean,
   responseViewPreserveFocus?:boolean,
-  responseViewLanguageMap?:Record<string,string>,
+  responseViewLanguageMap?:Record<string, string>,
   responseViewColumn?:string,
   logLevel?:string,
   logResponseBodyLength?:number,
@@ -60,11 +59,12 @@ export function getConfigSetting() : AppConfig {
   return workspace.getConfiguration(APP_NAME);
 }
 
+export type ConfigWatcher = (appConfig: AppConfig, ...config: Array<Record<string, unknown>>) => void
 
-export function watchConfigSettings(watcher: (appConfig: AppConfig, ...config: Array<Record<string, unknown>>) => void, ...sections: Array<string>) : Disposable {
+export function watchConfigSettings(watcher: ConfigWatcher, ...sections: Array<string>) : Disposable {
   const rootSections = [...sections];
   watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
-  return workspace.onDidChangeConfiguration((changeEvent) => {
+  return workspace.onDidChangeConfiguration(changeEvent => {
     if (rootSections.some(section => changeEvent.affectsConfiguration(section))) {
       watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
     }
@@ -73,10 +73,10 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig, ...config: A
 
 
 export const httpDocumentSelector = [
-	{ language: 'http', scheme: '*' }
+  { language: 'http', scheme: '*' }
 ];
 
-export function initHttpClient() : HttpClient{
+export function initHttpClient() : HttpClient {
   const config = getConfigSetting();
   const httpConfig = workspace.getConfiguration('http');
   const request = {

@@ -1,10 +1,9 @@
-
 import * as vscode from 'vscode';
 import { httpFileStore, HttpRegionSendContext } from 'httpyac';
 import { initHttpClient } from '../config';
 
 
-export async function getHttpRegionFromLine(doc: vscode.TextDocument  | undefined, line: number | undefined) : Promise<HttpRegionSendContext | undefined> {
+export async function getHttpRegionFromLine(doc: vscode.TextDocument | undefined, line: number | undefined) : Promise<HttpRegionSendContext | undefined> {
   const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
   if (document) {
     const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
@@ -20,5 +19,3 @@ export async function getHttpRegionFromLine(doc: vscode.TextDocument  | undefine
   }
   return undefined;
 }
-
-

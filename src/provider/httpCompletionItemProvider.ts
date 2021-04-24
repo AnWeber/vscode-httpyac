@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { types } from 'mime-types';
 import { HttpFile, httpFileStore, HttpRegion, HttpSymbolKind } from 'httpyac';
-import {httpDocumentSelector} from '../config';
+import { httpDocumentSelector } from '../config';
 interface HttpCompletionItem {
   name: string;
   description: string;
@@ -49,47 +49,47 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
       const result = [
         {
           name: 'GET',
-          description: `The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.`,
+          description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'HEAD',
-          description: `The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.`,
+          description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'POST',
-          description: `The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.`,
+          description: 'The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'PUT',
-          description: `The PUT method replaces all current representations of the target resource with the request payload.`,
+          description: 'The PUT method replaces all current representations of the target resource with the request payload.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'DELETE',
-          description: `The DELETE method deletes the specified resource.`,
+          description: 'The DELETE method deletes the specified resource.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'CONNECT',
-          description: `The CONNECT method establishes a tunnel to the server identified by the target resource.`,
+          description: 'The CONNECT method establishes a tunnel to the server identified by the target resource.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'OPTIONS',
-          description: `The OPTIONS method is used to describe the communication options for the target resource.`,
+          description: 'The OPTIONS method is used to describe the communication options for the target resource.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'TRACE',
-          description: `The TRACE method performs a message loop-back test along the path to the target resource.`,
+          description: 'The TRACE method performs a message loop-back test along the path to the target resource.',
           kind: vscode.CompletionItemKind.Keyword,
         },
         {
           name: 'PATCH',
-          description: `The PATCH method is used to apply partial modifications to a resource.`,
+          description: 'The PATCH method is used to apply partial modifications to a resource.',
           kind: vscode.CompletionItemKind.Keyword,
         }
       ];
@@ -169,7 +169,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
   private isInRequestLine(httpRegion: HttpRegion, line: number) {
     if (httpRegion.symbol.startLine <= line && line <= httpRegion.symbol.endLine && httpRegion.symbol.children) {
       const preLine = httpRegion.symbol.children.find(obj => obj.startLine === line - 1);
-      if (preLine && (preLine.kind === HttpSymbolKind.requestLine || preLine.kind === HttpSymbolKind.requestHeader)){
+      if (preLine && (preLine.kind === HttpSymbolKind.requestLine || preLine.kind === HttpSymbolKind.requestHeader)) {
         return true;
       }
     }
@@ -178,13 +178,11 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
 
   private getMimetypes(line: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
     if (isInRequestLine && line.toLowerCase().indexOf('content-type') >= 0) {
-      const result = Object.entries(types).map(([key, value]) => {
-        return {
-          name: value,
-          description: key,
-          kind: vscode.CompletionItemKind.Value,
-        };
-      });
+      const result = Object.entries(types).map(([key, value]) => ({
+        name: value,
+        description: key,
+        kind: vscode.CompletionItemKind.Value,
+      }));
       result.push({
         name: 'application/x-www-form-urlencoded',
         description: 'application/x-www-form-urlencoded',
@@ -203,42 +201,42 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
           description: 'responses of a requests with a name are automatically added as variables and can be reused by other requests',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@name ${name}')
-        },{
+        }, {
           name: '@ref',
           description: 'When the request is called, it is ensured that the referenced request is called beforehand',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@ref ${name}')
-        },{
+        }, {
           name: '@forceRef',
           description: 'When the request is called, it is ensured that the referenced request is always called beforehand',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@forceRef ${name}')
-        },{
+        }, {
           name: '@disabled',
           description: 'requests can be disabled',
           kind: vscode.CompletionItemKind.Property,
           text: '@disabled ${file}'
-        },{
+        }, {
           name: '@language',
           description: 'language id of the response view',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@language ${name}')
-        },{
+        }, {
           name: '@note',
           description: 'shows a confirmation dialog before sending request',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@note ${message}')
-        },{
+        }, {
           name: '@save',
           description: 'If specified, the response will not be displayed but saved directly.',
           kind: vscode.CompletionItemKind.Property,
           text: ' @save ${name}',
-        },{
+        }, {
           name: '@openWith',
           description: 'viewType of custom editor to preview files',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@openWith ${name}')
-        },{
+        }, {
           name: '@extension',
           description: 'extension of file for save or openWith.',
           kind: vscode.CompletionItemKind.Property,
@@ -247,16 +245,16 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
       ];
 
       return result
-        .filter(obj => obj.name.toLowerCase().indexOf(textLine.replace(/#/, '').trim()) >= 0).map(obj => {
+        .filter(obj => obj.name.toLowerCase().indexOf(textLine.replace(/#/u, '').trim()) >= 0).map(obj => {
           if (textLine.endsWith('@')) {
             if (obj.text && typeof obj.text !== 'string') {
-              obj.text = new vscode.SnippetString(obj.text.value.substring(1));
+              obj.text = new vscode.SnippetString(obj.text.value.slice(1));
             } else {
-              obj.text = obj.name.substring(1);
+              obj.text = obj.name.slice(1);
             }
           }
           return obj;
-      });
+        });
     }
     return [];
   }
@@ -265,13 +263,11 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
     if (httpFile && line.startsWith('#') && line.toLowerCase().indexOf('ref') >= 0) {
       const result: Array<HttpCompletionItem> = [];
 
-      const toHttpCompletionItem = (httpRegion: HttpRegion) => {
-        return {
-          name: httpRegion.metaData.name,
-          description: 'httpRegion name',
-          kind: vscode.CompletionItemKind.Reference
-        };
-      };
+      const toHttpCompletionItem = (httpRegion: HttpRegion) => ({
+        name: httpRegion.metaData.name,
+        description: 'httpRegion name',
+        kind: vscode.CompletionItemKind.Reference
+      });
 
       result.push(...httpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
       if (httpFile.imports) {

@@ -1,4 +1,3 @@
-
 import { log, utils } from 'httpyac';
 import { window } from 'vscode';
 import { getConfigSetting } from '../config';
@@ -13,7 +12,7 @@ export function errorHandler(this: unknown): MethodDecorator {
 }
 
 export function errorHandlerWrapper(target: unknown, propertyKey: string | symbol, method: (...args: unknown[]) => unknown) {
-  return function (this: unknown, ...args: unknown[]) : unknown{
+  return function(this: unknown, ...args: unknown[]) : unknown {
     try {
       const result = method.apply(this, args);
       if (utils.isPromise(result)) {

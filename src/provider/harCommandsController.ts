@@ -41,7 +41,7 @@ export class HarCommandsController {
       await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         cancellable: true,
-        title: "create har",
+        title: 'create har',
       }, async (progress, token) => {
         context.progress = {
           isCanceled: () => token.isCancellationRequested,
@@ -49,7 +49,7 @@ export class HarCommandsController {
             const dispose = token.onCancellationRequested(event);
             return () => dispose.dispose();
           },
-          report: (data) => progress.report(data),
+          report: data => progress.report(data),
         };
 
         const httpClient = context.httpClient;
@@ -77,20 +77,17 @@ export class HarCommandsController {
   private async pickHttpSnippetResult() {
     const init: Array<GenerationTarget> = [];
     const items = availableTargets().reduce((prev, current) => {
-      const clients = current.clients.map(client => {
-        return {
-          label: `${current.title} - ${client.title}`,
-          target: current.key,
-          client: client.key,
-          description: client.description,
-        };
-      });
+      const clients = current.clients.map(client => ({
+        label: `${current.title} - ${client.title}`,
+        target: current.key,
+        client: client.key,
+        description: client.description,
+      }));
       prev.push(...clients);
       return prev;
     }, init);
     return await vscode.window.showQuickPick(items);
   }
-
 
 
   getHarRequest(options: HttpRequest): Request {
@@ -106,12 +103,10 @@ export class HarCommandsController {
       headers: Object.entries(options.headers || {}).reduce((prev, current) => {
         const [name, value] = current;
         if (Array.isArray(value)) {
-          prev.push(...value.map(val => {
-            return {
-              name,
-              value: val,
-            };
-          }));
+          prev.push(...value.map(val => ({
+            name,
+            value: val,
+          })));
         } else {
           prev.push({
             name,
@@ -123,9 +118,9 @@ export class HarCommandsController {
     };
 
     if (indexOfQuery > 0) {
-      harRequest.url = harRequest.url.substring(0, indexOfQuery);
+      harRequest.url = harRequest.url.slice(0, indexOfQuery);
       const initQueryString: QueryString[] = [];
-      harRequest.queryString = url.substring(url.indexOf('?') + 1).split('&').reduce((prev, current) => {
+      harRequest.queryString = url.slice(url.indexOf('?') + 1).split('&').reduce((prev, current) => {
         const [name, value] = current.split('=');
         prev.push({ name, value });
         return prev;

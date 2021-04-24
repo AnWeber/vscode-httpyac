@@ -1,4 +1,4 @@
-import { HttpRegion, utils,log } from 'httpyac';
+import { HttpRegion, utils, log } from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
@@ -35,7 +35,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
 
     const documentFilter = [{
       scheme: 'untitled',
-    },{
+    }, {
       scheme: 'file',
       pattern: `**/${TempPathFolder}/**`
     }];
@@ -43,10 +43,10 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     this.subscriptions = [
       vscode.languages.registerHoverProvider(documentFilter, this),
       vscode.languages.registerCodeLensProvider(documentFilter, this),
-      vscode.workspace.onDidCloseTextDocument((document) => {
+      vscode.workspace.onDidCloseTextDocument(document => {
         this.remove(document);
       }),
-      vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+      vscode.window.onDidChangeActiveTextEditor(async editor => {
         if (editor) {
           const cacheItem = this.outputCache.find(obj => obj.prettyPrintNeeded && obj.document === editor.document);
           if (cacheItem) {
@@ -90,7 +90,8 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
           arguments: [cacheItem.httpRegion],
           title,
           command: commands.viewHeader
-        })));
+        }))
+      );
     }
 
     return Promise.resolve(result);
@@ -101,7 +102,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem?.httpRegion?.response) {
         const responseHover = utils.toMarkdownPreview(cacheItem.httpRegion.response);
-        return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/) || new vscode.Range(0, 0, 0, 100));
+        return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/u) || new vscode.Range(0, 0, 0, 100));
       }
     }
     return undefined;
@@ -171,7 +172,3 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     }
   }
 }
-
-
-
-

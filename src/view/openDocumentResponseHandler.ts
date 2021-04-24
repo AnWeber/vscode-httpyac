@@ -2,8 +2,7 @@ import { HttpRegion } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 import { ResponseHandlerResult } from './responseHandler';
-import {getLanguageId, showTextEditor, getContent} from './responseHandlerUtils';
-
+import { getLanguageId, showTextEditor, getContent } from './responseHandlerUtils';
 
 
 export async function openDocumentResponseHandler(httpRegion: HttpRegion) : Promise<boolean | ResponseHandlerResult> {

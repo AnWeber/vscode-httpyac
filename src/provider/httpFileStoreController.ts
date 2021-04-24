@@ -8,7 +8,8 @@ export class HttpFileStoreController {
 
   private syncParseHttpFile: Record<string, Promise<HttpFile>> = {};
   private subscriptions: Array<vscode.Disposable> = [];
-  constructor(private readonly httpFileEmitter: vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>, private readonly refreshCodeLens: vscode.EventEmitter<void>) {
+  constructor(private readonly httpFileEmitter: vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>,
+    private readonly refreshCodeLens: vscode.EventEmitter<void>) {
 
     const refreshHttpFileThrottled = throttle(this.refreshHttpFile.bind(this), 200);
     const document = vscode.window.activeTextEditor?.document;
@@ -16,18 +17,18 @@ export class HttpFileStoreController {
       refreshHttpFileThrottled(document);
     }
     this.subscriptions = [
-      vscode.workspace.onDidCloseTextDocument((document) => {
+      vscode.workspace.onDidCloseTextDocument(document => {
         httpFileStore.remove(document.fileName);
       }),
-      vscode.workspace.onDidOpenTextDocument( async (document: vscode.TextDocument) => {
+      vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         await this.refreshHttpFile(document);
       }),
-      vscode.workspace.onDidChangeTextDocument(async (event) => {
+      vscode.workspace.onDidChangeTextDocument(async event => {
         if (event.contentChanges.length > 0) {
           await refreshHttpFileThrottled(event.document);
         }
       }),
-      vscode.workspace.onDidRenameFiles((fileRenameEvent) => {
+      vscode.workspace.onDidRenameFiles(fileRenameEvent => {
         fileRenameEvent.files.forEach(file => {
           httpFileStore.rename(file.oldUri.fsPath, file.newUri.fsPath);
         });
@@ -36,7 +37,7 @@ export class HttpFileStoreController {
   }
 
   @errorHandler()
-  private async refreshHttpFile(document: vscode.TextDocument){
+  private async refreshHttpFile(document: vscode.TextDocument) {
     if (vscode.languages.match(httpDocumentSelector, document)) {
 
       const httpFile = await this.getHttpFile(document);
@@ -63,7 +64,7 @@ export class HttpFileStoreController {
   }
 
 
-  dispose() : void{
+  dispose() : void {
     if (this.subscriptions) {
       this.subscriptions.forEach(obj => obj.dispose());
       this.subscriptions = [];

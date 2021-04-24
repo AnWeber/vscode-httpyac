@@ -66,9 +66,6 @@ function showMessage(level: LogLevel, ...params: unknown[]) {
 }
 
 
-
-
-
 export function initVscodeLogger() : Disposable {
   logOutputProvider.log = logToOutputChannel;
   logOutputProvider.clear = (channel: LogChannels) => {

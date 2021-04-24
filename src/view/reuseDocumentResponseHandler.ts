@@ -5,8 +5,10 @@ import { ResponseHandlerResult } from './responseHandler';
 import { getLanguageId, showTextEditor, getContent } from './responseHandlerUtils';
 
 
-
-export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visibleDocuments: Array<vscode.TextDocument>): Promise<boolean | ResponseHandlerResult> {
+export async function reuseDocumentResponseHandler(
+  httpRegion: HttpRegion,
+  visibleDocuments: Array<vscode.TextDocument>
+): Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
 
   if (httpRegion.response?.body
@@ -26,7 +28,7 @@ export async function reuseDocumentResponseHandler(httpRegion: HttpRegion, visib
         await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
 
         return {
-          document: document,
+          document,
           editor,
         };
       }
