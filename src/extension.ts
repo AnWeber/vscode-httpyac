@@ -1,7 +1,7 @@
 
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, actionProcessor, HttpFile, popupService, log, parser, variables } from 'httpyac';
+import { httpYacApi, httpFileStore, actions, HttpFile, popupService, log, parser, variables } from 'httpyac';
 import { responseHandlers, ResponseOutputProcessor } from './view/responseOutputProcessor';
 import { watchConfigSettings, httpDocumentSelector, getConfigSetting } from './config';
 import { initVscodeLogger } from './logger';
@@ -25,12 +25,12 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
 		return result === buttonTitle;
 	}));
 
-	httpYacApi.variableReplacers.splice(0, 0, variables.replacer.showInputBoxVariableReplacerFactory(async (message: string, defaultValue: string) => await vscode.window.showInputBox({
+	httpYacApi.variableReplacers.splice(0, 0, new variables.replacer.ShowInputBoxVariableReplacer(async (message: string, defaultValue: string) => await vscode.window.showInputBox({
 		placeHolder: message,
 		value: defaultValue,
 		prompt: message
 	})));
-	httpYacApi.variableReplacers.splice(0,0, variables.replacer.showQuickpickVariableReplacerFactory(async (message: string, values: string[]) => await vscode.window.showQuickPick(values,{
+	httpYacApi.variableReplacers.splice(0,0, new variables.replacer.ShowQuickpickVariableReplacer(async (message: string, values: string[]) => await vscode.window.showQuickPick(values,{
 		placeHolder: message
 	})));
 
@@ -104,7 +104,7 @@ function initExtensionScript() {
 			if (extensionScript) {
 				if (isAbsolute(extensionScript) && await fs.stat(extensionScript)) {
 					const script = await fs.readFile(extensionScript, { encoding: 'utf-8' });
-					await actionProcessor.executeScript({
+					await actions.executeScript({
 						script,
 						fileName: extensionScript,
 						variables: {},
