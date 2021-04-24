@@ -152,7 +152,7 @@
     "metadata": {
       "patterns": [
         {
-          "match": "^\\s*#{1,}\\s+(@([^\\s]*))\\s+(.*)?$",
+          "match": "^\\s*#+\\s+(@([^\\s]*))\\s+(.*)?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
@@ -201,7 +201,7 @@
           }
         },
         {
-          "match": "^\\s*\\#{1,}.*$",
+          "match": "^\\s*\\#+.*$",
           "name": "comment.line.sharp.http"
         },
         {
