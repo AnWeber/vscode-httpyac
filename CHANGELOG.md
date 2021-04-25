@@ -1,3 +1,19 @@
+## 2.5.0 (2021-04-25)
+
+#### Breaking Changes
+
+* [Action](https://github.com/AnWeber/httpyac/blob/main/src/models/httpRegionAction.ts#L7) method changed to process instead of processor
+*  [VariableReplacer](https://github.com/AnWeber/httpyac/blob/main/src/models/variableReplacer.ts#L5) changed to object with replace method, to implement better trust support
+#### Features
+
+* better static code analysis in project
+* json schema support for .httpyac.json
+* rest client dynamic variable support ($guid, $randomInt, $timestamp, $datetime, $localDatetime, $processEnv, $dotenv)
+
+#### Fix
+
+* ref and forceRef support is fixed
+* error on executing httpRegionScript
 ## 2.4.0 (2021-04-15)
 
 #### Features

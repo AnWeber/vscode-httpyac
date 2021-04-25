@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "2.4.0",
+	"version": "2.5.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -593,19 +593,19 @@
 			}
 		],
 		"jsonValidation": [
-      {
-        "fileMatch": ".httpyac.json",
-        "url": "./schemas/httpyac-schema.json"
-      },
-      {
-        "fileMatch": "http-client.env.json",
-        "url": "./schemas/http-client.env-schema.json"
-      },
-      {
-        "fileMatch": "http-client.private.env.json",
-        "url": "./schemas/http-client.private.env-schema.json"
-      }
-    ]
+			{
+				"fileMatch": ".httpyac.json",
+				"url": "./schemas/httpyac-schema.json"
+			},
+			{
+				"fileMatch": "http-client.env.json",
+				"url": "./schemas/http-client.env-schema.json"
+			},
+			{
+				"fileMatch": "http-client.private.env.json",
+				"url": "./schemas/http-client.private.env-schema.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
@@ -630,7 +630,7 @@
 		"@typescript-eslint/parser": "^4.22.0",
 		"eslint": "^7.25.0",
 		"eslint-plugin-node": "^11.1.0",
-		"fork-ts-checker-webpack-plugin": "^6.2.4",
+		"fork-ts-checker-webpack-plugin": "^6.2.5",
 		"husky": "^6.0.0",
 		"lint-staged": "^10.5.4",
 		"lockfile-lint": "^4.6.2",
@@ -643,7 +643,7 @@
 	},
 	"dependencies": {
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^2.4.0",
+		"httpyac": "^2.5.0",
 		"lodash": "^4.17.21",
 		"mime-types": "^2.1.30",
 		"tmp-promise": "^3.0.2"
