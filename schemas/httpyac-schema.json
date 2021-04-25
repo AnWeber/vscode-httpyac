@@ -1,0 +1,122 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/EnvironmentConfig",
+    "definitions": {
+        "EnvironmentConfig": {
+            "type": "object",
+            "properties": {
+                "cookieJarEnabled": {
+                    "type": "boolean"
+                },
+                "log": {
+                    "type": "object",
+                    "properties": {
+                        "level": {
+                            "$ref": "#/definitions/LogLevel"
+                        },
+                        "supportAnsiColors": {
+                            "type": "boolean"
+                        },
+                        "isRequestLogEnabled": {
+                            "type": "boolean"
+                        },
+                        "responseBodyLength": {
+                            "type": "number"
+                        },
+                        "prettyPrint": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "defaultHeaders": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "environments": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Variables"
+                    }
+                },
+                "clientCertificates": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/ClientCertificateOptions"
+                    }
+                },
+                "dotenv": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "defaultFiles": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "dirname": {
+                            "type": "string"
+                        },
+                        "variableProviderEnabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "intellij": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "dirname": {
+                            "type": "string"
+                        },
+                        "variableProviderEnabled": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "LogLevel": {
+            "type": "number",
+            "enum": [
+                0,
+                2,
+                5,
+                10,
+                100
+            ]
+        },
+        "Variables": {
+            "type": "object",
+            "additionalProperties": {}
+        },
+        "ClientCertificateOptions": {
+            "type": "object",
+            "properties": {
+                "cert": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "pfx": {
+                    "type": "string"
+                },
+                "passphrase": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

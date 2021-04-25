@@ -591,7 +591,21 @@
 				"mac": "cmd+alt+g",
 				"when": "editorTextFocus && editorLangId == 'http'"
 			}
-		]
+		],
+		"jsonValidation": [
+      {
+        "fileMatch": ".httpyac.json",
+        "url": "./schemas/httpyac-schema.json"
+      },
+      {
+        "fileMatch": "http-client.env.json",
+        "url": "./schemas/http-client.env-schema.json"
+      },
+      {
+        "fileMatch": "http-client.private.env.json",
+        "url": "./schemas/http-client.private.env-schema.json"
+      }
+    ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",
