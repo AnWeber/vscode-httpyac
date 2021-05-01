@@ -1,4 +1,4 @@
-import { ClientCertificateOptions, gotHttpClientFactory, HttpClient, HttpRequest, Variables } from 'httpyac';
+import { ClientCertificateOptions, HttpRequest, Variables } from 'httpyac';
 import { Disposable, workspace } from 'vscode';
 
 export const APP_NAME = 'httpyac';
@@ -75,13 +75,3 @@ export function watchConfigSettings(watcher: ConfigWatcher, ...sections: Array<s
 export const httpDocumentSelector = [
   { language: 'http', scheme: '*' }
 ];
-
-export function initHttpClient() : HttpClient {
-  const config = getConfigSetting();
-  const httpConfig = workspace.getConfiguration('http');
-  const request = {
-    ...config.requestOptions,
-    proxy: httpConfig.proxy
-  };
-  return gotHttpClientFactory(request);
-}

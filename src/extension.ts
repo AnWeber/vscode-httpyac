@@ -1,73 +1,77 @@
 import * as vscode from 'vscode';
 import * as provider from './provider';
-import { httpYacApi, httpFileStore, actions, HttpFile, popupService, log, parser, variables } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { responseHandlers, ResponseOutputProcessor } from './view/responseOutputProcessor';
-import { watchConfigSettings, httpDocumentSelector, getConfigSetting } from './config';
+import * as config from './config';
 import { initVscodeLogger } from './logger';
 import { promises as fs } from 'fs';
 import { isAbsolute, join } from 'path';
-import { HttpFileStoreController } from './provider';
 
 
 export interface HttpYacExtensionApi{
-  httpYacApi: typeof httpYacApi,
-  httpFileStoreController: HttpFileStoreController,
+  httpyac: typeof httpyac,
   responseHandlers: typeof responseHandlers,
+  httpFileStore: httpyac.HttpFileStore,
+  config: typeof config,
+  refreshCodeLens: vscode.EventEmitter<void>,
+  environementChanged: vscode.EventEmitter<string[] | undefined>
 }
 
 
 export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi {
-  httpYacApi.additionalRequire.vscode = vscode;
-  httpYacApi.httpRegionParsers.push(new parser.NoteMetaHttpRegionParser(async (note: string) => {
+  httpyac.httpYacApi.additionalRequire.vscode = vscode;
+  httpyac.httpYacApi.httpRegionParsers.push(new httpyac.parser.NoteMetaHttpRegionParser(async (note: string) => {
     const buttonTitle = 'Execute';
     const result = await vscode.window.showWarningMessage(note, { modal: true }, buttonTitle);
     return result === buttonTitle;
   }));
 
-  httpYacApi.variableReplacers.splice(0, 0, new variables.replacer.ShowInputBoxVariableReplacer(
+  httpyac.httpYacApi.variableReplacers.splice(0, 0, new httpyac.variables.replacer.ShowInputBoxVariableReplacer(
     async (message: string, defaultValue: string) => await vscode.window.showInputBox({
       placeHolder: message,
       value: defaultValue,
       prompt: message
     })
   ));
-  httpYacApi.variableReplacers.splice(0, 0, new variables.replacer.ShowQuickpickVariableReplacer(
+  httpyac.httpYacApi.variableReplacers.splice(0, 0, new httpyac.variables.replacer.ShowQuickpickVariableReplacer(
     async (message: string, values: string[]) => await vscode.window.showQuickPick(values, {
       placeHolder: message
     })
   ));
 
   const responseOutputProcessor = new ResponseOutputProcessor();
-  const httpFileEmitter = new vscode.EventEmitter<{ httpFile: HttpFile, document: vscode.TextDocument }>();
+
   const refreshCodeLens = new vscode.EventEmitter<void>();
 
-  const httpFileStoreController = new provider.HttpFileStoreController(httpFileEmitter, refreshCodeLens);
+  const environementChanged = new vscode.EventEmitter<string[] | undefined>();
+
+  const httpFileStore = new httpyac.HttpFileStore();
   context.subscriptions.push(...[
     refreshCodeLens,
-    httpFileStoreController,
-    new provider.HarCommandsController(),
-    new provider.RequestCommandsController(refreshCodeLens, responseOutputProcessor),
-    new provider.EnvironmentController(refreshCodeLens),
-    new provider.DecorationProvider(context, httpFileEmitter),
-    new provider.HttpCompletionItemProvider(),
+    new provider.HttpFileStoreController(httpFileStore, refreshCodeLens),
+    new provider.HarCommandsController(httpFileStore),
+    new provider.RequestCommandsController(refreshCodeLens, responseOutputProcessor, httpFileStore),
+    new provider.EnvironmentController(environementChanged, refreshCodeLens, httpFileStore),
+    new provider.DecorationProvider(context, refreshCodeLens, httpFileStore),
+    new provider.HttpCompletionItemProvider(httpFileStore),
     responseOutputProcessor,
-    vscode.languages.registerDocumentSymbolProvider(httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStoreController)),
-    watchConfigSettings(config => {
+    vscode.languages.registerDocumentSymbolProvider(config.httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStore)),
+    config.watchConfigSettings(configuration => {
       httpFileStore.clear();
-      const index = httpYacApi.httpRegionParsers.findIndex(obj => obj instanceof parser.SettingsScriptHttpRegionParser);
+      const index = httpyac.httpYacApi.httpRegionParsers.findIndex(obj => obj instanceof httpyac.parser.SettingsScriptHttpRegionParser);
       if (index >= 0) {
-        httpYacApi.httpRegionParsers.splice(index, 1);
+        httpyac.httpYacApi.httpRegionParsers.splice(index, 1);
       }
-      if (config.httpRegionScript) {
-        httpYacApi.httpRegionParsers.push(new parser.SettingsScriptHttpRegionParser(async () => {
-          const fileName = getConfigSetting().httpRegionScript;
+      if (configuration.httpRegionScript) {
+        httpyac.httpYacApi.httpRegionParsers.push(new httpyac.parser.SettingsScriptHttpRegionParser(async () => {
+          const fileName = config.getConfigSetting().httpRegionScript;
           if (fileName) {
             if (isAbsolute(fileName)) {
               try {
                 const script = await fs.readFile(fileName, 'utf-8');
                 return { script, lineOffset: 0 };
               } catch (err) {
-                log.trace(`file not found: ${fileName}`);
+                httpyac.log.trace(`file not found: ${fileName}`);
               }
             } else if (vscode.workspace.workspaceFolders) {
               for (const workspaceFolder of vscode.workspace.workspaceFolders) {
@@ -79,7 +83,7 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
                     lineOffset: 0
                   };
                 } catch (err) {
-                  log.trace(`file not found: ${file}`);
+                  httpyac.log.trace(`file not found: ${file}`);
                 }
               }
             }
@@ -93,43 +97,41 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
   ]);
 
   return {
-    httpYacApi,
-    httpFileStoreController,
-    responseHandlers
+    httpyac,
+    httpFileStore,
+    responseHandlers,
+    config,
+    refreshCodeLens,
+    environementChanged
   };
 }
 
 
 function initExtensionScript() {
-  const disposable = watchConfigSettings(async config => {
+  const disposable = config.watchConfigSettings(async config => {
     try {
       const extensionScript = config.extensionScript;
       if (extensionScript) {
         if (isAbsolute(extensionScript) && await fs.stat(extensionScript)) {
           const script = await fs.readFile(extensionScript, { encoding: 'utf-8' });
-          await actions.executeScript({
+          await httpyac.actions.executeScript({
             script,
             fileName: extensionScript,
             variables: {},
             lineOffset: 0
           });
-          log.info('extenionscript executed. dispose config watcher');
+          httpyac.log.info('extenionscript executed. dispose config watcher');
           if (disposable) {
             disposable.dispose();
           }
         } else {
-          popupService.error('extenionscript not found');
-          log.error('extenionscript not found');
+          httpyac.popupService.error('extenionscript not found');
+          httpyac.log.error('extenionscript not found');
         }
       }
     } catch (err) {
-      log.error(err);
+      httpyac.log.error(err);
     }
   });
   return disposable;
-}
-
-// this method is called when your extension is deactivated
-export function deactivate() : void {
-  httpFileStore.clear();
 }

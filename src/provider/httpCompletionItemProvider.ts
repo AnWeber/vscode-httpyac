@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { types } from 'mime-types';
-import { HttpFile, httpFileStore, HttpRegion, HttpSymbolKind } from 'httpyac';
+import { HttpFile, HttpFileStore, HttpRegion, HttpSymbolKind } from 'httpyac';
 import { httpDocumentSelector } from '../config';
 interface HttpCompletionItem {
   name: string;
@@ -13,7 +13,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
 
   private subscriptions: Array<vscode.Disposable>;
 
-  constructor() {
+  constructor(private readonly httpFileStore: HttpFileStore) {
 
     this.subscriptions = [
       vscode.languages.registerCompletionItemProvider(httpDocumentSelector, this),
@@ -23,7 +23,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
   public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[] | undefined> {
 
     const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character)).trim();
-    const httpFile = httpFileStore.get(document.fileName);
+    const httpFile = this.httpFileStore.get(document.fileName);
 
     const isInRequestLine = !!(httpFile && httpFile.httpRegions.some(httpRegion => this.isInRequestLine(httpRegion, position.line)));
 

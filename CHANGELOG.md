@@ -1,3 +1,13 @@
+## 2.6.0 (2021-05-01)
+
+#### Features
+* extended extension api
+* toMarkdown with better option support and style change
+* httpClient is optional on httpyacApi.send
+
+#### Fix
+* incomplete httpRegion.source fixed
+
 ## 2.5.0 (2021-04-25)
 
 #### Breaking Changes

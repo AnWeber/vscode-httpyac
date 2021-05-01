@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { httpFileStore, environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession } from 'httpyac';
+import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, HttpFileStore, utils } from 'httpyac';
 import { errorHandler } from './errorHandler';
 
 const commands = {
@@ -18,7 +18,11 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   private disposeEnvironment: (() => void) | false = false;
   onDidChangeCodeLenses: vscode.Event<void>;
 
-  constructor(refreshCodeLens: vscode.EventEmitter<void>) {
+  constructor(
+    private readonly environmentChanged: vscode.EventEmitter<string[] | undefined>,
+    refreshCodeLens: vscode.EventEmitter<void>,
+    private readonly httpFileStore: HttpFileStore
+  ) {
     environments.environmentStore.activeEnvironments = getConfigSetting().environmentSelectedOnStart;
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
@@ -28,7 +32,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
-      watchConfigSettings(this.initEnvironmentProvider.bind(this))
+      watchConfigSettings(this.initEnvironmentProvider.bind(this), 'http')
     ];
 
   }
@@ -41,7 +45,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  private async initEnvironmentProvider(appConfig: AppConfig) : Promise<void> {
+  private async initEnvironmentProvider(appConfig: AppConfig, httpOptions: Record<string, unknown>) : Promise<void> {
     this.config = appConfig;
     if (this.disposeEnvironment) {
       this.disposeEnvironment();
@@ -58,6 +62,8 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       },
       cookieJarEnabled: appConfig.cookieJarEnabled,
       clientCertificates: appConfig.clientCertficates,
+      request: appConfig.requestOptions,
+      proxy: utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
       defaultHeaders: appConfig.requestDefaultHeaders,
       intellij: {
         enabled: appConfig.intellijEnvEnabled,
@@ -76,12 +82,13 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     if (vscode.workspace.workspaceFolders) {
       rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath));
     }
+
     this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
   }
 
   provideCodeLenses(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
-    const httpFile = httpFileStore.get(document.fileName);
+    const httpFile = this.httpFileStore.get(document.fileName);
     if (this.config.showCodeLensEnvironment) {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
@@ -120,7 +127,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   private async toggleEnv(doc?: vscode.TextDocument) : Promise<void> {
     const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
     if (document) {
-      const httpFile = httpFileStore.get(document.fileName);
+      const httpFile = this.httpFileStore.get(document.fileName);
       if (httpFile) {
         const env = await this.pickEnv(httpFile);
         httpFile.activeEnvironment = env;
@@ -151,12 +158,13 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     } else {
       vscode.window.showInformationMessage('no environment found');
     }
+    this.environmentChanged.fire(environments.environmentStore.activeEnvironments);
     return environments.environmentStore.activeEnvironments;
   }
 
   private async toggleAllEnv() : Promise<void> {
     const env = await this.pickEnv();
-    const httpFiles = httpFileStore.getAll();
+    const httpFiles = this.httpFileStore.getAll();
     for (const httpFile of httpFiles) {
       if (httpFile) {
         httpFile.activeEnvironment = env;

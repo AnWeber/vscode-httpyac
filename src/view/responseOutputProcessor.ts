@@ -101,7 +101,11 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
     if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem?.httpRegion?.response) {
-        const responseHover = utils.toMarkdownPreview(cacheItem.httpRegion.response);
+        const responseHover = utils.toMarkdown(cacheItem.httpRegion.response, {
+          testResults: cacheItem.httpRegion.testResults,
+          responseBody: false,
+          requestBody: false,
+        });
         return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/u) || new vscode.Range(0, 0, 0, 100));
       }
     }

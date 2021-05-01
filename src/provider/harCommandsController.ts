@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext } from 'httpyac';
+import { httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext, HttpFileStore } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { getHttpRegionFromLine } from '../utils';
@@ -16,7 +16,7 @@ export class HarCommandsController {
 
   subscriptions: Array<vscode.Disposable>;
 
-  constructor() {
+  constructor(private readonly httpFileStore: HttpFileStore) {
     this.subscriptions = [
       vscode.commands.registerCommand(commands.generateCode, this.generateCode, this),
     ];
@@ -31,7 +31,7 @@ export class HarCommandsController {
 
   @errorHandler()
   private async generateCode(document?: vscode.TextDocument, line?: number) {
-    const httpRegionSendContext = await getHttpRegionFromLine(document, line);
+    const httpRegionSendContext = await getHttpRegionFromLine(document, line, this.httpFileStore);
     await this.generateCodeRequest(httpRegionSendContext);
   }
 
@@ -52,7 +52,7 @@ export class HarCommandsController {
           report: data => progress.report(data),
         };
 
-        const httpClient = context.httpClient;
+        const httpClient = utils.initHttpClient();
 
         context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
 
