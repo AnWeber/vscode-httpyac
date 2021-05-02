@@ -53,6 +53,7 @@ module.exports = (env, argv) => {
     plugins: [
       new webpack.ContextReplacementPlugin(/keyv/),
       new ForkTsCheckerWebpackPlugin({
+        async: true,
         typescript: {
           diagnosticOptions: {
             semantic: true,
