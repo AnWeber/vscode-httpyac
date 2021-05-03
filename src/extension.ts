@@ -6,6 +6,7 @@ import * as config from './config';
 import { initVscodeLogger } from './logger';
 import { promises as fs } from 'fs';
 import { isAbsolute, join } from 'path';
+import { DocumentStore } from './documentStore';
 
 
 export interface HttpYacExtensionApi{
@@ -46,16 +47,17 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
   const environementChanged = new vscode.EventEmitter<string[] | undefined>();
 
   const httpFileStore = new httpyac.HttpFileStore();
+  const documentStore = new DocumentStore(httpFileStore);
   context.subscriptions.push(...[
     refreshCodeLens,
-    new provider.HttpFileStoreController(httpFileStore, refreshCodeLens),
-    new provider.HarCommandsController(httpFileStore),
-    new provider.RequestCommandsController(refreshCodeLens, responseOutputProcessor, httpFileStore),
-    new provider.EnvironmentController(environementChanged, refreshCodeLens, httpFileStore),
-    new provider.DecorationProvider(context, refreshCodeLens, httpFileStore),
-    new provider.HttpCompletionItemProvider(httpFileStore),
+    new provider.HttpFileStoreController(documentStore, refreshCodeLens),
+    new provider.HarCommandsController(documentStore),
+    new provider.RequestCommandsController(refreshCodeLens, responseOutputProcessor, documentStore),
+    new provider.EnvironmentController(environementChanged, refreshCodeLens, documentStore),
+    new provider.DecorationProvider(context, refreshCodeLens, documentStore),
+    new provider.HttpCompletionItemProvider(documentStore),
     responseOutputProcessor,
-    vscode.languages.registerDocumentSymbolProvider(config.httpDocumentSelector, new provider.HttpDocumentSymbolProvider(httpFileStore)),
+    vscode.languages.registerDocumentSymbolProvider(config.httpDocumentSelector, new provider.HttpDocumentSymbolProvider(documentStore)),
     config.watchConfigSettings(configuration => {
       httpFileStore.clear();
       const index = httpyac.httpYacApi.httpRegionParsers.findIndex(obj => obj instanceof httpyac.parser.SettingsScriptHttpRegionParser);

@@ -1,15 +1,16 @@
 import * as vscode from 'vscode';
-import { HttpRegionSendContext, HttpFileStore } from 'httpyac';
+import { HttpRegionSendContext } from 'httpyac';
+import { DocumentStore } from '../documentStore';
 
 
 export async function getHttpRegionFromLine(
   doc: vscode.TextDocument | undefined,
   line: number | undefined,
-  httpFileStore: HttpFileStore
+  documentStore: DocumentStore
 ): Promise<HttpRegionSendContext | undefined> {
   const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
   if (document) {
-    const httpFile = await httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
+    const httpFile = await documentStore.getHttpFile(document);
     if (httpFile) {
       const currentLine = Number.isInteger(line) ? line : vscode.window.activeTextEditor?.selection.active.line;
       if (currentLine !== undefined) {

@@ -1,15 +1,14 @@
 import * as vscode from 'vscode';
-import { HttpFile, HttpFileStore } from 'httpyac';
 import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
 import { httpDocumentSelector } from '../config';
+import { DocumentStore } from '../documentStore';
 
 export class HttpFileStoreController {
 
-  private syncParseHttpFile: Record<string, Promise<HttpFile>> = {};
   private subscriptions: Array<vscode.Disposable> = [];
   constructor(
-    private readonly httpFileStore: HttpFileStore,
+    private readonly documentStore: DocumentStore,
     private readonly refreshCodeLens: vscode.EventEmitter<void>
   ) {
 
@@ -20,7 +19,7 @@ export class HttpFileStoreController {
     }
     this.subscriptions = [
       vscode.workspace.onDidCloseTextDocument(document => {
-        this.httpFileStore.remove(document.fileName);
+        this.documentStore.httpFileStore.remove(document.fileName);
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         await this.refreshHttpFile(document);
@@ -32,7 +31,7 @@ export class HttpFileStoreController {
       }),
       vscode.workspace.onDidRenameFiles(fileRenameEvent => {
         fileRenameEvent.files.forEach(file => {
-          this.httpFileStore.rename(file.oldUri.fsPath, file.newUri.fsPath);
+          this.documentStore.httpFileStore.rename(file.oldUri.fsPath, file.newUri.fsPath);
         });
       }),
     ];
@@ -42,7 +41,7 @@ export class HttpFileStoreController {
   private async refreshHttpFile(document: vscode.TextDocument) {
     if (vscode.languages.match(httpDocumentSelector, document)) {
 
-      const httpFile = await this.getHttpFile(document);
+      const httpFile = await this.documentStore.getHttpFile(document);
       if (this.refreshCodeLens) {
         this.refreshCodeLens.fire();
       }
@@ -51,16 +50,6 @@ export class HttpFileStoreController {
     return undefined;
   }
 
-  async getHttpFile(document: vscode.TextDocument) : Promise<HttpFile> {
-    if (this.syncParseHttpFile[document.fileName]) {
-      return this.syncParseHttpFile[document.fileName];
-    }
-    const promise = this.httpFileStore.getOrCreate(document.fileName, () => Promise.resolve(document.getText()), document.version);
-    this.syncParseHttpFile[document.fileName] = promise;
-    const httpFile = await promise;
-    delete this.syncParseHttpFile[document.fileName];
-    return httpFile;
-  }
 
   dispose() : void {
     if (this.subscriptions) {

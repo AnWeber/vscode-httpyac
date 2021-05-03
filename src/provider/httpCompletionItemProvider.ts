@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { types } from 'mime-types';
-import { HttpFile, HttpFileStore, HttpRegion, HttpSymbolKind } from 'httpyac';
+import { HttpFile, HttpRegion, HttpSymbolKind } from 'httpyac';
 import { httpDocumentSelector } from '../config';
+import { DocumentStore } from '../documentStore';
 interface HttpCompletionItem {
   name: string;
   description: string;
@@ -13,7 +14,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
 
   private subscriptions: Array<vscode.Disposable>;
 
-  constructor(private readonly httpFileStore: HttpFileStore) {
+  constructor(private readonly documentStore: DocumentStore) {
 
     this.subscriptions = [
       vscode.languages.registerCompletionItemProvider(httpDocumentSelector, this),
@@ -23,7 +24,7 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
   public async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[] | undefined> {
 
     const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character)).trim();
-    const httpFile = this.httpFileStore.get(document.fileName);
+    const httpFile = await this.documentStore.getHttpFile(document);
 
     const isInRequestLine = !!(httpFile && httpFile.httpRegions.some(httpRegion => this.isInRequestLine(httpRegion, position.line)));
 

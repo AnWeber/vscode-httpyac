@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, HttpFileStore, utils } from 'httpyac';
+import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, utils } from 'httpyac';
 import { errorHandler } from './errorHandler';
+import { DocumentStore } from '../documentStore';
 
 const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,
@@ -21,7 +22,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   constructor(
     private readonly environmentChanged: vscode.EventEmitter<string[] | undefined>,
     refreshCodeLens: vscode.EventEmitter<void>,
-    private readonly httpFileStore: HttpFileStore
+    private readonly documentStore: DocumentStore
   ) {
     environments.environmentStore.activeEnvironments = getConfigSetting().environmentSelectedOnStart;
     this.onDidChangeCodeLenses = refreshCodeLens.event;
@@ -86,9 +87,9 @@ export class EnvironmentController implements vscode.CodeLensProvider {
     this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
   }
 
-  provideCodeLenses(document: vscode.TextDocument): vscode.ProviderResult<vscode.CodeLens[]> {
+  async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
-    const httpFile = this.httpFileStore.get(document.fileName);
+    const httpFile = await this.documentStore.getHttpFile(document);
     if (this.config.showCodeLensEnvironment) {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
@@ -127,7 +128,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
   private async toggleEnv(doc?: vscode.TextDocument) : Promise<void> {
     const document = doc?.getText ? doc : vscode.window.activeTextEditor?.document;
     if (document) {
-      const httpFile = this.httpFileStore.get(document.fileName);
+      const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
         const env = await this.pickEnv(httpFile);
         httpFile.activeEnvironment = env;
@@ -164,11 +165,9 @@ export class EnvironmentController implements vscode.CodeLensProvider {
 
   private async toggleAllEnv() : Promise<void> {
     const env = await this.pickEnv();
-    const httpFiles = this.httpFileStore.getAll();
+    const httpFiles = this.documentStore.getAll();
     for (const httpFile of httpFiles) {
-      if (httpFile) {
-        httpFile.activeEnvironment = env;
-      }
+      httpFile.activeEnvironment = env;
     }
   }
 
