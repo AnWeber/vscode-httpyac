@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron:  '0 0 * * 1'
 jobs:
   build:
     strategy:
@@ -25,6 +30,6 @@ jobs:
         node-version: 14.x
     - run: npm install
     - run: npm run lint
-    - run: npm run package
+    - run: npm run compile
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1

@@ -13,6 +13,7 @@
 	"bugs": {
 		"url": "https://github.com/AnWeber/vscode-httpyac/issues"
 	},
+	"qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
 	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.50.0"
@@ -608,10 +609,9 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run package",
+		"vscode:prepublish": "npm run compile",
 		"compile": "webpack --config ./webpack.config.js",
 		"watch": "webpack --watch --config ./webpack.config.js",
-		"package": "webpack --mode production --devtool hidden-source-map --config ./webpack.config.js",
 		"lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
 		"eslint": "eslint src --ext ts",
 		"lint": "npm run eslint && npm run lockfile-lint",
@@ -623,7 +623,7 @@
 	"devDependencies": {
 		"@types/lodash": "^4.14.168",
 		"@types/mime-types": "^2.1.0",
-		"@types/node": "^14.14.43",
+		"@types/node": "^15.0.1",
 		"@types/uuid": "^8.3.0",
 		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^4.22.0",
