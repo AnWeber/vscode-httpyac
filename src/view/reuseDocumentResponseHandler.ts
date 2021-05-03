@@ -18,14 +18,13 @@ export async function reuseDocumentResponseHandler(
 
     const document = visibleDocuments.find(document => document.languageId === language && document.isUntitled);
     if (document) {
-      const lineCount = document.lineCount;
       let editor = vscode.window.visibleTextEditors.find(obj => obj.document === document);
       if (editor !== vscode.window.activeTextEditor) {
         editor = await showTextEditor(document, false);
       }
       if (editor) {
         const content = getContent(httpRegion.response, config.responseViewContent);
-        await editor.edit((obj => obj.replace(new vscode.Range(0, 0, lineCount || 0, 0), content)));
+        await editor.edit((obj => obj.replace(new vscode.Range(0, 0, document.lineCount || 0, 0), content)));
 
         return {
           document,

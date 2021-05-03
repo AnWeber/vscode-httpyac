@@ -8,7 +8,8 @@ import { getLanguageId, showTextEditor, getContent } from './responseHandlerUtil
 export async function openDocumentResponseHandler(httpRegion: HttpRegion) : Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
   if (httpRegion.response?.body
-    && (config.responseViewMode === 'open' || config.responseViewMode === 'reuse')) {
+    && config.responseViewMode
+    && ['preview', 'reuse', 'open'].indexOf(config.responseViewMode) >= 0) {
     const language = getLanguageId(httpRegion.response.contentType, config.responseViewContent);
     const content = getContent(httpRegion.response, config.responseViewContent);
     const document = await vscode.workspace.openTextDocument({
