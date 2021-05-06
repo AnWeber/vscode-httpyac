@@ -54,7 +54,6 @@ export interface AppConfig {
 
 }
 
-
 export function getConfigSetting() : AppConfig {
   return workspace.getConfiguration(APP_NAME);
 }
@@ -62,7 +61,7 @@ export function getConfigSetting() : AppConfig {
 export type ConfigWatcher = (appConfig: AppConfig, ...config: Array<Record<string, unknown>>) => void
 
 export function watchConfigSettings(watcher: ConfigWatcher, ...sections: Array<string>) : Disposable {
-  const rootSections = [...sections];
+  const rootSections = [APP_NAME, ...sections];
   watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
   return workspace.onDidChangeConfiguration(changeEvent => {
     if (rootSections.some(section => changeEvent.affectsConfiguration(section))) {
