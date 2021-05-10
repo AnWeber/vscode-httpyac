@@ -630,7 +630,7 @@
 		"@typescript-eslint/parser": "^4.22.0",
 		"eslint": "^7.25.0",
 		"eslint-plugin-node": "^11.1.0",
-		"fork-ts-checker-webpack-plugin": "^6.2.5",
+		"fork-ts-checker-webpack-plugin": "^6.2.6",
 		"husky": "^6.0.0",
 		"lint-staged": "^10.5.4",
 		"lockfile-lint": "^4.6.2",
