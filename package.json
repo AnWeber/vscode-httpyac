@@ -82,7 +82,7 @@
 					"description": "default request headers if not overwritten"
 				},
 				"httpyac.requestGotOptions": {
-					"type": "objct",
+					"type": "object",
 					"scope": "resource",
 					"description": "got options used as default"
 				},
