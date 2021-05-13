@@ -40,7 +40,7 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: un
   }
   if (level === LogLevel.error) {
     outputChannel.show(true);
-  } else if (getConfigSetting().logRequest && channel === LogChannels.Request) {
+  } else if (getConfigSetting().showlogRequestOutput && channel === LogChannels.Request) {
     outputChannel.show(true);
   }
 }

@@ -292,9 +292,15 @@
 				},
 				"httpyac.logRequest": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"scope": "resource",
 					"description": "log request in output channel requests"
+				},
+				"httpyac.showlogRequestOutput": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "should log request output always be shown"
 				},
 				"httpyac.useMethodInSendCodeLens": {
 					"type": "boolean",
