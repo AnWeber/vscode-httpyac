@@ -1,21 +1,12 @@
 import * as vscode from 'vscode';
 import * as provider from './provider';
 import * as httpyac from 'httpyac';
-import { responseHandlers, ResponseOutputProcessor } from './view/responseOutputProcessor';
+import { responseHandlers, ResponseOutputProcessor } from './view';
 import * as config from './config';
 import { initVscodeLogger } from './logger';
 import { DocumentStore } from './documentStore';
 import { initVscodeFileProvider } from './fileProvider';
-
-
-export interface HttpYacExtensionApi{
-  httpyac: typeof httpyac,
-  responseHandlers: typeof responseHandlers,
-  httpFileStore: httpyac.HttpFileStore,
-  config: typeof config,
-  refreshCodeLens: vscode.EventEmitter<void>,
-  environementChanged: vscode.EventEmitter<string[] | undefined>
-}
+import { HttpYacExtensionApi } from './extensionApi';
 
 
 export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi {
@@ -102,6 +93,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     httpyac,
     httpFileStore,
     responseHandlers,
+    responseOutputProcessor,
     config,
     refreshCodeLens,
     environementChanged

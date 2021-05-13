@@ -6,6 +6,7 @@
 * update dotenv to 9.0.2
 * add setting to disable codelens in notebooks
 * add settting to enable showing request output
+* extended extensionApi with ResponseOutputProcessor
 #### Fix
 * fix error in settings for requestGotOptions
 
