@@ -16,7 +16,7 @@
 	"qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
 	"icon": "icon.png",
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.56.0"
 	},
 	"categories": [
 		"Other",
