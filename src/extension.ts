@@ -4,9 +4,8 @@ import * as httpyac from 'httpyac';
 import { responseHandlers, ResponseOutputProcessor } from './view/responseOutputProcessor';
 import * as config from './config';
 import { initVscodeLogger } from './logger';
-import { promises as fs } from 'fs';
-import { isAbsolute, join } from 'path';
 import { DocumentStore } from './documentStore';
+import { initVscodeFileProvider } from './fileProvider';
 
 
 export interface HttpYacExtensionApi{
@@ -19,7 +18,8 @@ export interface HttpYacExtensionApi{
 }
 
 
-export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi {
+export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi {
+  initVscodeFileProvider();
   httpyac.httpYacApi.additionalRequire.vscode = vscode;
   httpyac.httpYacApi.httpRegionParsers.push(new httpyac.parser.NoteMetaHttpRegionParser(async (note: string) => {
     const buttonTitle = 'Execute';
@@ -49,6 +49,7 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
   const httpFileStore = new httpyac.HttpFileStore();
   const documentStore = new DocumentStore(httpFileStore);
   context.subscriptions.push(...[
+    initVscodeLogger(),
     refreshCodeLens,
     new provider.HttpFileStoreController(documentStore, refreshCodeLens),
     new provider.HarCommandsController(documentStore),
@@ -68,18 +69,18 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
         httpyac.httpYacApi.httpRegionParsers.push(new httpyac.parser.SettingsScriptHttpRegionParser(async () => {
           const fileName = config.getConfigSetting().httpRegionScript;
           if (fileName) {
-            if (isAbsolute(fileName)) {
+            if (httpyac.fileProvider.isAbsolute(fileName)) {
               try {
-                const script = await fs.readFile(fileName, 'utf-8');
+                const script = await httpyac.fileProvider.readFile(fileName, 'utf-8');
                 return { script, lineOffset: 0 };
               } catch (err) {
                 httpyac.log.trace(`file not found: ${fileName}`);
               }
             } else if (vscode.workspace.workspaceFolders) {
               for (const workspaceFolder of vscode.workspace.workspaceFolders) {
-                const file = join(workspaceFolder.uri.fsPath, fileName);
+                const file = httpyac.fileProvider.joinPath(workspaceFolder.uri, fileName);
                 try {
-                  const script = await fs.readFile(file, 'utf-8');
+                  const script = await httpyac.fileProvider.readFile(file, 'utf-8');
                   return {
                     script,
                     lineOffset: 0
@@ -95,7 +96,6 @@ export function activate(context: vscode.ExtensionContext) : HttpYacExtensionApi
       }
     }),
     initExtensionScript(),
-    initVscodeLogger(),
   ]);
 
   return {
@@ -114,8 +114,8 @@ function initExtensionScript() {
     try {
       const extensionScript = config.extensionScript;
       if (extensionScript) {
-        if (isAbsolute(extensionScript) && await fs.stat(extensionScript)) {
-          const script = await fs.readFile(extensionScript, { encoding: 'utf-8' });
+        if (httpyac.fileProvider.isAbsolute(extensionScript) && await httpyac.fileProvider.exists(extensionScript)) {
+          const script = await httpyac.fileProvider.readFile(extensionScript, 'utf-8');
           await httpyac.actions.executeScript({
             script,
             fileName: extensionScript,

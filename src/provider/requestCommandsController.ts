@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import { HttpRegion, httpYacApi, HttpSymbolKind, log, HttpRegionSendContext, HttpFileSendContext, utils, RepeatOrder } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { AppConfig, APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
-import { promises as fs } from 'fs';
 import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
-import { getHttpRegionFromLine } from '../utils';
+import { getHttpRegionFromLine, isNotebook } from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
 
@@ -26,7 +25,7 @@ export const commands = {
 export class RequestCommandsController implements vscode.CodeLensProvider {
 
   private config: AppConfig | undefined;
-  private tmpFiles: Array<string> = [];
+  private tmpFiles: Array<vscode.Uri> = [];
 
   subscriptions: Array<vscode.Disposable>;
   onDidChangeCodeLenses: vscode.Event<void>;
@@ -53,13 +52,13 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
       vscode.workspace.onDidCloseTextDocument(async doc => {
-        const index = this.tmpFiles.indexOf(doc.fileName);
+        const index = this.tmpFiles.indexOf(doc.uri);
         if (index >= 0) {
           try {
             this.tmpFiles.splice(index, 1);
-            await fs.unlink(doc.fileName);
+            await vscode.workspace.fs.delete(doc.uri);
           } catch (err) {
-            log.error(err);
+            httpyac.log.error(err);
           }
         }
       })
@@ -79,9 +78,11 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
     const result: Array<vscode.CodeLens> = [];
 
+    if (!this.config?.useCodeLensInNotebook && isNotebook(document)) {
+      return result;
+    }
+
     if (httpFile && httpFile.httpRegions.length > 0) {
-
-
       if (this.config?.showCodeLensSendAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendAll,
@@ -104,7 +105,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       }
 
       for (const httpRegion of httpFile.httpRegions) {
-        const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
+        const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document, requestLine];
 
@@ -163,7 +164,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     return Promise.resolve(result);
   }
 
-  private httpRegionSendContext: HttpRegionSendContext | undefined;
+  private httpRegionSendContext: httpyac.HttpRegionSendContext | undefined;
 
   @errorHandler()
   private async send(document?: vscode.TextDocument, line?: number) : Promise<void> {
@@ -174,7 +175,10 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   @errorHandler()
   private async sendRepeat(document?: vscode.TextDocument, line?: number) : Promise<void> {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line, this.documentStore);
-    const repeatOrder = await vscode.window.showQuickPick([{ label: 'parallel', value: RepeatOrder.parallel }, { label: 'sequential', value: RepeatOrder.sequential }]);
+    const repeatOrder = await vscode.window.showQuickPick([
+      { label: 'parallel', value: httpyac.RepeatOrder.parallel },
+      { label: 'sequential', value: httpyac.RepeatOrder.sequential }
+    ]);
     const count = await vscode.window.showInputBox({
       placeHolder: 'repeat count',
     });
@@ -214,7 +218,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
 
       const pickedObjs = await vscode.window.showQuickPick(httpRegions.map(httpRegion => ({
-        label: utils.getRegionName(httpRegion),
+        label: httpyac.utils.getRegionName(httpRegion),
         data: httpRegion
       })), {
         placeHolder: 'select requests',
@@ -231,7 +235,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     }
   }
 
-  private async sendRequest(context: HttpRegionSendContext | HttpFileSendContext | undefined) {
+  private async sendRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined) {
 
     if (context) {
       await vscode.window.withProgress({
@@ -248,11 +252,11 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
           report: data => progress.report(data),
         };
 
-        const result = await httpYacApi.send(context);
+        const result = await httpyac.httpYacApi.send(context);
         if (this.refreshCodeLens) {
           this.refreshCodeLens.fire();
         }
-        if (result && utils.isHttpRegionSendContext(context)) {
+        if (result && httpyac.utils.isHttpRegionSendContext(context)) {
           await this.responseOutputProcessor.show(context.httpRegion);
         }
       });
@@ -283,9 +287,9 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  private async viewHeader(document: vscode.TextDocument | HttpRegion | undefined, line: number | undefined) : Promise<void> {
+  private async viewHeader(document: vscode.TextDocument | httpyac.HttpRegion | undefined, line: number | undefined) : Promise<void> {
     if (document) {
-      let httpRegion: HttpRegion | undefined;
+      let httpRegion: httpyac.HttpRegion | undefined;
       if (this.isHttpRegion(document)) {
         httpRegion = document;
       } else {
@@ -296,7 +300,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       }
 
       if (httpRegion?.response) {
-        const content = utils.toMarkdown(httpRegion.response, {
+        const content = httpyac.utils.toMarkdown(httpRegion.response, {
           testResults: httpRegion.testResults,
           meta: true,
           timings: true,
@@ -307,8 +311,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         const { path } = await file({ postfix: '.md' });
         const uri = vscode.Uri.file(path);
         if (uri) {
-          await fs.writeFile(uri.fsPath, content);
-          this.tmpFiles.push(uri.fsPath);
+          await vscode.workspace.fs.writeFile(uri, Buffer.from(content, 'utf-8'));
+          this.tmpFiles.push(uri);
           await vscode.commands.executeCommand('vscode.openWith', uri, 'vscode.markdown.preview.editor');
         }
       }
@@ -328,7 +332,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         filters
       });
       if (uri && parsedDocument.httpRegion.response.rawBody) {
-        await fs.writeFile(uri.fsPath, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
+        await vscode.workspace.fs.writeFile(uri, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
       }
     }
   }
@@ -340,8 +344,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     await vscode.window.showTextDocument(document);
   }
 
-  private isHttpRegion(obj: unknown): obj is HttpRegion {
-    const guard = obj as HttpRegion;
+  private isHttpRegion(obj: unknown): obj is httpyac.HttpRegion {
+    const guard = obj as httpyac.HttpRegion;
     return Array.isArray(guard.actions) && !!guard.symbol && !!guard.metaData;
   }
 }

@@ -1,6 +1,5 @@
 import { HttpRegion } from 'httpyac';
-import { window } from 'vscode';
-import { promises as fs } from 'fs';
+import { window, workspace } from 'vscode';
 import { getExtension } from './responseHandlerUtils';
 
 
@@ -16,8 +15,8 @@ export async function saveFileResponseHandler(httpRegion: HttpRegion): Promise<b
     const uri = await window.showSaveDialog({
       filters
     });
-    if (uri) {
-      await fs.writeFile(uri?.fsPath, new Uint8Array(httpRegion.response.rawBody));
+    if (uri && httpRegion.response.rawBody) {
+      await workspace.fs.writeFile(uri, httpRegion.response.rawBody);
       return true;
     }
   }

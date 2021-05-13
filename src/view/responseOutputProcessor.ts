@@ -8,7 +8,6 @@ import { openWithResponseHandler } from './openWithResponseHandler';
 import { previewDocumentResponseHandler } from './previewDocumentResponseHandler';
 import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
 import { openDocumentResponseHandler } from './openDocumentResponseHandler';
-import { promises as fs } from 'fs';
 import { ResponseHandler } from './responseHandler';
 import { TempPathFolder } from './responseHandlerUtils';
 
@@ -166,8 +165,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       const cacheItem = this.outputCache[index];
       if (cacheItem.deleteFile) {
         try {
-          const fileName = cacheItem.document.fileName;
-          await fs.unlink(fileName);
+          await vscode.workspace.fs.delete(cacheItem.document.uri);
         } catch (err) {
           log.error(err);
         }

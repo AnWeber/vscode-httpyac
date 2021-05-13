@@ -19,7 +19,7 @@ export class HttpFileStoreController {
     }
     this.subscriptions = [
       vscode.workspace.onDidCloseTextDocument(document => {
-        this.documentStore.httpFileStore.remove(document.fileName);
+        this.documentStore.httpFileStore.remove(document.uri);
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         await this.refreshHttpFile(document);
@@ -31,7 +31,7 @@ export class HttpFileStoreController {
       }),
       vscode.workspace.onDidRenameFiles(fileRenameEvent => {
         fileRenameEvent.files.forEach(file => {
-          this.documentStore.httpFileStore.rename(file.oldUri.fsPath, file.newUri.fsPath);
+          this.documentStore.httpFileStore.rename(file.oldUri, file.newUri);
         });
       }),
     ];

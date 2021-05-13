@@ -2,7 +2,6 @@ import { ContentType, HttpRegion, HttpResponse, utils } from 'httpyac';
 import { extension } from 'mime-types';
 import { dir } from 'tmp-promise';
 import { join, extname } from 'path';
-import { promises as fs } from 'fs';
 import * as vscode from 'vscode';
 import { getConfigSetting, ResponseViewContent } from '../config';
 
@@ -31,9 +30,10 @@ export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion,
   const ext = extension || getExtension(httpRegion);
   const { path } = await dir();
   const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getRegionName(httpRegion, 'response')));
-  await fs.mkdir(join(path, TempPathFolder));
+
+  await vscode.workspace.fs.createDirectory(vscode.Uri.file(join(path, TempPathFolder)));
   const fileName = join(path, TempPathFolder, `${name}.${ext}`);
-  await fs.writeFile(fileName, content);
+  await vscode.workspace.fs.writeFile(vscode.Uri.file(fileName), content);
   return fileName;
 }
 

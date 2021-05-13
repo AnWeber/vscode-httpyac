@@ -1,3 +1,14 @@
+## 2.8.0 (2021-05-13)
+
+#### Features
+* support [remote repositories](https://code.visualstudio.com/updates/v1_56#_remote-repositories-remotehub)
+* add support for mimetype application/x-javascript
+* update dotenv to 9.0.2
+* add setting to disable codelens in notebooks
+* add settting to enable showing request output
+#### Fix
+* fix error in settings for requestGotOptions
+
 ## 2.7.0 (2021-05-03)
 
 #### Features

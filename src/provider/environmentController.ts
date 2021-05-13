@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, utils } from 'httpyac';
+import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, utils, PathLike } from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
+import { isNotebook } from '../utils';
 
 const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,
@@ -79,9 +80,9 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       },
     };
 
-    const rootDirs: string[] = [];
+    const rootDirs: PathLike[] = [];
     if (vscode.workspace.workspaceFolders) {
-      rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri.fsPath));
+      rootDirs.push(...vscode.workspace.workspaceFolders.map(folder => folder.uri));
     }
 
     this.disposeEnvironment = await environments.environmentStore.configure(rootDirs, {}, environmentConfig);
@@ -89,6 +90,9 @@ export class EnvironmentController implements vscode.CodeLensProvider {
 
   async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
+    if (!this.config?.useCodeLensInNotebook && isNotebook(document)) {
+      return result;
+    }
     const httpFile = await this.documentStore.getHttpFile(document);
     if (this.config.showCodeLensEnvironment) {
       if (httpFile) {
