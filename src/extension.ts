@@ -94,7 +94,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     httpFileStore,
     responseHandlers,
     responseOutputProcessor,
-    config,
+    httpDocumentSelector: config.httpDocumentSelector,
     refreshCodeLens,
     environementChanged
   };
