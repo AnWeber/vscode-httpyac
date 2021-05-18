@@ -84,6 +84,12 @@
 					"scope": "resource",
 					"description": "default request headers if not overwritten"
 				},
+				"httpyac.requestBodyForceInjectVariables": {
+					"type": "object",
+					"default": false,
+					"scope": "resource",
+					"description": "always inject variables in request body"
+				},
 				"httpyac.requestGotOptions": {
 					"type": "object",
 					"scope": "resource",
