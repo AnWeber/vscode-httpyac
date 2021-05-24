@@ -1,5 +1,5 @@
 import { workspace, Uri } from 'vscode';
-import { fileProvider, FileEnconding, WatchDispose, PathLike } from 'httpyac';
+import { fileProvider, FileEnconding, WatchDispose, PathLike, log } from 'httpyac';
 
 export function initVscodeFileProvider(): void {
 
@@ -36,6 +36,7 @@ export function initVscodeFileProvider(): void {
       }
       return false;
     } catch (err) {
+      log.trace(err);
       return false;
     }
   };

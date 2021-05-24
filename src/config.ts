@@ -7,7 +7,7 @@ export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
 export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
 export interface AppConfig {
-  requestBodyForceInjectVariables?: boolean;
+  requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>
   requestOptions?: HttpRequest,
   cookieJarEnabled?: boolean,
