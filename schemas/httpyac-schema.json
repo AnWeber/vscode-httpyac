@@ -29,6 +29,12 @@
                     },
                     "additionalProperties": false
                 },
+                "requestBodyInjectVariablesExtensions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "defaultHeaders": {
                     "type": "object",
                     "additionalProperties": {
