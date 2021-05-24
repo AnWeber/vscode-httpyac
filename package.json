@@ -647,7 +647,7 @@
 		"@types/vscode": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^4.24.0",
 		"@typescript-eslint/parser": "^4.24.0",
-		"eslint": "^7.26.0",
+		"eslint": "^7.27.0",
 		"eslint-plugin-node": "^11.1.0",
 		"fork-ts-checker-webpack-plugin": "^6.2.9",
 		"husky": "^6.0.0",
