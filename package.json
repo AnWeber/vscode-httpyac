@@ -640,7 +640,7 @@
 		"*.ts": "eslint --cache --fix"
 	},
 	"devDependencies": {
-		"@types/lodash": "^4.14.169",
+		"@types/lodash": "^4.14.170",
 		"@types/mime-types": "^2.1.0",
 		"@types/node": "^15.3.0",
 		"@types/uuid": "^8.3.0",
