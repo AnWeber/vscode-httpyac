@@ -657,7 +657,7 @@
 		"thread-loader": "^3.0.4",
 		"ts-loader": "^9.2.0",
 		"typescript": "^4.2.4",
-		"webpack": "^5.37.0",
+		"webpack": "^5.37.1",
 		"webpack-cli": "^4.7.0"
 	},
 	"dependencies": {
