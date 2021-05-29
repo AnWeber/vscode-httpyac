@@ -69,9 +69,10 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
               }
             } else if (vscode.workspace.workspaceFolders) {
               for (const workspaceFolder of vscode.workspace.workspaceFolders) {
-                const file = httpyac.fileProvider.joinPath(workspaceFolder.uri, fileName);
+                const file = vscode.Uri.joinPath(workspaceFolder.uri, fileName);
                 try {
-                  const script = await httpyac.fileProvider.readFile(file, 'utf-8');
+                  const content = await vscode.workspace.fs.readFile(file);
+                  const script = Buffer.from(content).toString('utf-8');
                   return {
                     script,
                     lineOffset: 0
@@ -92,6 +93,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
   return {
     httpyac,
     httpFileStore,
+    documentStore,
     responseHandlers,
     responseOutputProcessor,
     httpDocumentSelector: config.httpDocumentSelector,

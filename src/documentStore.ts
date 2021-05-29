@@ -1,13 +1,17 @@
-import { HttpFileStore, HttpFile } from 'httpyac';
+import { HttpFileStore, HttpFile, PathLike } from 'httpyac';
 import { TextDocument } from 'vscode';
 
 
 export class DocumentStore {
 
-  constructor(readonly httpFileStore: HttpFileStore) { }
+  public getDocumentPathLike: (document: TextDocument) => PathLike;
+
+  constructor(readonly httpFileStore: HttpFileStore) {
+    this.getDocumentPathLike = document => document.uri;
+  }
 
   getHttpFile(document: TextDocument): Promise<HttpFile> {
-    return this.httpFileStore.getOrCreate(document.uri, () => Promise.resolve(document.getText()), document.version);
+    return this.httpFileStore.getOrCreate(this.getDocumentPathLike(document), () => Promise.resolve(document.getText()), document.version);
   }
 
   getAll(): Array<HttpFile> {

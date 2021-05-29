@@ -1,9 +1,8 @@
 import { workspace, Uri } from 'vscode';
 import { fileProvider, FileEnconding, WatchDispose, PathLike, log } from 'httpyac';
 
+
 export function initVscodeFileProvider(): void {
-
-
   fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
@@ -16,13 +15,6 @@ export function initVscodeFileProvider(): void {
     const uri = toUri(fileName);
     if (uri) {
       return Uri.joinPath(uri, path);
-    }
-    throw new Error('No valid uri');
-  };
-  fileProvider.toString = (fileName: PathLike): string => {
-    const uri = toUri(fileName);
-    if (uri) {
-      return uri.toString();
     }
     throw new Error('No valid uri');
   };
@@ -78,13 +70,26 @@ export function initVscodeFileProvider(): void {
 
 }
 
+interface VirtualDocument{
+  uri: Uri,
+  fileUri: Uri;
+  toString(): string;
+}
 
-function toUri(fileName: PathLike): Uri | false {
-  if (typeof fileName === 'string') {
-    return Uri.file(fileName);
+function toUri(pathLike: PathLike): Uri | false {
+  if (typeof pathLike === 'string') {
+    return Uri.file(pathLike);
   }
-  if (fileName instanceof Uri) {
-    return fileName;
+  if (pathLike instanceof Uri) {
+    return pathLike;
+  }
+  if (isVirtualDocument(pathLike)) {
+    return pathLike.fileUri || pathLike.uri;
   }
   return false;
+}
+
+function isVirtualDocument(pathLike: PathLike): pathLike is VirtualDocument {
+  const virtualDocument = pathLike as VirtualDocument;
+  return !!virtualDocument.uri;
 }
