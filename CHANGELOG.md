@@ -1,3 +1,9 @@
+## 2.11.0 (2021-05-29)
+
+#### Features
+* add parser for response and responseRef
+* add documentStore to extensionApi
+
 ## 2.10.0 (2021-05-24)
 
 #### Features
