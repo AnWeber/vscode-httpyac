@@ -1,7 +1,17 @@
+## 2.12.1 (2021-05-30)
+
+#### Features
+* change signature of responseRef array
+* HttpSymbol provides property source
+* utils for http file output
+#### Fix
+* Spelling mistake in symbol
+* small error in Http version output
+
 ## 2.12.0 (2021-05-30)
 
 #### Features
-* update to httpay 2.12.0
+* update to httpyac 2.12.0
 ## 2.11.0 (2021-05-29)
 
 #### Features
