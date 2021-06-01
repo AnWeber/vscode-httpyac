@@ -1,3 +1,7 @@
+## 2.12.3 (2021-06-01)
+
+#### Fix
+* fix error if ### on first line
 ## 2.12.1 (2021-05-30)
 
 #### Features
