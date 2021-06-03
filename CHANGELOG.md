@@ -1,3 +1,7 @@
+## 2.12.4 (2021-06-03)
+#### Fix
+* error on require local javascript file
+
 ## 2.12.3 (2021-06-01)
 
 #### Fix

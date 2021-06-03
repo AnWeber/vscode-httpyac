@@ -67,7 +67,13 @@ export function initVscodeFileProvider(): void {
     throw new Error('No valid uri');
   };
 
-
+  fileProvider.fsPath = (fileName: PathLike) => {
+    const uri = toUri(fileName);
+    if (uri) {
+      return uri.fsPath;
+    }
+    throw new Error('No valid uri');
+  };
 }
 
 interface VirtualDocument{
