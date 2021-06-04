@@ -1,3 +1,11 @@
+## 2.12.5 (2021-06-04)
+
+#### Features
+* new setting `httpyac.environmentStoreSelectedOnStart` to store last used env
+
+#### Fix
+* region delimiter ignore chars after delimiter
+
 ## 2.12.4 (2021-06-03)
 #### Fix
 * error on require local javascript file
