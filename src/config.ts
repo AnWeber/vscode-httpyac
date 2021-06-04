@@ -13,6 +13,7 @@ export interface AppConfig {
   cookieJarEnabled?: boolean,
   clientCertficates?: Record<string, ClientCertificateOptions>
   environmentSelectedOnStart?: Array<string>,
+  environmentStoreSelectedOnStart?: boolean,
   environmentPickMany?:boolean,
   environmentVariables?: Record<string, Variables>,
   dotenvEnabled?:boolean,

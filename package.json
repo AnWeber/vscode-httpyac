@@ -144,6 +144,12 @@
 					"scope": "resource",
 					"description": "list of default environment on startup"
 				},
+				"httpyac.environmentStoreSelectedOnStart": {
+					"type": "boolean",
+					"default": false,
+					"scope": "resource",
+					"description": "store env in setting `environmentSelectedOnStart` after change"
+				},
 				"httpyac.environmentPickMany": {
 					"type": "boolean",
 					"scope": "resource",

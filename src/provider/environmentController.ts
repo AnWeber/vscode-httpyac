@@ -158,6 +158,10 @@ export class EnvironmentController implements vscode.CodeLensProvider {
         } else {
           environments.environmentStore.activeEnvironments = [pickedObj.label];
         }
+        if (this.config.environmentStoreSelectedOnStart) {
+          const config = vscode.workspace.getConfiguration(APP_NAME);
+          await config.update('environmentSelectedOnStart', environments.environmentStore.activeEnvironments);
+        }
       } else {
         environments.environmentStore.activeEnvironments = undefined;
       }
