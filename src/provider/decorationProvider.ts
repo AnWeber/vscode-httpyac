@@ -1,4 +1,4 @@
-import { HttpFile, HttpSymbolKind } from 'httpyac';
+import { HttpFile } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting, httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
@@ -7,20 +7,36 @@ export class DecorationProvider {
 
   private subscriptions: Array<vscode.Disposable>;
   private decoration: vscode.TextEditorDecorationType;
+  private decorationActive: vscode.TextEditorDecorationType;
+  private decorationActiveBefore: vscode.TextEditorDecorationType;
 
   constructor(
-    context: vscode.ExtensionContext,
     refreshCodeLens: vscode.EventEmitter<void>,
     private readonly documentStore: DocumentStore
   ) {
     this.decoration = vscode.window.createTextEditorDecorationType({
-      gutterIconPath: context.asAbsolutePath('./assets/gutter.svg'),
-      gutterIconSize: '70%',
+      border: 'dotted rgba(0, 0, 0, 20%)',
+      borderWidth: '0 0 2px 0',
+      isWholeLine: true,
+    });
+
+    this.decorationActive = vscode.window.createTextEditorDecorationType({
+      borderColor: new vscode.ThemeColor('editor.selectionBackground'),
+      border: 'solid',
+      borderWidth: '0 0 2px 0',
+      isWholeLine: true,
+    });
+
+    this.decorationActiveBefore = vscode.window.createTextEditorDecorationType({
+      borderColor: new vscode.ThemeColor('editor.inactiveSelectionBackground'),
+      border: 'solid',
+      borderWidth: '0 0 2px 0',
+      isWholeLine: true,
     });
 
     this.subscriptions = [
       refreshCodeLens.event(() => this.setEditorDecoration(vscode.window.activeTextEditor)),
-      vscode.window.onDidChangeActiveTextEditor(this.setEditorDecoration, this)
+      vscode.window.onDidChangeTextEditorSelection(this.onDidChangeTextEditorSelection, this),
     ];
   }
 
@@ -33,20 +49,44 @@ export class DecorationProvider {
     }
   }
 
-  private setDecoration(httpFile: HttpFile, editor: vscode.TextEditor) {
-    if (getConfigSetting().showGutterIcon) {
-      const ranges: Array<vscode.Range> = [];
+  private async onDidChangeTextEditorSelection({ textEditor }: vscode.TextEditorSelectionChangeEvent) {
+    if (textEditor && vscode.languages.match(httpDocumentSelector, textEditor.document)) {
+      const httpFile = await this.documentStore.getHttpFile(textEditor.document);
+      if (httpFile) {
+        this.setDecoration(httpFile, textEditor);
+      }
+    }
+  }
 
-      for (const httpRegion of httpFile.httpRegions) {
+  private setDecoration(httpFile: HttpFile, editor: vscode.TextEditor) {
+    if (getConfigSetting().useDecorationProvider) {
+      const borderLineRanges: Array<vscode.Range> = [];
+      let activeBorderLineStart: vscode.Range | undefined;
+      let activeBorderLineEnd: vscode.Range | undefined;
+
+      httpFile.httpRegions.forEach((httpRegion, index) => {
         if (httpRegion.symbol.children) {
-          const symbol = httpRegion.symbol.children.find(obj => obj.kind === HttpSymbolKind.requestLine);
-          if (symbol) {
-            ranges.push(new vscode.Range(symbol.startLine, symbol.startOffset, symbol.endLine, symbol.endOffset));
+          const currentRange = new vscode.Range(httpRegion.symbol.endLine, 0, httpRegion.symbol.endLine, httpRegion.symbol.endOffset);
+
+          if (httpRegion.symbol.startLine <= editor.selection.active.line
+            && httpRegion.symbol.endLine >= editor.selection.active.line) {
+
+            activeBorderLineStart = borderLineRanges.pop();
+
+            activeBorderLineEnd = currentRange;
+          } else if (index < httpFile.httpRegions.length - 1) {
+            borderLineRanges.push(currentRange);
           }
         }
+      });
+      if (borderLineRanges.length > 0) {
+        editor.setDecorations(this.decoration, borderLineRanges);
       }
-      if (ranges.length > 0) {
-        editor.setDecorations(this.decoration, ranges);
+      if (activeBorderLineStart) {
+        editor.setDecorations(this.decorationActiveBefore, [activeBorderLineStart]);
+      }
+      if (activeBorderLineEnd) {
+        editor.setDecorations(this.decorationActive, [activeBorderLineEnd]);
       }
     }
   }

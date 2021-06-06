@@ -35,7 +35,7 @@ export interface AppConfig {
   logRequest?: boolean,
   showlogRequestOutput?: boolean,
   useMethodInSendCodeLens?:boolean,
-  showGutterIcon?:boolean,
+  useDecorationProvider?:boolean,
   showNotificationPopup?: boolean,
   useCodeLensInNotebook?: boolean;
   showCodeLensEnvironment?:boolean,

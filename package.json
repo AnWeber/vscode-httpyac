@@ -326,11 +326,11 @@
 					"scope": "resource",
 					"description": "use request method in send code lens"
 				},
-				"httpyac.showGutterIcon": {
+				"httpyac.useDecorationProvider": {
 					"type": "boolean",
 					"default": true,
 					"scope": "resource",
-					"description": "show gutter icon to highlight request lines"
+					"description": "show border lines around request"
 				},
 				"httpyac.showNotificationPopup": {
 					"type": "boolean",
