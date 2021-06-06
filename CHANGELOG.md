@@ -2,6 +2,10 @@
 
 #### Features
 * decorationProvider supports borderlines around region
+* better test method support
+
+#### Fix
+* error parsing body in inline response
 
 ## 2.13.1 (2021-06-05)
 
