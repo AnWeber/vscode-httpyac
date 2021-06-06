@@ -2,6 +2,7 @@ import { HttpFile } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting, httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
+import { isNotebook } from '../utils';
 
 export class DecorationProvider {
 
@@ -59,7 +60,7 @@ export class DecorationProvider {
   }
 
   private setDecoration(httpFile: HttpFile, editor: vscode.TextEditor) {
-    if (getConfigSetting().useDecorationProvider) {
+    if (getConfigSetting().useDecorationProvider && !isNotebook(editor)) {
       const borderLineRanges: Array<vscode.Range> = [];
       let activeBorderLineStart: vscode.Range | undefined;
       let activeBorderLineEnd: vscode.Range | undefined;
