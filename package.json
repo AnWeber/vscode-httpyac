@@ -650,7 +650,7 @@
 		"@types/node": "^15.12.1",
 		"@types/uuid": "^8.3.0",
 		"@types/vscode": "^1.56.0",
-		"@typescript-eslint/eslint-plugin": "^4.26.0",
+		"@typescript-eslint/eslint-plugin": "^4.26.1",
 		"@typescript-eslint/parser": "^4.26.0",
 		"eslint": "^7.28.0",
 		"eslint-plugin-node": "^11.1.0",
