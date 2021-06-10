@@ -316,7 +316,7 @@
 				},
 				"httpyac.useCodeLensInNotebook": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"scope": "resource",
 					"description": "show codelens if httpbook is used"
 				},
