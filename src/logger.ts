@@ -10,7 +10,6 @@ function getOutputChannel(channel: LogChannels) {
   if (!outputChannel) {
     outputChannel = window.createOutputChannel(`${APP_NAME} - ${LogChannels[channel]}`);
     outputChannels[channel] = outputChannel;
-    outputChannel.show(true);
   }
   return outputChannel;
 }

@@ -1,3 +1,9 @@
+## 2.14.1 (2021-06-11)
+
+#### Fix
+* update normalize-url
+* fix Protocol "https:" not supported. Expected "http:" (disable http2)
+
 ## 2.14.0 (2021-06-06)
 
 #### Features

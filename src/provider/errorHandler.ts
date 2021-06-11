@@ -1,5 +1,5 @@
 import { log, utils } from 'httpyac';
-import { window, workspace } from 'vscode';
+import { window } from 'vscode';
 import { getConfigSetting } from '../config';
 
 export function errorHandler(this: unknown): MethodDecorator {
