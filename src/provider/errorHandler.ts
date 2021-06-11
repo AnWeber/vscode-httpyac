@@ -31,11 +31,6 @@ async function handleError(_target: unknown, _propertyKey: string | symbol, err:
 
   if (getConfigSetting().showNotificationPopup) {
     if (err instanceof Error) {
-      if (err.message.match(/Protocol.*not\s+supported/u)) {
-        if (workspace.getConfiguration('http').proxySupport === 'override') {
-          await window.showErrorMessage('Proxy issue: maybe change http.proxySupport=override to off');
-        }
-      }
       await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
     } else if (utils.isString(err)) {
       await window.showErrorMessage(err);
