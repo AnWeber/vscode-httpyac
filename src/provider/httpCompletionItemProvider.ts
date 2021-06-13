@@ -273,8 +273,10 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
       result.push(...httpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
       if (httpFile.imports) {
         for (const httpFileLoader of httpFile.imports) {
-          const refHttpFile = await httpFileLoader();
-          result.push(...refHttpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
+          const refHttpFile = await httpFileLoader(httpFile);
+          if (refHttpFile) {
+            result.push(...refHttpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
+          }
         }
       }
       return result;
