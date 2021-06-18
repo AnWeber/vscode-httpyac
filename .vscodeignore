@@ -1,5 +1,7 @@
 .vscode/**
 .vscode-test/**
+.husky
+.github
 out/**
 src/**
 examples/**
