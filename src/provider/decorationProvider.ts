@@ -24,14 +24,14 @@ export class DecorationProvider {
     this.decorationActive = vscode.window.createTextEditorDecorationType({
       borderColor: new vscode.ThemeColor('editor.selectionBackground'),
       border: 'solid',
-      borderWidth: '0 0 2px 0',
+      borderWidth: '0 0 3px 0',
       isWholeLine: true,
     });
 
     this.decorationActiveBefore = vscode.window.createTextEditorDecorationType({
-      borderColor: new vscode.ThemeColor('editor.inactiveSelectionBackground'),
+      borderColor: new vscode.ThemeColor('editor.selectionBackground'),
       border: 'solid',
-      borderWidth: '0 0 2px 0',
+      borderWidth: '0 0 3px 0',
       isWholeLine: true,
     });
 
