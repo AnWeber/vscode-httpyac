@@ -1,5 +1,5 @@
 import { ClientCertificateOptions, HttpRequest, Variables } from 'httpyac';
-import { Disposable, workspace } from 'vscode';
+import { Disposable, workspace, DecorationRenderOptions } from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
@@ -35,7 +35,9 @@ export interface AppConfig {
   logRequest?: boolean,
   showlogRequestOutput?: boolean,
   useMethodInSendCodeLens?:boolean,
-  useDecorationProvider?:boolean,
+  useDecorationProvider?: boolean,
+  decorationActiveRegion?: DecorationRenderOptions,
+  decorationInactiveRegion?: DecorationRenderOptions,
   showNotificationPopup?: boolean,
   useCodeLensInNotebook?: boolean;
   showCodeLensEnvironment?:boolean,

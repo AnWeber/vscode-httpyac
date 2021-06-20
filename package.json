@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "2.15.1",
+	"version": "2.16.0",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -332,6 +332,27 @@
 					"scope": "resource",
 					"description": "show border lines around request"
 				},
+				"httpyac.decorationActiveRegion": {
+					"type": "object",
+					"default": {
+						"borderColor": "theme.editor.selectionBackground",
+						"border": "solid",
+						"borderWidth": "0 0 3px 0",
+						"isWholeLine": true
+					},
+					"scope": "window",
+					"description": "decoration for active region (colors starting with theme. use vscode color)"
+				},
+				"httpyac.decorationInactiveRegion": {
+					"type": "object",
+					"default": {
+						"border": "dotted rgba(0, 0, 0, 20%)",
+						"borderWidth": "0 0 2px 0",
+						"isWholeLine": true
+					},
+					"scope": "window",
+					"description": "decoration for inactive region (colors starting with theme. use vscode color)"
+				},
 				"httpyac.showNotificationPopup": {
 					"type": "boolean",
 					"default": true,
@@ -647,27 +668,27 @@
 	"devDependencies": {
 		"@types/lodash": "^4.14.170",
 		"@types/mime-types": "^2.1.0",
-		"@types/node": "^15.12.2",
+		"@types/node": "^15.12.4",
 		"@types/uuid": "^8.3.0",
 		"@types/vscode": "^1.57.0",
 		"@typescript-eslint/eslint-plugin": "^4.27.0",
 		"@typescript-eslint/parser": "^4.27.0",
-		"eslint": "^7.28.0",
+		"eslint": "^7.29.0",
 		"eslint-plugin-node": "^11.1.0",
-		"fork-ts-checker-webpack-plugin": "^6.2.10",
+		"fork-ts-checker-webpack-plugin": "^6.2.12",
 		"husky": "^6.0.0",
 		"lint-staged": "^11.0.0",
 		"lockfile-lint": "^4.6.2",
 		"mkdirp": "^1.0.4",
 		"thread-loader": "^3.0.4",
 		"ts-loader": "^9.2.3",
-		"typescript": "^4.3.3",
-		"webpack": "^5.39.0",
+		"typescript": "^4.3.4",
+		"webpack": "^5.39.1",
 		"webpack-cli": "^4.7.2"
 	},
 	"dependencies": {
 		"httpsnippet": "^1.25.0",
-		"httpyac": "^2.15.1",
+		"httpyac": "^2.16.0",
 		"lodash": "^4.17.21",
 		"mime-types": "^2.1.31",
 		"tmp-promise": "^3.0.2"

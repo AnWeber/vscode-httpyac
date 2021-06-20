@@ -1,3 +1,12 @@
+## 2.16.0 (2021-06-20)
+
+#### Features
+* customize textdecoration provider
+
+#### Fix
+* error while using metadata followRedirect fixed
+* http2 needs to explicitly activated
+
 ## 2.15.1 (2021-06-17)
 
 #### Fix
