@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"publisher": "anweber",
 	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "2.16.0",
+	"version": "2.16.1",
 	"homepage": "https://github.com/AnWeber/vscode-httpyac",
 	"repository": {
 		"type": "git",
@@ -33,8 +33,7 @@
 		"rest-client"
 	],
 	"activationEvents": [
-		"onCommand:httpyac.send",
-		"onCommand:httpyac.sendAll",
+		"onCommand:httpyac.new",
 		"onLanguage:http"
 	],
 	"main": "./dist/extension.js",

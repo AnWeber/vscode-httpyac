@@ -1,3 +1,8 @@
+## 2.16.1 (2021-06-20)
+
+#### Fix
+* activation on new file command
+
 ## 2.16.0 (2021-06-20)
 
 #### Features
