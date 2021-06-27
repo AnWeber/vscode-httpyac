@@ -69,6 +69,14 @@
 				"path": "./syntaxes/http.tmLanguage.json"
 			}
 		],
+		"startEntries": [
+			{
+				"id": "httpyac.new",
+				"title": "httpyac",
+				"description": "send REST, SOAP, and GraphQL requests",
+				"command": "httpyac.new"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "httpyac",
