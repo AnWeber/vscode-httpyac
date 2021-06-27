@@ -5,7 +5,7 @@ import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { file } from 'tmp-promise';
-import { getHttpRegionFromLine, isNotebook } from '../utils';
+import { CommandDocumentArg as DocumentArgument, CommandsLineArg as LineArgument, getHttpRegionFromLine, isNotebook } from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
 
@@ -107,7 +107,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       for (const httpRegion of httpFile.httpRegions) {
         const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
-        const args = [document, requestLine];
+        const args = [document.uri, requestLine];
 
         if (!!httpRegion.request && !httpRegion.metaData.disabled) {
           if (this.config?.showCodeLensSend) {
@@ -167,13 +167,13 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   private httpRegionSendContext: httpyac.HttpRegionSendContext | undefined;
 
   @errorHandler()
-  private async send(document?: vscode.TextDocument, line?: number) : Promise<void> {
+  private async send(document?: DocumentArgument, line?: LineArgument) : Promise<void> {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line, this.documentStore);
     await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
-  private async sendRepeat(document?: vscode.TextDocument, line?: number) : Promise<void> {
+  private async sendRepeat(document?: DocumentArgument, line?: LineArgument) : Promise<void> {
     this.httpRegionSendContext = await getHttpRegionFromLine(document, line, this.documentStore);
     const repeatOrder = await vscode.window.showQuickPick([
       { label: 'parallel', value: httpyac.RepeatOrder.parallel },
@@ -279,7 +279,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  private async show(document?: vscode.TextDocument, line?: number) : Promise<void> {
+  private async show(document?: DocumentArgument, line?: LineArgument) : Promise<void> {
     const parsedDocument = await getHttpRegionFromLine(document, line, this.documentStore);
     if (parsedDocument) {
       await this.responseOutputProcessor.show(parsedDocument.httpRegion);
@@ -287,7 +287,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  private async viewHeader(document: vscode.TextDocument | httpyac.HttpRegion | undefined, line: number | undefined) : Promise<void> {
+  private async viewHeader(document: DocumentArgument | httpyac.HttpRegion | undefined, line: LineArgument) : Promise<void> {
     if (document) {
       let httpRegion: httpyac.HttpRegion | undefined;
       if (this.isHttpRegion(document)) {
@@ -320,7 +320,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
   }
 
   @errorHandler()
-  private async save(document?: vscode.TextDocument, line?: number) : Promise<void> {
+  private async save(document?: DocumentArgument, line?: LineArgument) : Promise<void> {
     const parsedDocument = await getHttpRegionFromLine(document, line, this.documentStore);
     if (parsedDocument && parsedDocument.httpRegion.response) {
       const ext = parsedDocument.httpRegion.metaData.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');

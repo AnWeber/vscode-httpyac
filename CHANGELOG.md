@@ -1,3 +1,9 @@
+## 2.16.2 (2021-06-27)
+
+#### Features
+* support start entries contribution (VSCode Insiders)
+* support more command arguments (TextDocument, TextEditor, Uri)
+
 ## 2.16.1 (2021-06-20)
 
 #### Fix
