@@ -84,7 +84,7 @@
 				"httpyac.requestDefaultHeaders": {
 					"type": "object",
 					"default": {
-						"User-Agent": "httpyac"
+						"user-Agent": "httpyac"
 					},
 					"scope": "resource",
 					"description": "default request headers if not overwritten"
