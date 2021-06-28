@@ -1,3 +1,11 @@
+## 2.17.0 (2021-06-28)
+
+
+#### Fix
+* fixed parser, if global variable is used in first line (Anweber/vscode-httpyac#45)
+* http2 needs to explicitly activated (second attempt:-))
+* multiple user-agent header removed
+
 ## 2.16.2 (2021-06-27)
 
 #### Features
