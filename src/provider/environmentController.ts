@@ -64,9 +64,7 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       },
       cookieJarEnabled: appConfig.cookieJarEnabled,
       clientCertificates: appConfig.clientCertficates,
-      request: Object.assign({
-        http2: httpOptions.proxySupport === 'off',
-      }, appConfig.requestOptions),
+      request: appConfig.requestOptions,
       requestBodyInjectVariablesExtensions: appConfig.requestBodyInjectVariablesExtensions,
       proxy: utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
       defaultHeaders: appConfig.requestDefaultHeaders,
