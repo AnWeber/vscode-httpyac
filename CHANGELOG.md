@@ -1,5 +1,12 @@
-## 2.17.0 (2021-06-28)
+## 2.18.0 (2021-06-30)
 
+#### Features
+* add new meta data @noRejectUnauthorized, to disable ssl verification
+* add better json schema support in settings and file .httpyac.json
+* improve error for SSL Validation error
+* add completion for new meta data
+
+## 2.17.0 (2021-06-28)
 
 #### Fix
 * fixed parser, if global variable is used in first line (Anweber/vscode-httpyac#45)
