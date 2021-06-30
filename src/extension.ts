@@ -98,7 +98,8 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     responseOutputProcessor,
     httpDocumentSelector: config.httpDocumentSelector,
     refreshCodeLens,
-    environementChanged
+    environementChanged,
+    getErrorQuickFix: provider.getErrorQuickFix,
   };
 }
 

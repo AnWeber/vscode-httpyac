@@ -12,4 +12,5 @@ export interface HttpYacExtensionApi{
   httpDocumentSelector: vscode.DocumentSelector,
   refreshCodeLens: vscode.EventEmitter<void>,
   environementChanged: vscode.EventEmitter<string[] | undefined>
+  getErrorQuickFix: (err: Error) => string | undefined;
 }

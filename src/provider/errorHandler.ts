@@ -12,7 +12,7 @@ export function errorHandler(this: unknown): MethodDecorator {
 }
 
 export function errorHandlerWrapper(target: unknown, propertyKey: string | symbol, method: (...args: unknown[]) => unknown) {
-  return function(this: unknown, ...args: unknown[]) : unknown {
+  return function(this: unknown, ...args: unknown[]): unknown {
     try {
       const result = method.apply(this, args);
       if (utils.isPromise(result)) {
@@ -31,11 +31,35 @@ async function handleError(_target: unknown, _propertyKey: string | symbol, err:
 
   if (getConfigSetting().showNotificationPopup) {
     if (err instanceof Error) {
-      await window.showErrorMessage(err.stack || `${err.name} - ${err.message}`);
+      let message = err.stack || `${err.name} - ${err.message}`;
+      const quickFix = getErrorQuickFix(err);
+      if (quickFix) {
+        message = `${err.name} - ${err.message} => ${quickFix}`;
+      }
+      await window.showErrorMessage(message);
     } else if (utils.isString(err)) {
       await window.showErrorMessage(err);
     } else {
       await window.showErrorMessage(JSON.stringify(err, null, 2));
     }
   }
+}
+
+export function getErrorQuickFix(err: Error) : string | undefined {
+  if (err.name === 'RequestError') {
+    if ([
+      'self signed certificate',
+      'unable to verify the first certificate',
+    ].indexOf(err.message) >= 0) {
+      log.info('Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)');
+      return 'Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)';
+    }
+    if ([
+      'Protocol "https:" not supported. Expected "http:"'
+    ].indexOf(err.message) >= 0) {
+      log.info('HTTP2 requests are not supported with settings http.proxySupport!=off');
+      return 'HTTP2 request are not supported with settings http.proxySupport!=off';
+    }
+  }
+  return undefined;
 }
