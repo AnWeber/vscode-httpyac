@@ -242,6 +242,26 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
           description: 'extension of file for save or openWith.',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@extension ${extension}')
+        }, {
+          name: '@noLog',
+          description: 'prevent logging of request data in output console',
+          kind: vscode.CompletionItemKind.Property,
+          text: new vscode.SnippetString('@noLog')
+        }, {
+          name: '@noCookieJar',
+          description: 'cookieJar support is disabled for this request',
+          kind: vscode.CompletionItemKind.Property,
+          text: new vscode.SnippetString('@noCookieJar')
+        }, {
+          name: '@noClientCert',
+          description: 'SSL client certificate is not send for this request',
+          kind: vscode.CompletionItemKind.Property,
+          text: new vscode.SnippetString('@noClientCert')
+        }, {
+          name: '@noRejectUnauthorized',
+          description: 'all invalid SSL certificates will be ignored and no error will be thrown.',
+          kind: vscode.CompletionItemKind.Property,
+          text: new vscode.SnippetString('@noRejectUnauthorized')
         }
       ];
 
