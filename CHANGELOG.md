@@ -1,3 +1,10 @@
+## 2.19.0 (2021-07-09)
+
+#### Features
+* simple escaping of template strings in body with `\{\{...\}\}` (is replaced with `{{...}}`)
+* add test result summary, if more requests are executed at the same time
+* add timings, testResults, meta data to code lens in response Preview
+
 ## 2.18.1 (2021-07-06)
 
 #### Features
