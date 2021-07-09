@@ -77,6 +77,33 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
       const headers = getConfigSetting().responseViewHeader;
       if (headers) {
         lenses.push(...headers.map(headerName => {
+          const timingsProperty = 'timings.';
+          if (headerName.startsWith(timingsProperty) && response.timings) {
+            const prop = headerName.slice(timingsProperty.length);
+            const timings = response.timings as Record<string, number>;
+            return `${prop}: ${timings[prop] || 0}ms`;
+          }
+          const metaProperty = 'meta.';
+          if (headerName.startsWith(metaProperty) && response.meta) {
+            const prop = headerName.slice(metaProperty.length);
+            if (response.meta[prop]) {
+              return `${prop}: ${response.meta[prop]}`;
+            }
+          }
+          const testsProperty = 'tests.';
+          if (headerName.startsWith(testsProperty) && cacheItem.httpRegion.testResults) {
+            const prop = headerName.slice(metaProperty.length);
+            const testResults = cacheItem.httpRegion.testResults;
+            if (prop === 'failed') {
+              return `${prop}: ${testResults.filter(obj => !obj.result).length}`;
+            }
+            if (prop === 'success') {
+              return `${prop}: ${testResults.filter(obj => obj.result).length}`;
+            }
+            if (prop === 'total') {
+              return `${prop}: ${testResults.length}`;
+            }
+          }
           const val = utils.getHeader(response.headers, headerName);
           if (val) {
             return `${headerName}: ${val}`;
@@ -104,6 +131,8 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
           testResults: cacheItem.httpRegion.testResults,
           responseBody: false,
           requestBody: false,
+          timings: true,
+          meta: true,
         });
         return new vscode.Hover(new vscode.MarkdownString(responseHover), document.getWordRangeAtPosition(new vscode.Position(0, 0), /[^-\s]/u) || new vscode.Range(0, 0, 0, 100));
       }

@@ -501,11 +501,12 @@
 				"httpyac.responseViewHeader": {
 					"type": "array",
 					"default": [
+						"timings.total",
 						"content-type",
 						"content-length"
 					],
 					"scope": "resource",
-					"description": "headers visible in code lens of response"
+					"description": "headers, testResults, timings, meta data visible in code lens of response"
 				},
 				"httpyac.responseViewPrettyPrint": {
 					"type": "boolean",

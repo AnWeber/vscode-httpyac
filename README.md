@@ -210,7 +210,7 @@ keybindings are only active in files with language http
 #### Response View Settings
 | Name | Description | Default |
 | - | - | - |
-| `httpyac.responseViewHeader` | headers visible in code lens of response | `[ "content-type", "content-length" ]`|
+| `httpyac.responseViewHeader` | headers (e.g. content-type), test results (e.g. tests.failed), timings (e.g. timings.total) and meta data (e.g. meta.size) visible in code lens of response | `[ "timings.total", "content-type", "content-length" ]`|
 | `httpyac.responseViewMode` | response view mode of file | `preview` |
 | `httpyac.responseViewPrettyPrint` | response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation) | `true`|
 | `httpyac.responseViewPreserveFocus` | response view will not take focus after receiving response | `true`|
