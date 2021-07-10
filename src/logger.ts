@@ -1,17 +1,76 @@
 import { Disposable, OutputChannel, window } from 'vscode';
 import { APP_NAME, getConfigSetting } from './config';
-import { logOutputProvider, LogLevel, LogChannels } from 'httpyac';
+import { logOutputProvider, LogLevel, LogChannels, LogHandler } from 'httpyac';
 
 
 const outputChannels: Record<string, OutputChannel> = {};
 
-function getOutputChannel(channel: LogChannels) {
+function getOutputChannel(channel: string) {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = window.createOutputChannel(`${APP_NAME} - ${LogChannels[channel]}`);
+    outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);
     outputChannels[channel] = outputChannel;
   }
   return outputChannel;
+}
+
+export class OutputChannelLogHandler implements LogHandler {
+  private readonly outputChannel: OutputChannel;
+  constructor(channel: string) {
+    this.outputChannel = getOutputChannel(channel);
+  }
+  info(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('INFO: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  log(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('INFO: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  trace(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('TRACE: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  debug(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('DEBUG: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  error(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('ERROR: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  warn(...params: unknown[]): void {
+    if (params.length > 0) {
+      this.outputChannel.append('WARN: ');
+      logParams(this.outputChannel, ...params);
+    } else {
+      this.outputChannel.appendLine('');
+    }
+  }
+  clear(): void {
+    this.outputChannel.clear();
+  }
+
 }
 
 function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: unknown[]) {
@@ -20,11 +79,21 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: un
     return;
   }
 
-  const outputChannel = getOutputChannel(channel);
+  const outputChannel = getOutputChannel(LogChannels[channel]);
 
   if (channel !== LogChannels.Request) {
     outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
   }
+  logParams(outputChannel, params);
+  if (level === LogLevel.error) {
+    outputChannel.show(true);
+  } else if (getConfigSetting().showlogRequestOutput && channel === LogChannels.Request) {
+    outputChannel.show(true);
+  }
+}
+
+
+function logParams(outputChannel: OutputChannel, ...params: unknown[]) {
   for (const param of params) {
     if (typeof param === 'string') {
       outputChannel.appendLine(param);
@@ -37,13 +106,7 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: un
       outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
     }
   }
-  if (level === LogLevel.error) {
-    outputChannel.show(true);
-  } else if (getConfigSetting().showlogRequestOutput && channel === LogChannels.Request) {
-    outputChannel.show(true);
-  }
 }
-
 
 function showMessage(level: LogLevel, ...params: unknown[]) {
   if (getConfigSetting().showNotificationPopup) {
@@ -68,7 +131,7 @@ function showMessage(level: LogLevel, ...params: unknown[]) {
 export function initVscodeLogger() : Disposable {
   logOutputProvider.log = logToOutputChannel;
   logOutputProvider.clear = (channel: LogChannels) => {
-    const outputChannel = getOutputChannel(channel);
+    const outputChannel = getOutputChannel(LogChannels[channel]);
     outputChannel.clear();
   };
   return {

@@ -8,6 +8,7 @@ import { file } from 'tmp-promise';
 import { CommandDocumentArg as DocumentArgument, CommandsLineArg as LineArgument, getHttpRegionFromLine, isNotebook } from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
+import { OutputChannelLogHandler } from '../logger';
 
 export const commands = {
   send: `${APP_NAME}.send`,
@@ -243,6 +244,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         cancellable: true,
         title: 'send',
       }, async (progress, token) => {
+        context.scriptConsole = new OutputChannelLogHandler('Console');
         context.progress = {
           isCanceled: () => token.isCancellationRequested,
           register: (event: () => void) => {
