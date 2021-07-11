@@ -5,7 +5,7 @@ import { logOutputProvider, LogLevel, LogChannels, LogHandler } from 'httpyac';
 
 const outputChannels: Record<string, OutputChannel> = {};
 
-function getOutputChannel(channel: string) {
+export function getOutputChannel(channel: string): OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
     outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);

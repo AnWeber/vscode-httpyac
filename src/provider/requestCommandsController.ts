@@ -8,7 +8,7 @@ import { file } from 'tmp-promise';
 import { CommandDocumentArg as DocumentArgument, CommandsLineArg as LineArgument, getHttpRegionFromLine, isNotebook } from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
-import { OutputChannelLogHandler } from '../logger';
+import { OutputChannelLogHandler, getOutputChannel } from '../logger';
 
 export const commands = {
   send: `${APP_NAME}.send`,
@@ -245,6 +245,19 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         title: 'send',
       }, async (progress, token) => {
         context.scriptConsole = new OutputChannelLogHandler('Console');
+
+        const requestChannel = getOutputChannel('Request');
+        if (this.config?.logRequest) {
+          context.logRequest = httpyac.utils.requestLoggerFactory((arg: string) => {
+            requestChannel.appendLine(arg);
+          }, {
+            requestOutput: true,
+            requestHeaders: true,
+            requestBodyLength: 0,
+            responseHeaders: true,
+            responseBodyLength: this.config?.logResponseBodyLength,
+          });
+        }
         context.progress = {
           isCanceled: () => token.isCancellationRequested,
           register: (event: () => void) => {

@@ -58,9 +58,6 @@ export class EnvironmentController implements vscode.CodeLensProvider {
       log: {
         level: toLogLevel(appConfig.logLevel),
         supportAnsiColors: false,
-        isRequestLogEnabled: !!appConfig.logRequest,
-        responseBodyLength: appConfig.logResponseBodyLength || 0,
-        prettyPrint: appConfig.responseViewPrettyPrint,
       },
       cookieJarEnabled: appConfig.cookieJarEnabled,
       clientCertificates: appConfig.clientCertficates,
