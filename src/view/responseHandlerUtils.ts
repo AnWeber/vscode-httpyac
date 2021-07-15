@@ -29,7 +29,7 @@ export function getExtension(httpRegion: HttpRegion) : string {
 export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion, extension?: string | undefined) : Promise<string> {
   const ext = extension || getExtension(httpRegion);
   const { path } = await dir();
-  const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getRegionName(httpRegion, 'response')));
+  const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getDisplayName(httpRegion, 'response')));
 
   await vscode.workspace.fs.createDirectory(vscode.Uri.file(join(path, TempPathFolder)));
   const fileName = join(path, TempPathFolder, `${name}.${ext}`);

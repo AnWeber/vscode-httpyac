@@ -219,7 +219,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
 
       const pickedObjs = await vscode.window.showQuickPick(httpRegions.map(httpRegion => ({
-        label: httpyac.utils.getRegionName(httpRegion),
+        label: httpyac.utils.getDisplayName(httpRegion),
         data: httpRegion
       })), {
         placeHolder: 'select requests',
@@ -248,7 +248,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
         const requestChannel = getOutputChannel('Request');
         if (this.config?.logRequest) {
-          context.logRequest = httpyac.utils.requestLoggerFactory((arg: string) => {
+          context.logResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
             requestChannel.appendLine(arg);
           }, {
             requestOutput: true,

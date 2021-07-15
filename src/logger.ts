@@ -80,14 +80,9 @@ function logToOutputChannel(channel: LogChannels, level: LogLevel, ...params: un
   }
 
   const outputChannel = getOutputChannel(LogChannels[channel]);
-
-  if (channel !== LogChannels.Request) {
-    outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
-  }
+  outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
   logParams(outputChannel, params);
   if (level === LogLevel.error) {
-    outputChannel.show(true);
-  } else if (getConfigSetting().showlogRequestOutput && channel === LogChannels.Request) {
     outputChannel.show(true);
   }
 }
