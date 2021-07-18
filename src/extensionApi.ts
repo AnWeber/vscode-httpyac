@@ -15,6 +15,7 @@ export interface ResponseOutputProcessor{
 }
 
 export interface DocumentStore{
+  getDocumentPathLike: (document: vscode.TextDocument) => httpyac.PathLike;
   getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile>;
   getAll(): Array<httpyac.HttpFile>;
 }
