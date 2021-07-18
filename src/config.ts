@@ -33,7 +33,6 @@ export interface AppConfig {
   logLevel?:string,
   logResponseBodyLength?:number,
   logRequest?: boolean,
-  showlogRequestOutput?: boolean,
   useMethodInSendCodeLens?:boolean,
   useDecorationProvider?: boolean,
   decorationActiveRegion?: DecorationRenderOptions,

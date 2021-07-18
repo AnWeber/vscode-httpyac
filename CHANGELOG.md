@@ -1,3 +1,14 @@
+## 2.20.0 (2021-07-18)
+
+#### Features
+* allow [loop](https://github.com/AnWeber/httpyac/blob/main/examples/metaData/loop.http) one requests multiple times with `for <var> of <iterable>`, `for <count>` or `while <condition>`
+
+#### Fix
+* error in dotenv import with `.env.{{system}}` notation (#51)
+* use right default comment behavior in script blocks (#52)
+* line break issue with comment in last line (Anweber/httpyac#56)
+* do not open httpyac output log automatically (Anweber/httpbook#28)
+
 ## 2.19.0 (2021-07-09)
 
 #### Features
