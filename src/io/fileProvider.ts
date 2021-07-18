@@ -1,8 +1,8 @@
 import { workspace, Uri } from 'vscode';
-import { fileProvider, FileEnconding, WatchDispose, PathLike, log } from 'httpyac';
+import { fileProvider, FileEnconding, WatchDispose, PathLike } from 'httpyac';
 
 
-export function initVscodeFileProvider(): void {
+export function initFileProvider(): void {
   fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
@@ -28,7 +28,6 @@ export function initVscodeFileProvider(): void {
       }
       return false;
     } catch (err) {
-      log.trace(err);
       return false;
     }
   };

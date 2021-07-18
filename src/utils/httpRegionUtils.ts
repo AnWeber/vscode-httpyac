@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
-import { HttpRegionSendContext } from 'httpyac';
+import { HttpFileSendContext, HttpRegionSendContext, httpYacApi, Logger, LogLevel, utils } from 'httpyac';
 import { DocumentStore } from '../documentStore';
+import { getOutputChannel, logToOuputChannelFactory } from '../io';
+import { getConfigSetting } from '../config';
 
-export type CommandDocumentArg = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
-export type CommandsLineArg = number | vscode.Position | vscode.Range | undefined;
+export type DocumentArgument = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
+export type LineArgument = number | vscode.Position | vscode.Range | undefined;
 
 
 export async function getHttpRegionFromLine(
-  documentArg: CommandDocumentArg,
-  line: CommandsLineArg,
+  documentArg: DocumentArgument,
+  line: LineArgument,
   documentStore: DocumentStore
 ): Promise<HttpRegionSendContext | undefined> {
   const editor = getTextEditor(documentArg);
@@ -25,7 +27,7 @@ export async function getHttpRegionFromLine(
   return undefined;
 }
 
-function getLine(line: CommandsLineArg, editor: vscode.TextEditor) : number {
+function getLine(line: LineArgument, editor: vscode.TextEditor) : number {
   if (line) {
     if (Number.isInteger(line)) {
       return line as number;
@@ -44,7 +46,7 @@ function getLine(line: CommandsLineArg, editor: vscode.TextEditor) : number {
 }
 
 
-function getTextEditor(documentIdentifier: CommandDocumentArg): vscode.TextEditor | undefined {
+function getTextEditor(documentIdentifier: DocumentArgument): vscode.TextEditor | undefined {
   let editor: vscode.TextEditor | undefined;
   if (isTextEditor(documentIdentifier)) {
     editor = documentIdentifier;
@@ -56,13 +58,54 @@ function getTextEditor(documentIdentifier: CommandDocumentArg): vscode.TextEdito
   return editor || vscode.window.activeTextEditor;
 }
 
-function isTextDocument(documentIdentifier: CommandDocumentArg): documentIdentifier is vscode.TextDocument {
+function isTextDocument(documentIdentifier: DocumentArgument): documentIdentifier is vscode.TextDocument {
   const doc = documentIdentifier as vscode.TextDocument;
 
   return doc && !!doc.getText && doc.uri instanceof vscode.Uri;
 }
 
-function isTextEditor(documentIdentifier: CommandDocumentArg): documentIdentifier is vscode.TextEditor {
+function isTextEditor(documentIdentifier: DocumentArgument): documentIdentifier is vscode.TextEditor {
   const editor = documentIdentifier as vscode.TextEditor;
   return editor && !!editor.document && isTextDocument(editor.document);
+}
+
+
+export async function sendContext(context: HttpRegionSendContext | HttpFileSendContext | undefined): Promise<boolean> {
+
+  if (context) {
+    const config = getConfigSetting();
+    context.scriptConsole = new Logger({
+      level: toLogLevel(config.logLevel),
+      logMethod: logToOuputChannelFactory('Console'),
+    });
+    if (config.logRequest) {
+      context.logResponse = utils.requestLoggerFactory((arg: string) => {
+        const requestChannel = getOutputChannel('Request');
+        requestChannel.appendLine(arg);
+      }, {
+        requestOutput: true,
+        requestHeaders: true,
+        requestBodyLength: 0,
+        responseHeaders: true,
+        responseBodyLength: config?.logResponseBodyLength,
+      });
+    }
+    return await httpYacApi.send(context);
+  }
+  return false;
+}
+
+export function toLogLevel(level: string | undefined) : LogLevel {
+  switch (level) {
+    case 'trace':
+      return LogLevel.trace;
+    case 'debug':
+      return LogLevel.debug;
+    case 'warn':
+      return LogLevel.warn;
+    case 'error':
+      return LogLevel.error;
+    default:
+      return LogLevel.info;
+  }
 }

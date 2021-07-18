@@ -8,7 +8,7 @@ import { openWithResponseHandler } from './openWithResponseHandler';
 import { previewDocumentResponseHandler } from './previewDocumentResponseHandler';
 import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
 import { openDocumentResponseHandler } from './openDocumentResponseHandler';
-import { ResponseHandler } from './responseHandler';
+import { ResponseHandler } from '../extensionApi';
 import { TempPathFolder } from './responseHandlerUtils';
 
 export const responseHandlers: Array<ResponseHandler> = [

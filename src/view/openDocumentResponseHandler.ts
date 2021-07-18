@@ -1,7 +1,7 @@
 import { HttpRegion } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
-import { ResponseHandlerResult } from './responseHandler';
+import { ResponseHandlerResult } from '../extensionApi';
 import { getLanguageId, showTextEditor, getContent } from './responseHandlerUtils';
 
 

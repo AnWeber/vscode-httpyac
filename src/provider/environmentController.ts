@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import { AppConfig, APP_NAME, watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
-import { environments, HttpFile, EnvironmentConfig, log, toLogLevel, UserSession, utils, PathLike } from 'httpyac';
+import { environments, HttpFile, EnvironmentConfig, log, UserSession, utils, PathLike } from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
-import { isNotebook } from '../utils';
+import { isNotebook, toLogLevel } from '../utils';
 
 const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,

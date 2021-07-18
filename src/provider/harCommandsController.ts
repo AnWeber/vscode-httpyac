@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { httpYacApi, HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext } from 'httpyac';
+import { HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
-import { getHttpRegionFromLine } from '../utils';
+import { DocumentArgument, getHttpRegionFromLine, LineArgument, sendContext } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
 import { Request, Header, Param, QueryString } from './harRequest';
@@ -31,7 +31,7 @@ export class HarCommandsController {
   }
 
   @errorHandler()
-  private async generateCode(document?: vscode.TextDocument, line?: number) {
+  private async generateCode(document?: DocumentArgument, line?: LineArgument) {
     const httpRegionSendContext = await getHttpRegionFromLine(document, line, this.documentStore);
     await this.generateCodeRequest(httpRegionSendContext);
   }
@@ -69,7 +69,7 @@ export class HarCommandsController {
           }
           return await httpClient(request, context);
         };
-        await httpYacApi.send(context);
+        await sendContext(context);
       });
     }
 

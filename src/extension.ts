@@ -3,33 +3,15 @@ import * as provider from './provider';
 import * as httpyac from 'httpyac';
 import { responseHandlers, ResponseOutputProcessor } from './view';
 import * as config from './config';
-import { initVscodeLogger } from './logger';
+import { initUserInteractionProvider, initFileProvider } from './io';
 import { DocumentStore } from './documentStore';
-import { initVscodeFileProvider } from './fileProvider';
 import { HttpYacExtensionApi } from './extensionApi';
+import { sendContext } from './utils';
 
 
 export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi {
-  initVscodeFileProvider();
+  initFileProvider();
   httpyac.httpYacApi.additionalRequire.vscode = vscode;
-  httpyac.httpYacApi.httpRegionParsers.push(new httpyac.parser.NoteMetaHttpRegionParser(async (note: string) => {
-    const buttonTitle = 'Execute';
-    const result = await vscode.window.showWarningMessage(note, { modal: true }, buttonTitle);
-    return result === buttonTitle;
-  }));
-
-  httpyac.httpYacApi.variableReplacers.splice(0, 0, new httpyac.variables.replacer.ShowInputBoxVariableReplacer(
-    async (message: string, defaultValue: string) => await vscode.window.showInputBox({
-      placeHolder: message,
-      value: defaultValue,
-      prompt: message
-    })
-  ));
-  httpyac.httpYacApi.variableReplacers.splice(0, 0, new httpyac.variables.replacer.ShowQuickpickVariableReplacer(
-    async (message: string, values: string[]) => await vscode.window.showQuickPick(values, {
-      placeHolder: message
-    })
-  ));
 
   const responseOutputProcessor = new ResponseOutputProcessor();
 
@@ -40,7 +22,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
   const httpFileStore = new httpyac.HttpFileStore();
   const documentStore = new DocumentStore(httpFileStore);
   context.subscriptions.push(...[
-    initVscodeLogger(),
+    initUserInteractionProvider(),
     refreshCodeLens,
     new provider.HttpFileStoreController(documentStore, refreshCodeLens),
     new provider.HarCommandsController(documentStore),
@@ -100,6 +82,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     refreshCodeLens,
     environementChanged,
     getErrorQuickFix: provider.getErrorQuickFix,
+    sendContext,
   };
 }
 
@@ -122,7 +105,6 @@ function initExtensionScript() {
             disposable.dispose();
           }
         } else {
-          httpyac.popupService.error('extenionscript not found');
           httpyac.log.error('extenionscript not found');
         }
       }
