@@ -11,6 +11,7 @@
       "begin": "\\s*{{\\s*",
       "name": "http.request.body.javascript",
       "end": "\\s*}}\\s*",
+      "contentName": "source.js",
       "beginCaptures": {
         "0": {
           "name": "comment.line.http"
@@ -30,6 +31,7 @@
     {
       "begin": "^\\s*>\\s{1}{%?\\s*",
       "name": "http.request.body.javascript",
+      "contentName": "source.js",
       "end": "^\\s*%}\\s*",
       "beginCaptures": {
         "0": {
@@ -51,6 +53,7 @@
       "begin": "\\s*(?=(\\[|{[^{]))",
       "name": "http.request.body.json",
       "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "contentName": "source.json",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
@@ -81,6 +84,7 @@
       "begin": "\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
       "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "contentName": "source.graphql",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
@@ -96,6 +100,7 @@
       "begin": "\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
       "end": "^\\{\\s*$",
+      "contentName": "source.graphql",
       "patterns": [
         {
           "include": "source.graphql"

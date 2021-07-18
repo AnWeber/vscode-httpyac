@@ -66,15 +66,13 @@
 			{
 				"language": "http",
 				"scopeName": "source.http",
-				"path": "./syntaxes/http.tmLanguage.json"
-			}
-		],
-		"startEntries": [
-			{
-				"id": "httpyac.new",
-				"title": "httpyac",
-				"description": "send REST, SOAP, and GraphQL requests",
-				"command": "httpyac.new"
+				"path": "./syntaxes/http.tmLanguage.json",
+        "embeddedLanguages": {
+					"source.json": "json",
+          "source.js": "javascript",
+          "text.xml": "xml",
+					"source.graphql": "graphql"
+				}
 			}
 		],
 		"configuration": {
