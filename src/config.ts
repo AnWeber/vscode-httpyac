@@ -1,28 +1,32 @@
-import { ClientCertificateOptions, HttpRequest, Variables } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { Disposable, workspace, DecorationRenderOptions } from 'vscode';
+import { toUri } from './io';
 
 export const APP_NAME = 'httpyac';
 
 export const RESPONSE_VIEW_PREVIEW = 'responseViewPreview';
 export const RESPONSE_VIEW_PRESERVE_FOCUS = 'responseViewPreserveFocus';
 export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
-export interface AppConfig {
+
+
+export interface ResourceConfig {
   requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>
-  requestOptions?: HttpRequest,
+  requestOptions?: httpyac.HttpRequest,
   cookieJarEnabled?: boolean,
-  clientCertficates?: Record<string, ClientCertificateOptions>
+  clientCertficates?: Record<string, httpyac.ClientCertificateOptions>
+  environmentVariables?: Record<string, httpyac.Variables>,
+  envDirName?: string,
+  logLevel?: string,
+  logResponseBodyLength?:number,
+  logRequest?: boolean,
+}
+
+
+export interface AppConfig {
   environmentSelectedOnStart?: Array<string>,
   environmentStoreSelectedOnStart?: boolean,
   environmentPickMany?:boolean,
-  environmentVariables?: Record<string, Variables>,
-  dotenvEnabled?:boolean,
-  dotenvDirname?:string,
-  dotenvDefaultFiles?:Array<string>,
-  dotenvVariableProviderEnabled?:boolean,
-  intellijEnvEnabled?:boolean,
-  intellijDirname?:string,
-  intellijVariableProviderEnabled?:boolean,
   responseViewHeader?:Array<string>,
   responseViewContent?: ResponseViewContent,
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none',
@@ -30,9 +34,6 @@ export interface AppConfig {
   responseViewPreserveFocus?:boolean,
   responseViewLanguageMap?:Record<string, string>,
   responseViewColumn?:string,
-  logLevel?:string,
-  logResponseBodyLength?:number,
-  logRequest?: boolean,
   useMethodInSendCodeLens?:boolean,
   useDecorationProvider?: boolean,
   decorationActiveRegion?: DecorationRenderOptions,
@@ -45,31 +46,79 @@ export interface AppConfig {
   showCodeLensRemoveCookies?:boolean,
   showCodeLensSendAll?: boolean,
   showCodeLensSendSelected?: boolean,
-  showCodeLensSend?:boolean,
+  showCodeLensSend?: boolean,
+  showCodeLensClearAll?: boolean,
   showCodeLensSendRepeat?: boolean,
   showCodeLensTestResult?: boolean,
   showCodeLensShowResponse?:boolean,
   showCodeLensSaveResponse?:boolean,
   showCodeLensShowResponseHeaders?:boolean,
-  extensionScript?:string,
-  httpRegionScript?: string,
-
-  readonly [key: string]: unknown;
-
 }
 
 export function getConfigSetting() : AppConfig {
-  return workspace.getConfiguration(APP_NAME);
+  const result: AppConfig = {};
+  Object.assign(result, workspace.getConfiguration(APP_NAME));
+  return result;
 }
 
-export type ConfigWatcher = (appConfig: AppConfig, ...config: Array<Record<string, unknown>>) => void
+export function getResourceConfig(fileName: httpyac.io.PathLike) : ResourceConfig {
+  const result: ResourceConfig = {};
 
-export function watchConfigSettings(watcher: ConfigWatcher, ...sections: Array<string>) : Disposable {
-  const rootSections = [APP_NAME, ...sections];
-  watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
+  Object.assign(result, workspace.getConfiguration(APP_NAME), toUri(fileName) || undefined);
+  return result;
+}
+
+
+function toLogLevel(level: string | undefined): httpyac.LogLevel {
+  switch (level) {
+    case 'trace':
+      return httpyac.LogLevel.trace;
+    case 'debug':
+      return httpyac.LogLevel.debug;
+    case 'warn':
+      return httpyac.LogLevel.warn;
+    case 'error':
+      return httpyac.LogLevel.error;
+    default:
+      return httpyac.LogLevel.info;
+  }
+}
+
+export async function getEnvironmentConfig(fileName: httpyac.io.PathLike): Promise<httpyac.EnvironmentConfig> {
+  const config = getResourceConfig(fileName);
+  const httpOptions = workspace.getConfiguration('http');
+
+  const environmentConfig: httpyac.EnvironmentConfig = {
+    environments: config.environmentVariables,
+    log: {
+      level: toLogLevel(config.logLevel),
+      supportAnsiColors: false,
+    },
+    cookieJarEnabled: config.cookieJarEnabled,
+    clientCertificates: config.clientCertficates,
+    request: config.requestOptions,
+    requestBodyInjectVariablesExtensions: config.requestBodyInjectVariablesExtensions,
+    proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
+    defaultHeaders: config.requestDefaultHeaders,
+    envDirName: config.envDirName,
+  };
+
+  const uri = toUri(fileName);
+  if (uri) {
+    const workspaceFolder = workspace.getWorkspaceFolder(uri);
+    if (workspaceFolder) {
+      httpyac.utils.resolveClientCertficates(config, workspaceFolder);
+    }
+  }
+  return environmentConfig;
+}
+
+
+export function watchConfigSettings(watcher: (appConfig: AppConfig) => void) : Disposable {
+  watcher(getConfigSetting());
   return workspace.onDidChangeConfiguration(changeEvent => {
-    if (rootSections.some(section => changeEvent.affectsConfiguration(section))) {
-      watcher(getConfigSetting(), ...sections.map(section => workspace.getConfiguration(section)));
+    if (changeEvent.affectsConfiguration(APP_NAME)) {
+      watcher(getConfigSetting());
     }
   });
 }

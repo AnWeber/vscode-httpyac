@@ -1,6 +1,6 @@
 import { Disposable, OutputChannel, window } from 'vscode';
 import { APP_NAME } from '../config';
-import { log, userInteractionProvider, LogLevel } from 'httpyac';
+import { io, LogLevel } from 'httpyac';
 
 
 const outputChannels: Record<string, OutputChannel> = {};
@@ -36,25 +36,25 @@ export function logToOuputChannelFactory(channel: string) : (level: LogLevel, ..
 }
 
 export function initUserInteractionProvider(): Disposable {
-  log.options.logMethod = logToOuputChannelFactory('Log');
+  io.log.options.logMethod = logToOuputChannelFactory('Log');
 
-  userInteractionProvider.showErrorMessage = async (message: string) => {
+  io.userInteractionProvider.showErrorMessage = async (message: string) => {
     await window.showErrorMessage(message);
   };
-  userInteractionProvider.showWarnMessage = async (message: string) => {
+  io.userInteractionProvider.showWarnMessage = async (message: string) => {
     await window.showWarningMessage(message);
   };
-  userInteractionProvider.showNote = async (note: string) => {
+  io.userInteractionProvider.showNote = async (note: string) => {
     const buttonTitle = 'Execute';
     const result = await window.showWarningMessage(note, { modal: true }, buttonTitle);
     return result === buttonTitle;
   };
-  userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string) => await window.showInputBox({
+  io.userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string) => await window.showInputBox({
     placeHolder: message,
     value: defaultValue,
     prompt: message
   });
-  userInteractionProvider.showListPrompt = async (message: string, values: string[]) => await window.showQuickPick(values, {
+  io.userInteractionProvider.showListPrompt = async (message: string, values: string[]) => await window.showQuickPick(values, {
     placeHolder: message
   });
 

@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
-import { HttpFileSendContext, HttpRegionSendContext, httpYacApi, Logger, LogLevel, utils } from 'httpyac';
+import { HttpFileSendContext, HttpRegionSendContext, send, io, utils } from 'httpyac';
 import { DocumentStore } from '../documentStore';
 import { getOutputChannel, logToOuputChannelFactory } from '../io';
-import { getConfigSetting } from '../config';
+import { getEnvironmentConfig, getResourceConfig } from '../config';
 
 export type DocumentArgument = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
 export type LineArgument = number | vscode.Position | vscode.Range | undefined;
-
 
 export async function getHttpRegionFromLine(
   documentArg: DocumentArgument,
@@ -20,14 +19,17 @@ export async function getHttpRegionFromLine(
       const currentLine = getLine(line, editor);
       const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine);
       if (httpRegion) {
-        return { httpRegion, httpFile };
+        return {
+          httpRegion,
+          httpFile
+        };
       }
     }
   }
   return undefined;
 }
 
-function getLine(line: LineArgument, editor: vscode.TextEditor) : number {
+function getLine(line: LineArgument, editor: vscode.TextEditor): number {
   if (line) {
     if (Number.isInteger(line)) {
       return line as number;
@@ -73,12 +75,15 @@ function isTextEditor(documentIdentifier: DocumentArgument): documentIdentifier 
 export async function sendContext(context: HttpRegionSendContext | HttpFileSendContext | undefined): Promise<boolean> {
 
   if (context) {
-    const config = getConfigSetting();
-    context.scriptConsole = new Logger({
-      level: toLogLevel(config.logLevel),
-      logMethod: logToOuputChannelFactory('Console'),
-    });
-    if (config.logRequest) {
+    const resourceConfig = getResourceConfig(context.httpFile);
+    const config = await getEnvironmentConfig(context.httpFile.fileName);
+    if (!context.scriptConsole) {
+      context.scriptConsole = new io.Logger({
+        level: config.log?.level,
+        logMethod: logToOuputChannelFactory('Console'),
+      });
+    }
+    if (resourceConfig.logRequest && !context.logResponse) {
       context.logResponse = utils.requestLoggerFactory((arg: string) => {
         const requestChannel = getOutputChannel('Request');
         requestChannel.appendLine(arg);
@@ -87,25 +92,18 @@ export async function sendContext(context: HttpRegionSendContext | HttpFileSendC
         requestHeaders: true,
         requestBodyLength: 0,
         responseHeaders: true,
-        responseBodyLength: config?.logResponseBodyLength,
+        responseBodyLength: resourceConfig.logResponseBodyLength,
       });
     }
-    return await httpYacApi.send(context);
+
+    if (!context.config) {
+      context.config = config;
+    }
+
+    context.require = {
+      vscode,
+    };
+    return await send(context);
   }
   return false;
-}
-
-export function toLogLevel(level: string | undefined) : LogLevel {
-  switch (level) {
-    case 'trace':
-      return LogLevel.trace;
-    case 'debug':
-      return LogLevel.debug;
-    case 'warn':
-      return LogLevel.warn;
-    case 'error':
-      return LogLevel.error;
-    default:
-      return LogLevel.info;
-  }
 }

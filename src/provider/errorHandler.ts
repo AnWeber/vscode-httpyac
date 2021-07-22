@@ -1,4 +1,4 @@
-import { log, utils } from 'httpyac';
+import { io, utils } from 'httpyac';
 import { window } from 'vscode';
 import { getConfigSetting } from '../config';
 
@@ -27,7 +27,7 @@ export function errorHandlerWrapper(target: unknown, propertyKey: string | symbo
 }
 
 async function handleError(_target: unknown, _propertyKey: string | symbol, err: unknown) {
-  log.error(err);
+  io.log.error(err);
 
   if (getConfigSetting().showNotificationPopup) {
     if (err instanceof Error) {
@@ -51,13 +51,13 @@ export function getErrorQuickFix(err: Error) : string | undefined {
       'self signed certificate',
       'unable to verify the first certificate',
     ].indexOf(err.message) >= 0) {
-      log.info('Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)');
+      io.log.info('Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)');
       return 'Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)';
     }
     if ([
       'Protocol "https:" not supported. Expected "http:"'
     ].indexOf(err.message) >= 0) {
-      log.info('HTTP2 requests are not supported with settings http.proxySupport!=off');
+      io.log.info('HTTP2 requests are not supported with settings http.proxySupport!=off');
       return 'HTTP2 request are not supported with settings http.proxySupport!=off';
     }
   }

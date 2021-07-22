@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext } from 'httpyac';
+import { HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext, io } from 'httpyac';
 import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
-import { DocumentArgument, getHttpRegionFromLine, LineArgument, sendContext } from '../utils';
+import { DocumentArgument, getHttpRegionFromLine, LineArgument, sendContext, DisposeProvider } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
 import { Request, Header, Param, QueryString } from './harRequest';
@@ -12,31 +12,24 @@ const commands = {
   generateCode: `${APP_NAME}.generateCode`,
 };
 
-export class HarCommandsController {
-
-
-  subscriptions: Array<vscode.Disposable>;
+export class HarCommandsController extends DisposeProvider {
 
   constructor(private readonly documentStore: DocumentStore) {
+    super();
     this.subscriptions = [
       vscode.commands.registerCommand(commands.generateCode, this.generateCode, this),
     ];
   }
 
-  dispose(): void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose());
-      this.subscriptions = [];
+  @errorHandler()
+  private async generateCode(document?: DocumentArgument, line?: LineArgument) {
+    const context = await getHttpRegionFromLine(document, line, this.documentStore);
+    if (context) {
+      await this.generateCodeRequest(context);
     }
   }
 
-  @errorHandler()
-  private async generateCode(document?: DocumentArgument, line?: LineArgument) {
-    const httpRegionSendContext = await getHttpRegionFromLine(document, line, this.documentStore);
-    await this.generateCodeRequest(httpRegionSendContext);
-  }
-
-  private async generateCodeRequest(context: HttpRegionSendContext | HttpFileSendContext | undefined) {
+  private async generateCodeRequest(context: HttpRegionSendContext | HttpFileSendContext) {
     const target = await this.pickHttpSnippetResult();
     if (target && context) {
       await vscode.window.withProgress({
@@ -53,7 +46,7 @@ export class HarCommandsController {
           report: data => progress.report(data),
         };
 
-        const httpClient = utils.initHttpClient();
+        const httpClient = io.initHttpClient(context);
 
         context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
 

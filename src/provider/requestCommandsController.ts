@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { AppConfig, APP_NAME } from '../config';
+import { getConfigSetting, APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
-import { httpDocumentSelector, watchConfigSettings } from '../config';
+import { httpDocumentSelector } from '../config';
 import { file } from 'tmp-promise';
 import * as utils from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
+import { DisposeProvider } from '../utils';
 
 export const commands = {
   send: `${APP_NAME}.send`,
@@ -22,12 +23,10 @@ export const commands = {
   new: `${APP_NAME}.new`,
 };
 
-export class RequestCommandsController implements vscode.CodeLensProvider {
+export class RequestCommandsController extends DisposeProvider implements vscode.CodeLensProvider {
 
-  private config: AppConfig | undefined;
   private tmpFiles: Array<vscode.Uri> = [];
 
-  subscriptions: Array<vscode.Disposable>;
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(
@@ -35,11 +34,9 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
     private readonly responseOutputProcessor: ResponseOutputProcessor,
     private readonly documentStore: DocumentStore
   ) {
+    super();
     this.onDidChangeCodeLenses = refreshCodeLens.event;
     this.subscriptions = [
-      watchConfigSettings(config => {
-        this.config = config;
-      }),
       vscode.commands.registerCommand(commands.send, this.send, this),
       vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),
       vscode.commands.registerCommand(commands.clearAll, this.clearAll, this),
@@ -58,46 +55,40 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             this.tmpFiles.splice(index, 1);
             await vscode.workspace.fs.delete(doc.uri);
           } catch (err) {
-            httpyac.log.error(err);
+            httpyac.io.log.error(err);
           }
         }
       })
     ];
   }
 
-  public dispose(): void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose());
-      this.subscriptions = [];
-    }
-  }
-
   @errorHandler()
   public async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const httpFile = await this.documentStore.getHttpFile(document);
 
+    const config = getConfigSetting();
     const result: Array<vscode.CodeLens> = [];
 
-    if (!this.config?.useCodeLensInNotebook && utils.isNotebook(document)) {
+    if (!config?.useCodeLensInNotebook && utils.isNotebook(document)) {
       return result;
     }
 
     if (httpFile && httpFile.httpRegions.length > 0) {
-      if (this.config?.showCodeLensSendAll) {
+      if (config?.showCodeLensSendAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendAll,
           title: 'send all'
         }));
       }
 
-      if (this.config?.showCodeLensSendSelected) {
+      if (config?.showCodeLensSendSelected) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendSelected,
           title: 'send selected'
         }));
       }
 
-      if (this.config?.showCodeLensClearAll) {
+      if (config?.showCodeLensClearAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.clearAll,
           title: 'clear all'
@@ -110,23 +101,23 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         const args = [document.uri, requestLine];
 
         if (!!httpRegion.request && !httpRegion.metaData.disabled) {
-          if (this.config?.showCodeLensSend) {
+          if (config?.showCodeLensSend) {
             result.push(new vscode.CodeLens(range, {
               command: commands.send,
               arguments: args,
-              title: this.config?.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
+              title: config?.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
             }));
           }
-          if (this.config?.showCodeLensSendRepeat) {
+          if (config?.showCodeLensSendRepeat) {
             result.push(new vscode.CodeLens(range, {
               command: commands.sendRepeat,
               arguments: args,
-              title: this.config?.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
+              title: config?.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
             }));
           }
         }
 
-        if (httpRegion.testResults && this.config?.showCodeLensTestResult) {
+        if (httpRegion.testResults && config?.showCodeLensTestResult) {
           result.push(new vscode.CodeLens(range, {
             arguments: [httpRegion],
             title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${httpRegion.testResults.length}`,
@@ -135,7 +126,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
         }
 
         if (httpRegion.response) {
-          if (this.config?.showCodeLensShowResponse) {
+          if (config?.showCodeLensShowResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.show,
               arguments: args,
@@ -143,7 +134,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             }));
           }
 
-          if (this.config?.showCodeLensSaveResponse) {
+          if (config?.showCodeLensSaveResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.save,
               arguments: args,
@@ -151,7 +142,7 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
             }));
           }
 
-          if (this.config?.showCodeLensShowResponseHeaders) {
+          if (config?.showCodeLensShowResponseHeaders) {
             result.push(new vscode.CodeLens(range, {
               command: commands.viewHeader,
               arguments: args,
@@ -282,9 +273,9 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   @errorHandler()
   private async show(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
-    const parsedDocument = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    if (parsedDocument) {
-      await this.responseOutputProcessor.show(parsedDocument.httpRegion);
+    const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
+    if (context) {
+      await this.responseOutputProcessor.show(context.httpRegion);
     }
   }
 
@@ -295,9 +286,9 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       if (this.isHttpRegion(document)) {
         httpRegion = document;
       } else {
-        const parsedDocument = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-        if (parsedDocument) {
-          httpRegion = parsedDocument.httpRegion;
+        const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
+        if (context) {
+          httpRegion = context.httpRegion;
         }
       }
 
@@ -323,9 +314,10 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
 
   @errorHandler()
   private async save(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
-    const parsedDocument = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    if (parsedDocument && parsedDocument.httpRegion.response) {
-      const ext = parsedDocument.httpRegion.metaData.extension || extension(parsedDocument.httpRegion.response.contentType?.contentType || 'application/octet-stream');
+    const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
+    if (context?.httpRegion?.response) {
+      const { response, metaData } = context.httpRegion;
+      const ext = metaData.extension || extension(response.contentType?.contentType || 'application/octet-stream');
       const filters: Record<string, Array<string>> = {};
       if (ext) {
         filters[ext] = [ext];
@@ -333,8 +325,8 @@ export class RequestCommandsController implements vscode.CodeLensProvider {
       const uri = await vscode.window.showSaveDialog({
         filters
       });
-      if (uri && parsedDocument.httpRegion.response.rawBody) {
-        await vscode.workspace.fs.writeFile(uri, new Uint8Array(parsedDocument.httpRegion.response.rawBody));
+      if (uri && response.rawBody) {
+        await vscode.workspace.fs.writeFile(uri, new Uint8Array(response.rawBody));
       }
     }
   }

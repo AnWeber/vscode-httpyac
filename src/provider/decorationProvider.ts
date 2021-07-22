@@ -2,11 +2,10 @@ import { HttpFile } from 'httpyac';
 import * as vscode from 'vscode';
 import { watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
-import { isNotebook } from '../utils';
+import { DisposeProvider, isNotebook } from '../utils';
 
-export class DecorationProvider {
+export class DecorationProvider extends DisposeProvider {
 
-  private subscriptions: Array<vscode.Disposable>;
   private decorationInactive: vscode.TextEditorDecorationType | undefined;
   private decorationActiveBefore: vscode.TextEditorDecorationType | undefined;
   private decorationActive: vscode.TextEditorDecorationType | undefined;
@@ -15,6 +14,7 @@ export class DecorationProvider {
     refreshCodeLens: vscode.EventEmitter<void>,
     private readonly documentStore: DocumentStore
   ) {
+    super();
     this.subscriptions = [
       refreshCodeLens.event(() => this.setEditorDecoration(vscode.window.activeTextEditor)),
       vscode.window.onDidChangeTextEditorSelection(this.onDidChangeTextEditorSelection, this),
@@ -104,13 +104,6 @@ export class DecorationProvider {
       if (activeBorderLineEnd && this.decorationActive) {
         editor.setDecorations(this.decorationActive, [activeBorderLineEnd]);
       }
-    }
-  }
-
-  dispose(): void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose());
-      this.subscriptions = [];
     }
   }
 }
