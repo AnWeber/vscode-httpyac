@@ -1,7 +1,7 @@
 ## 2.21.0 (2021-07-22)
 
 #### Features
-* add pretty print for xml (#56)
+* add pretty print for xml in exchange body (#56)
 
 #### Fix
 * missing blank line after file import in multipart/formdata (Anweber/httpyac#57)
