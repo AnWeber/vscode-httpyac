@@ -164,7 +164,6 @@ Due to the NodeJS support the client can be extended arbitrarily. In addition, t
 | `httpyac.save` | save response of request in ActiveTextEditor in active line |
 | `httpyac.clearall` | clear all cached responses |
 | `httpyac.toggle-env` | toggle environment of active text document |
-| `httpyac.toggle-allenv` | toggle environment of all files |
 | `httpyac.generateCode` | generate code of request in ActiveTextEditor in active line |
 | `httpyac.reset` | reset environments, oauth sessions and cookies |
 | `httpyac.logout` | see current oauth2 sessions and logout |

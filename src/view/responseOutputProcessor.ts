@@ -1,4 +1,4 @@
-import { HttpRegion, utils, log } from 'httpyac';
+import { HttpRegion, utils, io } from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
@@ -10,6 +10,7 @@ import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
 import { openDocumentResponseHandler } from './openDocumentResponseHandler';
 import { ResponseHandler } from '../extensionApi';
 import { TempPathFolder } from './responseHandlerUtils';
+import { DisposeProvider } from '../utils';
 
 export const responseHandlers: Array<ResponseHandler> = [
   saveFileResponseHandler,
@@ -26,11 +27,11 @@ interface OutputCacheItem{
   deleteFile: boolean;
 }
 
-export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.HoverProvider {
+export class ResponseOutputProcessor extends DisposeProvider implements vscode.CodeLensProvider, vscode.HoverProvider {
   private outputCache: Array<OutputCacheItem> = [];
-  private subscriptions: Array<vscode.Disposable> = [];
 
   constructor() {
+    super();
 
     const documentFilter = [{
       scheme: 'untitled',
@@ -55,12 +56,6 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         }
       }),
     ];
-  }
-  dispose() : void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose);
-      this.subscriptions = [];
-    }
   }
 
   public provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
@@ -196,7 +191,7 @@ export class ResponseOutputProcessor implements vscode.CodeLensProvider, vscode.
         try {
           await vscode.workspace.fs.delete(cacheItem.document.uri);
         } catch (err) {
-          log.error(err);
+          io.log.error(err);
         }
       }
       this.outputCache.splice(index, 1);

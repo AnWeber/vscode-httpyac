@@ -1,3 +1,9 @@
+## 3.0.0 (2021-08-xx)
+
+#### Breaking Changes
+* removed extensionScript (use instead hook api)
+* removed dotenv and intellij configuration (use instead envDirName, if needed)
+
 ## 2.21.1 (2021-07-28)
 
 #### Fix

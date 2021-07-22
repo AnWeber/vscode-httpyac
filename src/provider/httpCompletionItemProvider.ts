@@ -3,6 +3,7 @@ import { types } from 'mime-types';
 import { HttpFile, HttpRegion, HttpSymbolKind } from 'httpyac';
 import { httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
+import { DisposeProvider } from '../utils';
 interface HttpCompletionItem {
   name: string;
   description: string;
@@ -10,12 +11,11 @@ interface HttpCompletionItem {
   kind: vscode.CompletionItemKind;
 }
 
-export class HttpCompletionItemProvider implements vscode.CompletionItemProvider {
+export class HttpCompletionItemProvider extends DisposeProvider implements vscode.CompletionItemProvider {
 
-  private subscriptions: Array<vscode.Disposable>;
 
   constructor(private readonly documentStore: DocumentStore) {
-
+    super();
     this.subscriptions = [
       vscode.languages.registerCompletionItemProvider(httpDocumentSelector, this),
     ];
@@ -302,12 +302,5 @@ export class HttpCompletionItemProvider implements vscode.CompletionItemProvider
       return result;
     }
     return [];
-  }
-
-  dispose(): void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose());
-      this.subscriptions = [];
-    }
   }
 }

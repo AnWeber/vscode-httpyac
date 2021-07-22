@@ -3,14 +3,15 @@ import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
 import { httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
+import { DisposeProvider } from '../utils';
 
-export class HttpFileStoreController {
+export class HttpFileStoreController extends DisposeProvider {
 
-  private subscriptions: Array<vscode.Disposable> = [];
   constructor(
     private readonly documentStore: DocumentStore,
     private readonly refreshCodeLens: vscode.EventEmitter<void>
   ) {
+    super();
 
     const refreshHttpFileThrottled = throttle(this.refreshHttpFile.bind(this), 200);
     const document = vscode.window.activeTextEditor?.document;
@@ -48,14 +49,6 @@ export class HttpFileStoreController {
       return httpFile;
     }
     return undefined;
-  }
-
-
-  dispose() : void {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(obj => obj.dispose());
-      this.subscriptions = [];
-    }
   }
 
 }
