@@ -16,15 +16,6 @@
                         },
                         "supportAnsiColors": {
                             "type": "boolean"
-                        },
-                        "isRequestLogEnabled": {
-                            "type": "boolean"
-                        },
-                        "responseBodyLength": {
-                            "type": "number"
-                        },
-                        "prettyPrint": {
-                            "type": "boolean"
                         }
                     },
                     "additionalProperties": false
@@ -127,9 +118,6 @@
                             "items": {
                                 "type": "string"
                             }
-                        },
-                        "dirname": {
-                            "type": "string"
                         },
                         "variableProviderEnabled": {
                             "type": "boolean"

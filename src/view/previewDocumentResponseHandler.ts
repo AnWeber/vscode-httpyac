@@ -19,10 +19,10 @@ export async function previewDocumentResponseHandler(httpRegion: HttpRegion) :Pr
       if (config.responseViewContent && config.responseViewContent !== 'body') {
         content = Buffer.from(getContent(httpRegion.response, config.responseViewContent));
         extension = 'http';
-      } else if (httpRegion.response.parsedBody
+      } else if (httpRegion.response.prettyPrintBody
         && config.responseViewPrettyPrint
         && config.responseViewPreserveFocus) {
-        content = Buffer.from(JSON.stringify(httpRegion.response.parsedBody, null, 2));
+        content = Buffer.from(httpRegion.response.prettyPrintBody);
       }
     }
 
