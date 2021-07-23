@@ -17,6 +17,7 @@ export interface DocumentStore{
   getDocumentPathLike: (document: vscode.TextDocument) => httpyac.io.PathLike;
   getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile>;
   getAll(): Array<httpyac.HttpFile>;
+  remove(document: vscode.TextDocument): void;
 }
 
 export interface HttpYacExtensionApi{

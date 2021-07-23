@@ -20,7 +20,7 @@ export class HttpFileStoreController extends DisposeProvider {
     }
     this.subscriptions = [
       vscode.workspace.onDidCloseTextDocument(document => {
-        this.documentStore.httpFileStore.remove(document.uri);
+        this.documentStore.remove(document);
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         await this.refreshHttpFile(document);

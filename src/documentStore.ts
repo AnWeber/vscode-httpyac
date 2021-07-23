@@ -34,4 +34,8 @@ export class DocumentStore {
     return this.httpFileStore.getAll();
   }
 
+  remove(document: TextDocument) : void {
+    const path = this.getDocumentPathLike(document);
+    this.httpFileStore.remove(path);
+  }
 }
