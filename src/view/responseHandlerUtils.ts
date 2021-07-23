@@ -70,8 +70,7 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
     if (response?.body) {
       if (utils.isString(response.body)) {
         if (response.prettyPrintBody
-          && getConfigSetting().responseViewPrettyPrint
-          && getConfigSetting().responseViewPreserveFocus) {
+          && getConfigSetting().responseViewPrettyPrint) {
           result.push(response.prettyPrintBody);
         } else {
           result.push(response.body);

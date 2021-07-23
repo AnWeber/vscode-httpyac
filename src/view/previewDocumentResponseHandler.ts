@@ -20,8 +20,7 @@ export async function previewDocumentResponseHandler(httpRegion: HttpRegion) :Pr
         content = Buffer.from(getContent(httpRegion.response, config.responseViewContent));
         extension = 'http';
       } else if (httpRegion.response.prettyPrintBody
-        && config.responseViewPrettyPrint
-        && config.responseViewPreserveFocus) {
+        && config.responseViewPrettyPrint) {
         content = Buffer.from(httpRegion.response.prettyPrintBody);
       }
     }
