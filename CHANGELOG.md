@@ -1,3 +1,9 @@
+## 2.21.1 (2021-07-28)
+
+#### Fix
+* log trace can be selected (#57)
+* requestGotOptions are used (#57)
+
 ## 2.21.0 (2021-07-22)
 
 #### Features

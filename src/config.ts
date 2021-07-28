@@ -7,7 +7,7 @@ export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
 export interface AppConfig {
   requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>
-  requestOptions?: HttpRequest,
+  requestGotOptions?: HttpRequest,
   cookieJarEnabled?: boolean,
   clientCertficates?: Record<string, ClientCertificateOptions>
   environmentSelectedOnStart?: Array<string>,
