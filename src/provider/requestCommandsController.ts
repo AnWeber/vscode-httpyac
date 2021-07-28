@@ -340,6 +340,6 @@ export class RequestCommandsController extends DisposeProvider implements vscode
 
   private isHttpRegion(obj: unknown): obj is httpyac.HttpRegion {
     const guard = obj as httpyac.HttpRegion;
-    return Array.isArray(guard.actions) && !!guard.symbol && !!guard.metaData;
+    return !!guard.symbol && !!guard.metaData;
   }
 }

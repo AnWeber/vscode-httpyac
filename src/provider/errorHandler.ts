@@ -30,7 +30,7 @@ async function handleError(_target: unknown, _propertyKey: string | symbol, err:
   io.log.error(err);
 
   if (getConfigSetting().showNotificationPopup) {
-    if (err instanceof Error) {
+    if (utils.isError(err)) {
       let message = err.stack || `${err.name} - ${err.message}`;
       const quickFix = getErrorQuickFix(err);
       if (quickFix) {

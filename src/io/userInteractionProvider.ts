@@ -1,6 +1,6 @@
 import { Disposable, OutputChannel, window } from 'vscode';
 import { APP_NAME } from '../config';
-import { io, LogLevel } from 'httpyac';
+import { io, LogLevel, utils } from 'httpyac';
 
 
 const outputChannels: Record<string, OutputChannel> = {};
@@ -22,7 +22,7 @@ export function logToOuputChannelFactory(channel: string) : (level: LogLevel, ..
     for (const param of params) {
       if (typeof param === 'string') {
         outputChannel.appendLine(param);
-      } else if (param instanceof Error) {
+      } else if (utils.isError(param)) {
         outputChannel.appendLine(`${param.name} - ${param.message}`);
         if (param.stack) {
           outputChannel.appendLine(param.stack);
