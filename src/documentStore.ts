@@ -1,12 +1,10 @@
-import { store, io, HttpFile, EnvironmentConfig } from 'httpyac';
+import { store, io, HttpFile } from 'httpyac';
 import { TextDocument } from 'vscode';
 import { getConfigSetting, getEnvironmentConfig } from './config';
 
 
 export class DocumentStore {
   activeEnvironment: Array<string> | undefined;
-
-  environmentConfig: EnvironmentConfig |undefined;
 
   public getDocumentPathLike: (document: TextDocument) => io.PathLike;
 
@@ -24,6 +22,20 @@ export class DocumentStore {
       path,
       () => Promise.resolve(document.getText()),
       document.version, {
+        config,
+        activeEnvironment: this.activeEnvironment,
+      }
+    );
+  }
+
+  async parseHttpFile(document: TextDocument): Promise<HttpFile> {
+    const path = this.getDocumentPathLike(document);
+    const config = await getEnvironmentConfig(path);
+
+    return await this.httpFileStore.parse(
+      path,
+      document.getText(),
+      {
         config,
         activeEnvironment: this.activeEnvironment,
       }
