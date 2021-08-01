@@ -36,13 +36,17 @@ export class HttpFileStoreController extends DisposeProvider {
         if (event.contentChanges.length > 0) {
           if (vscode.languages.match(httpDocumentSelector, event.document)) {
             await refreshHttpFileThrottled(event.document);
+          } else if (vscode.languages.match([{
+            language: 'dotenv', scheme: 'file',
+          }], event.document)) {
+            this.documentStore.httpFileStore.clear();
           } else if (vscode.languages.match([
             {
-              language: 'js', scheme: 'file',
+              language: 'javascript', scheme: 'file', pattern: '**/*httpyac*'
             }, {
-              language: 'json', scheme: 'file',
+              language: 'json', scheme: 'file', pattern: '**/*httpyac*'
             }, {
-              language: 'dotenv', scheme: 'file',
+              language: 'json', scheme: 'file', pattern: '**/http-client*'
             }
           ], event.document)) {
             this.documentStore.httpFileStore.clear();
