@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { getConfigSetting, APP_NAME } from '../config';
+import { getConfigSetting, APP_NAME, getEnvironmentConfig } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { httpDocumentSelector } from '../config';
@@ -9,6 +9,7 @@ import * as utils from '../utils';
 import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
+import { showTextEditor } from '../view/responseHandlerUtils';
 
 export const commands = {
   send: `${APP_NAME}.send`,
@@ -18,6 +19,7 @@ export const commands = {
   sendAll: `${APP_NAME}.sendall`,
   clearAll: `${APP_NAME}.clearall`,
   show: `${APP_NAME}.show`,
+  showVariables: `${APP_NAME}.showVariables`,
   viewHeader: `${APP_NAME}.viewHeader`,
   save: `${APP_NAME}.save`,
   new: `${APP_NAME}.new`,
@@ -44,6 +46,7 @@ export class RequestCommandsController extends DisposeProvider implements vscode
       vscode.commands.registerCommand(commands.sendSelected, this.sendSelected, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
       vscode.commands.registerCommand(commands.show, this.show, this),
+      vscode.commands.registerCommand(commands.showVariables, this.showVariables, this),
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
       vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
@@ -276,6 +279,25 @@ export class RequestCommandsController extends DisposeProvider implements vscode
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (context) {
       await this.responseOutputProcessor.show(context.httpRegion);
+    }
+  }
+
+  @errorHandler()
+  private async showVariables() : Promise<void> {
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
+      const httpFile = await this.documentStore.getHttpFile(document);
+      if (httpFile) {
+        const variables = await httpyac.getVariables({
+          httpFile,
+          config: await getEnvironmentConfig(httpFile.fileName)
+        });
+        const document = await vscode.workspace.openTextDocument({
+          language: 'json',
+          content: JSON.stringify(variables, null, 2),
+        });
+        showTextEditor(document, true);
+      }
     }
   }
 

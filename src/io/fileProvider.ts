@@ -3,6 +3,10 @@ import { io } from 'httpyac';
 
 
 export function initFileProvider(): void {
+  io.fileProvider.isAbsolute = (fileName: io.PathLike) => {
+    const uri = toUri(fileName);
+    return !!uri;
+  };
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
@@ -56,7 +60,7 @@ export function initFileProvider(): void {
         const result = await workspace.fs.readDirectory(uri);
         return result.map(([file]) => file);
       }
-      io.log.debug(`${uri.toString()} is no directory`);
+      io.log.trace(`${uri.toString()} is no directory`);
       return [];
     }
     throw new Error('No valid uri');
