@@ -20,15 +20,17 @@ export function logToOuputChannelFactory(channel: string) : (level: LogLevel, ..
 
     outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
     for (const param of params) {
-      if (typeof param === 'string') {
-        outputChannel.appendLine(param);
-      } else if (utils.isError(param)) {
-        outputChannel.appendLine(`${param.name} - ${param.message}`);
-        if (param.stack) {
-          outputChannel.appendLine(param.stack);
+      if (param !== undefined) {
+        if (typeof param === 'string') {
+          outputChannel.appendLine(param);
+        } else if (utils.isError(param)) {
+          outputChannel.appendLine(`${param.name} - ${param.message}`);
+          if (param.stack) {
+            outputChannel.appendLine(param.stack);
+          }
+        } else {
+          outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
         }
-      } else {
-        outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
       }
     }
 

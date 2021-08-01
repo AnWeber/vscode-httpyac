@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { HttpFileSendContext, HttpRegionSendContext, send, io, utils } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { DocumentStore } from '../documentStore';
 import { getOutputChannel, logToOuputChannelFactory } from '../io';
 import { getEnvironmentConfig, getResourceConfig } from '../config';
@@ -11,7 +11,7 @@ export async function getHttpRegionFromLine(
   documentArg: DocumentArgument,
   line: LineArgument,
   documentStore: DocumentStore
-): Promise<HttpRegionSendContext | undefined> {
+): Promise<httpyac.HttpRegionSendContext | undefined> {
   const editor = getTextEditor(documentArg);
   if (editor) {
     const httpFile = await documentStore.getHttpFile(editor.document);
@@ -72,19 +72,19 @@ function isTextEditor(documentIdentifier: DocumentArgument): documentIdentifier 
 }
 
 
-export async function sendContext(context: HttpRegionSendContext | HttpFileSendContext | undefined): Promise<boolean> {
+export async function sendContext(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined): Promise<boolean> {
 
   if (context) {
     const resourceConfig = getResourceConfig(context.httpFile);
     const config = await getEnvironmentConfig(context.httpFile.fileName);
     if (!context.scriptConsole) {
-      context.scriptConsole = new io.Logger({
+      context.scriptConsole = new httpyac.io.Logger({
         level: config.log?.level,
         logMethod: logToOuputChannelFactory('Console'),
       });
     }
     if (resourceConfig.logRequest && !context.logResponse) {
-      context.logResponse = utils.requestLoggerFactory((arg: string) => {
+      context.logResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
         const requestChannel = getOutputChannel('Request');
         requestChannel.appendLine(arg);
       }, {
@@ -102,8 +102,9 @@ export async function sendContext(context: HttpRegionSendContext | HttpFileSendC
 
     context.require = {
       vscode,
+      httpyac,
     };
-    return await send(context);
+    return await httpyac.send(context);
   }
   return false;
 }

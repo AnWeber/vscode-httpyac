@@ -291,14 +291,6 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
       });
 
       result.push(...httpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
-      if (httpFile.imports) {
-        for (const httpFileLoader of httpFile.imports) {
-          const refHttpFile = await httpFileLoader(httpFile);
-          if (refHttpFile) {
-            result.push(...refHttpFile.httpRegions.filter(obj => !!obj.metaData.name).map(toHttpCompletionItem));
-          }
-        }
-      }
       return result;
     }
     return [];

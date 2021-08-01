@@ -15,6 +15,7 @@ export interface ResourceConfig {
   clientCertficates?: Record<string, httpyac.ClientCertificateOptions>
   environmentVariables?: Record<string, httpyac.Variables>,
   envDirName?: string,
+  rootDir?: string,
   logLevel?: string,
   logResponseBodyLength?:number,
   logRequest?: boolean,
@@ -102,7 +103,7 @@ export async function getEnvironmentConfig(fileName: httpyac.io.PathLike): Promi
   };
 
   const uri = toUri(fileName);
-  if (uri) {
+  if (uri && config.clientCertficates) {
     const workspaceFolder = workspace.getWorkspaceFolder(uri);
     if (workspaceFolder) {
       httpyac.utils.resolveClientCertficates(config, workspaceFolder);

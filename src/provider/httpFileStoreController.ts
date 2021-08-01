@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import throttle from 'lodash/throttle';
 import { errorHandler } from './errorHandler';
-import { httpDocumentSelector } from '../config';
+import { httpDocumentSelector, watchConfigSettings } from '../config';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
 
@@ -19,15 +19,34 @@ export class HttpFileStoreController extends DisposeProvider {
       refreshHttpFileThrottled(document);
     }
     this.subscriptions = [
+      watchConfigSettings(() => {
+        this.documentStore.httpFileStore.clear();
+      }),
       vscode.workspace.onDidCloseTextDocument(document => {
-        this.documentStore.remove(document);
+        if (vscode.languages.match(httpDocumentSelector, document)) {
+          this.documentStore.remove(document);
+        }
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
-        await this.refreshHttpFile(document);
+        if (vscode.languages.match(httpDocumentSelector, document)) {
+          await this.refreshHttpFile(document);
+        }
       }),
       vscode.workspace.onDidChangeTextDocument(async event => {
         if (event.contentChanges.length > 0) {
-          await refreshHttpFileThrottled(event.document);
+          if (vscode.languages.match(httpDocumentSelector, event.document)) {
+            await refreshHttpFileThrottled(event.document);
+          } else if (vscode.languages.match([
+            {
+              language: 'js', scheme: 'file',
+            }, {
+              language: 'json', scheme: 'file',
+            }, {
+              language: 'dotenv', scheme: 'file',
+            }
+          ], event.document)) {
+            this.documentStore.httpFileStore.clear();
+          }
         }
       }),
       vscode.workspace.onDidRenameFiles(fileRenameEvent => {
