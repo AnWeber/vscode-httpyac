@@ -10,6 +10,12 @@ export function initFileProvider(): void {
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
+      if (uri.scheme === 'untitled') {
+        if (workspace.workspaceFolders && workspace.workspaceFolders?.length > 0) {
+          return workspace.workspaceFolders[0].uri;
+        }
+        return undefined;
+      }
       return Uri.joinPath(uri, '..');
     }
     throw new Error('No valid uri');
