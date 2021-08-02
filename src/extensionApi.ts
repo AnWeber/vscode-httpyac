@@ -14,10 +14,12 @@ export interface ResponseOutputProcessor{
 }
 
 export interface DocumentStore{
+  activeEnvironment: Array<string> | undefined;
   getDocumentPathLike: (document: vscode.TextDocument) => httpyac.io.PathLike;
   getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile>;
   getAll(): Array<httpyac.HttpFile>;
-  parseHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile>;
+  getOrCreate(path: httpyac.io.PathLike, getText: () => Promise<string>, version: number): Promise<httpyac.HttpFile>;
+  parse(uri: vscode.Uri | undefined, text: string): Promise<httpyac.HttpFile>;
   remove(document: vscode.TextDocument): void;
 }
 

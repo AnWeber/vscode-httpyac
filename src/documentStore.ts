@@ -1,5 +1,5 @@
-import { store, io, HttpFile } from 'httpyac';
-import { TextDocument } from 'vscode';
+import { store, io, HttpFile, EnvironmentConfig } from 'httpyac';
+import { TextDocument, Uri } from 'vscode';
 import { getConfigSetting, getEnvironmentConfig } from './config';
 
 
@@ -16,28 +16,34 @@ export class DocumentStore {
 
   async getHttpFile(document: TextDocument): Promise<HttpFile> {
     const path = this.getDocumentPathLike(document);
-    const config = await getEnvironmentConfig(path);
 
+    return this.getOrCreate(path, () => Promise.resolve(document.getText()), document.version);
+  }
+
+  async getOrCreate(path: io.PathLike, getText: () => Promise<string>, version: number) : Promise<HttpFile> {
+    const config = await getEnvironmentConfig(path);
     return await this.httpFileStore.getOrCreate(
       path,
-      () => Promise.resolve(document.getText()),
-      document.version, {
+      getText,
+      version, {
         config,
         activeEnvironment: this.activeEnvironment,
       }
     );
   }
 
-  async parseHttpFile(document: TextDocument): Promise<HttpFile> {
-    const path = this.getDocumentPathLike(document);
-    const config = await getEnvironmentConfig(path);
-
+  async parse(uri: Uri | undefined, text: string) : Promise<HttpFile> {
+    let config: EnvironmentConfig = {};
+    const path: io.PathLike = uri || 'unknown';
+    if (uri) {
+      config = await getEnvironmentConfig(uri);
+    }
     return await this.httpFileStore.parse(
       path,
-      document.getText(),
+      text,
       {
         config,
-        activeEnvironment: this.activeEnvironment,
+        activeEnvironment: this.activeEnvironment
       }
     );
   }
