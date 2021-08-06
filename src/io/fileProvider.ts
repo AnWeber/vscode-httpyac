@@ -1,4 +1,4 @@
-import { workspace, Uri, FileType } from 'vscode';
+import { workspace, window, languages, Uri, FileType } from 'vscode';
 import { io } from 'httpyac';
 
 
@@ -11,6 +11,10 @@ export function initFileProvider(): void {
     const uri = toUri(fileName);
     if (uri) {
       if (uri.scheme === 'untitled') {
+        const editor = window.visibleTextEditors.find(obj => languages.match({ language: 'http', scheme: 'file' }, obj.document));
+        if (editor) {
+          return Uri.joinPath(editor.document.uri, '..');
+        }
         if (workspace.workspaceFolders && workspace.workspaceFolders?.length > 0) {
           return workspace.workspaceFolders[0].uri;
         }
