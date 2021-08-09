@@ -60,7 +60,7 @@ export function getConfigSetting() : AppConfig {
   return result;
 }
 
-export function getResourceConfig(fileName: httpyac.io.PathLike) : ResourceConfig {
+export function getResourceConfig(fileName: httpyac.PathLike) : ResourceConfig {
   const result: ResourceConfig = {};
 
   Object.assign(result, workspace.getConfiguration(APP_NAME), toUri(fileName) || undefined);
@@ -83,7 +83,7 @@ function toLogLevel(level: string | undefined): httpyac.LogLevel {
   }
 }
 
-export async function getEnvironmentConfig(fileName: httpyac.io.PathLike): Promise<httpyac.EnvironmentConfig> {
+export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<httpyac.EnvironmentConfig> {
   const config = getResourceConfig(fileName);
   const httpOptions = workspace.getConfiguration('http');
 

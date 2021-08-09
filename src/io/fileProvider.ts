@@ -1,9 +1,9 @@
 import { workspace, window, languages, Uri, FileType } from 'vscode';
-import { io } from 'httpyac';
+import { FileEnconding, PathLike, io } from 'httpyac';
 
 
 export function initFileProvider(): void {
-  io.fileProvider.isAbsolute = (fileName: io.PathLike) => {
+  io.fileProvider.isAbsolute = (fileName: PathLike) => {
     const uri = toUri(fileName);
     return !!uri;
   };
@@ -25,7 +25,7 @@ export function initFileProvider(): void {
     throw new Error('No valid uri');
   };
 
-  io.fileProvider.joinPath = (fileName: io.PathLike, path: string): io.PathLike => {
+  io.fileProvider.joinPath = (fileName: PathLike, path: string): PathLike => {
     const uri = toUri(fileName);
     if (uri) {
       return Uri.joinPath(uri, path);
@@ -33,7 +33,7 @@ export function initFileProvider(): void {
     throw new Error('No valid uri');
   };
 
-  io.fileProvider.exists = async (fileName: io.PathLike): Promise<boolean> => {
+  io.fileProvider.exists = async (fileName: PathLike): Promise<boolean> => {
     try {
       const uri = toUri(fileName);
       if (uri) {
@@ -45,7 +45,7 @@ export function initFileProvider(): void {
       return false;
     }
   };
-  io.fileProvider.readFile = async (fileName: io.PathLike, encoding: io.FileEnconding): Promise<string> => {
+  io.fileProvider.readFile = async (fileName: PathLike, encoding: FileEnconding): Promise<string> => {
     const uri = toUri(fileName);
     if (uri) {
       const file = await workspace.fs.readFile(uri);
@@ -53,7 +53,7 @@ export function initFileProvider(): void {
     }
     throw new Error('No valid uri');
   };
-  io.fileProvider.readBuffer = async (fileName: io.PathLike) => {
+  io.fileProvider.readBuffer = async (fileName: PathLike) => {
     const uri = toUri(fileName);
     if (uri) {
       const file = await workspace.fs.readFile(uri);
@@ -62,7 +62,7 @@ export function initFileProvider(): void {
     throw new Error('No valid uri');
   };
 
-  io.fileProvider.readdir = async (dirname: io.PathLike): Promise<string[]> => {
+  io.fileProvider.readdir = async (dirname: PathLike): Promise<string[]> => {
     const uri = toUri(dirname);
     if (uri) {
       const filestats = await workspace.fs.stat(uri);
@@ -76,7 +76,7 @@ export function initFileProvider(): void {
     throw new Error('No valid uri');
   };
 
-  io.fileProvider.fsPath = (fileName: io.PathLike) => {
+  io.fileProvider.fsPath = (fileName: PathLike) => {
     const uri = toUri(fileName);
     if (uri) {
       return uri.fsPath;
@@ -91,7 +91,7 @@ interface VirtualDocument{
   toString(): string;
 }
 
-export function toUri(pathLike: io.PathLike): Uri | false {
+export function toUri(pathLike: PathLike): Uri | false {
   if (typeof pathLike === 'string') {
     return Uri.file(pathLike);
   }
@@ -104,7 +104,7 @@ export function toUri(pathLike: io.PathLike): Uri | false {
   return false;
 }
 
-function isVirtualDocument(pathLike: io.PathLike): pathLike is VirtualDocument {
+function isVirtualDocument(pathLike: PathLike): pathLike is VirtualDocument {
   const virtualDocument = pathLike as VirtualDocument;
   return !!virtualDocument.uri;
 }
