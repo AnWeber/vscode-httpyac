@@ -12,6 +12,10 @@
 * add requireUncached to script context to clear NodeJS Caching
 
 
+#### Fix
+* show commands only in http files
+
+
 ## 2.21.1 (2021-07-28)
 
 #### Fix

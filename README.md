@@ -2,9 +2,9 @@
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
 </p>
 
-# Http Yac - Yet another Rest Client
+# httpYac - Yet another Rest Client
 
-Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
+> Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
 
 <p align="center">
 <a href="https://httpyac.github.io/">
@@ -99,8 +99,6 @@ keybindings are only active in files with language http
 
 ## Next Steps
 
-* plugins like @vue/cli
-* vscode notebook support
 * import OpenApi / Postman
 
 ## License
