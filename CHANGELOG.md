@@ -1,3 +1,10 @@
+## 3.1.0 (2021-08-10)
+
+#### Features
+* OAuth2 Variable Substitution can send client_id in body (config setting)
+* change responseLogging to BailSeriesHook for simple use
+* switch to exchange view if no response body is provided
+
 ## 3.0.0 (2021-08-09)
 
 #### Breaking Changes
