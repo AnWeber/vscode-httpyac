@@ -29,7 +29,6 @@ interface OutputCacheItem{
 
 export class ResponseOutputProcessor extends DisposeProvider implements vscode.CodeLensProvider, vscode.HoverProvider {
   private outputCache: Array<OutputCacheItem> = [];
-
   constructor() {
     super();
 
@@ -136,7 +135,7 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
   }
 
   public async show(httpRegion: HttpRegion): Promise<void> {
-    if (httpRegion.request && httpRegion.response?.body) {
+    if (httpRegion.request && httpRegion.response) {
       const visibleDocuments = this.outputCache.map(obj => obj.document);
       for (const responseHandler of responseHandlers) {
         const result = await responseHandler(httpRegion, visibleDocuments);

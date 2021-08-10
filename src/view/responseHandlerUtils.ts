@@ -83,6 +83,12 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
   return utils.toMultiLineString(result);
 }
 
+export function getResponseViewContext(viewContent: ResponseViewContent | undefined, hasBody: boolean) : ResponseViewContent | undefined {
+  if (!hasBody && viewContent === 'body') {
+    return 'exchange';
+  }
+  return viewContent;
+}
 
 export function getLanguageId(contentType: ContentType | undefined, viewContent?: ResponseViewContent | undefined) : string {
   if (viewContent && viewContent !== 'body') {
