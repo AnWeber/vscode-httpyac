@@ -6,7 +6,6 @@ import * as config from './config';
 import { initUserInteractionProvider, initFileProvider } from './io';
 import { DocumentStore } from './documentStore';
 import { HttpYacExtensionApi } from './extensionApi';
-import { sendContext } from './utils';
 
 
 export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi {
@@ -43,7 +42,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     refreshCodeLens,
     environementChanged,
     getErrorQuickFix: provider.getErrorQuickFix,
-    sendContext,
+    sendContext: responseOutputProcessor.sendContext.bind(responseOutputProcessor),
     getEnvironmentConfig: config.getEnvironmentConfig,
   };
 }

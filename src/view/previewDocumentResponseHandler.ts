@@ -1,11 +1,11 @@
-import { HttpRegion, utils } from 'httpyac';
+import { HttpRegion, HttpResponse, utils } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 import { ResponseHandlerResult } from '../extensionApi';
 import { writeTempFileName, showTextEditor, getContent, getResponseViewContext } from './responseHandlerUtils';
 
 
-export async function previewDocumentResponseHandler(httpRegion: HttpRegion) :Promise<boolean | ResponseHandlerResult> {
+export async function previewDocumentResponseHandler(response: HttpResponse, httpRegion?: HttpRegion) :Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
 
   const editorConfig = vscode.workspace.getConfiguration('workbench.editor');
@@ -13,22 +13,22 @@ export async function previewDocumentResponseHandler(httpRegion: HttpRegion) :Pr
   let extension: string | undefined;
   if (editorConfig.enablePreview
     && config.responseViewMode === 'preview'
-    && httpRegion.response?.rawBody) {
-    const responseViewContent = getResponseViewContext(config.responseViewContent, !!httpRegion.response?.body);
+    && response?.rawBody) {
+    const responseViewContent = getResponseViewContext(config.responseViewContent, !!response?.body);
 
-    let content = httpRegion.response.rawBody;
+    let content = response.rawBody;
 
-    if (utils.isString(httpRegion.response.body)) {
+    if (utils.isString(response.body)) {
       if (config.responseViewContent && config.responseViewContent !== 'body') {
-        content = Buffer.from(getContent(httpRegion.response, config.responseViewContent));
+        content = Buffer.from(getContent(response, config.responseViewContent));
         extension = 'http';
-      } else if (httpRegion.response.prettyPrintBody
+      } else if (response.prettyPrintBody
         && config.responseViewPrettyPrint) {
-        content = Buffer.from(httpRegion.response.prettyPrintBody);
+        content = Buffer.from(response.prettyPrintBody);
       }
     }
     if (content.length === 0) {
-      content = Buffer.from(getContent(httpRegion.response, responseViewContent));
+      content = Buffer.from(getContent(response, responseViewContent));
       extension = 'http';
     }
 

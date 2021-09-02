@@ -7,11 +7,11 @@ import { getConfigSetting, ResponseViewContent } from '../config';
 
 export const TempPathFolder = 'httpyac_tmp';
 
-export function getExtension(httpRegion: HttpRegion) : string {
-  if (httpRegion.metaData.extension) {
+export function getExtension(httpRegion?: HttpRegion) : string {
+  if (httpRegion?.metaData?.extension) {
     return httpRegion.metaData.extension;
   }
-  if (httpRegion.request?.url) {
+  if (httpRegion?.request?.url) {
     const indexQuery = httpRegion.request.url.indexOf('?');
     let url = httpRegion.request.url;
     if (indexQuery >= 0) {
@@ -26,10 +26,11 @@ export function getExtension(httpRegion: HttpRegion) : string {
 }
 
 
-export async function writeTempFileName(content: Buffer, httpRegion: HttpRegion, extension?: string | undefined) : Promise<string> {
+export async function writeTempFileName(content: Buffer, httpRegion?: HttpRegion, extension?: string | undefined) : Promise<string> {
   const ext = extension || getExtension(httpRegion);
   const { path } = await dir();
-  const name = utils.shortenFileName(utils.replaceInvalidChars(utils.getDisplayName(httpRegion, 'response')));
+  const displayName = httpRegion ? utils.getDisplayName(httpRegion, 'response') : 'response';
+  const name = utils.shortenFileName(utils.replaceInvalidChars(displayName));
 
   await vscode.workspace.fs.createDirectory(vscode.Uri.file(join(path, TempPathFolder)));
   const fileName = join(path, TempPathFolder, `${name}.${ext}`);

@@ -1,10 +1,10 @@
-import { HttpRegion } from 'httpyac';
+import { HttpRegion, HttpResponse } from 'httpyac';
 import { window, workspace } from 'vscode';
 import { getExtension } from './responseHandlerUtils';
 
 
-export async function saveFileResponseHandler(httpRegion: HttpRegion): Promise<boolean> {
-  if (httpRegion?.response?.rawBody && httpRegion.metaData.save) {
+export async function saveFileResponseHandler(response: HttpResponse, httpRegion?: HttpRegion): Promise<boolean> {
+  if (response?.rawBody && httpRegion?.metaData?.save) {
     const filters: Record<string, Array<string>> = {
       'All Files': ['*']
     };
@@ -15,8 +15,8 @@ export async function saveFileResponseHandler(httpRegion: HttpRegion): Promise<b
     const uri = await window.showSaveDialog({
       filters
     });
-    if (uri && httpRegion.response.rawBody) {
-      await workspace.fs.writeFile(uri, httpRegion.response.rawBody);
+    if (uri && response.rawBody) {
+      await workspace.fs.writeFile(uri, response.rawBody);
       return true;
     }
   }

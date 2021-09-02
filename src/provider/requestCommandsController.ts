@@ -247,13 +247,9 @@ export class RequestCommandsController extends DisposeProvider implements vscode
           report: data => progress.report(data),
         };
 
-
-        const result = await utils.sendContext(context);
+        await this.responseOutputProcessor.sendContext(context);
         if (this.refreshCodeLens) {
           this.refreshCodeLens.fire();
-        }
-        if (result && httpyac.utils.isHttpRegionSendContext(context)) {
-          await this.responseOutputProcessor.show(context.httpRegion);
         }
       });
     }
@@ -277,8 +273,8 @@ export class RequestCommandsController extends DisposeProvider implements vscode
   @errorHandler()
   private async show(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    if (context) {
-      await this.responseOutputProcessor.show(context.httpRegion);
+    if (context?.httpRegion?.response) {
+      await this.responseOutputProcessor.show(context.httpRegion.response, context.httpRegion);
     }
   }
 

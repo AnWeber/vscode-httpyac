@@ -1,4 +1,4 @@
-import { HttpRegion, utils, io } from 'httpyac';
+import * as httpyac from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
@@ -10,7 +10,9 @@ import { reuseDocumentResponseHandler } from './reuseDocumentResponseHandler';
 import { openDocumentResponseHandler } from './openDocumentResponseHandler';
 import { ResponseHandler } from '../extensionApi';
 import { TempPathFolder } from './responseHandlerUtils';
-import { DisposeProvider } from '../utils';
+import { DisposeProvider, initContext } from '../utils';
+import { getOutputChannel } from '../io';
+import { getResourceConfig } from '../config';
 
 export const responseHandlers: Array<ResponseHandler> = [
   saveFileResponseHandler,
@@ -22,7 +24,8 @@ export const responseHandlers: Array<ResponseHandler> = [
 
 interface OutputCacheItem{
   document: vscode.TextDocument;
-  httpRegion: HttpRegion;
+  response: httpyac.HttpResponse;
+  httpRegion?: httpyac.HttpRegion;
   prettyPrintNeeded: boolean;
   deleteFile: boolean;
 }
@@ -61,11 +64,11 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
     const result: Array<vscode.CodeLens> = [];
 
     const cacheItem = this.outputCache.find(obj => obj.document === document);
-    if (cacheItem && cacheItem.httpRegion.response) {
-      const response = cacheItem.httpRegion.response;
+    if (cacheItem && cacheItem.response) {
+      const response = cacheItem.response;
       const lenses = [`HTTP${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
 
-      if (cacheItem.httpRegion.testResults) {
+      if (cacheItem.httpRegion?.testResults) {
         lenses.push(`TestResults ${cacheItem.httpRegion.testResults.filter(obj => obj.result).length}/${cacheItem.httpRegion.testResults.length}`);
       }
       const headers = getConfigSetting().responseViewHeader;
@@ -85,7 +88,7 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
             }
           }
           const testsProperty = 'tests.';
-          if (headerName.startsWith(testsProperty) && cacheItem.httpRegion.testResults) {
+          if (headerName.startsWith(testsProperty) && cacheItem.httpRegion?.testResults) {
             const prop = headerName.slice(metaProperty.length);
             const testResults = cacheItem.httpRegion.testResults;
             if (prop === 'failed') {
@@ -98,7 +101,7 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
               return `${prop}: ${testResults.length}`;
             }
           }
-          const val = utils.getHeader(response.headers, headerName);
+          const val = httpyac.utils.getHeader(response.headers, headerName);
           if (val) {
             return `${headerName}: ${val}`;
           }
@@ -121,7 +124,7 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
     if (this.outputCache.length > 0 && position.line === 0) {
       const cacheItem = this.outputCache.find(obj => obj.document === document);
       if (cacheItem?.httpRegion?.response) {
-        const responseHover = utils.toMarkdown(cacheItem.httpRegion.response, {
+        const responseHover = httpyac.utils.toMarkdown(cacheItem.httpRegion.response, {
           testResults: cacheItem.httpRegion.testResults,
           responseBody: false,
           requestBody: false,
@@ -134,32 +137,57 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
     return undefined;
   }
 
-  public async show(httpRegion: HttpRegion): Promise<void> {
-    if (httpRegion.request && httpRegion.response) {
-      const visibleDocuments = this.outputCache.map(obj => obj.document);
-      for (const responseHandler of responseHandlers) {
-        const result = await responseHandler(httpRegion, visibleDocuments);
-        if (result) {
 
+  public async sendContext(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined): Promise<boolean> {
 
-          if (result !== true) {
-            const prettyPrintNeeded = await this.prettyPrint(result.editor);
+    if (context) {
+      initContext(context);
 
-            const cacheItem = this.outputCache.find(obj => obj.document === result.document);
-            if (cacheItem) {
-              cacheItem.httpRegion = httpRegion;
-              cacheItem.prettyPrintNeeded = prettyPrintNeeded;
-            } else {
-              this.outputCache.push({
-                document: result.document,
-                httpRegion,
-                prettyPrintNeeded,
-                deleteFile: !!result.deleteFile
-              });
-            }
-          }
-          return;
+      const resourceConfig = getResourceConfig(context.httpFile);
+      const logToOutput = httpyac.utils.requestLoggerFactory((arg: string) => {
+        const requestChannel = getOutputChannel('Request');
+        requestChannel.appendLine(arg);
+      }, {
+        requestOutput: true,
+        requestHeaders: true,
+        requestBodyLength: 0,
+        responseHeaders: true,
+        responseBodyLength: resourceConfig.logResponseBodyLength,
+      });
+
+      context.logResponse = (response, httpRegion) => {
+        this.show(response, httpRegion);
+        if (resourceConfig.logRequest) {
+          logToOutput?.(response, httpRegion);
         }
+      };
+      return await httpyac.send(context);
+    }
+    return false;
+  }
+
+
+  public async show(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void> {
+    for (const responseHandler of responseHandlers) {
+      const result = await responseHandler(response, httpRegion);
+      if (result) {
+        if (result !== true) {
+          const prettyPrintNeeded = await this.prettyPrint(result.editor);
+
+          const cacheItem = this.outputCache.find(obj => obj.document === result.document);
+          if (cacheItem) {
+            cacheItem.response = response;
+            cacheItem.prettyPrintNeeded = prettyPrintNeeded;
+          } else {
+            this.outputCache.push({
+              document: result.document,
+              response,
+              prettyPrintNeeded,
+              deleteFile: !!result.deleteFile
+            });
+          }
+        }
+        return;
       }
     }
   }
@@ -190,7 +218,7 @@ export class ResponseOutputProcessor extends DisposeProvider implements vscode.C
         try {
           await vscode.workspace.fs.delete(cacheItem.document.uri);
         } catch (err) {
-          io.log.error(err);
+          httpyac.io.log.error(err);
         }
       }
       this.outputCache.splice(index, 1);

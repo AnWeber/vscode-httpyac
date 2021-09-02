@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { DocumentStore } from '../documentStore';
-import { getOutputChannel, logToOuputChannelFactory } from '../io';
-import { getEnvironmentConfig, getResourceConfig } from '../config';
+import { logToOuputChannelFactory } from '../io';
+import { getEnvironmentConfig } from '../config';
 
 export type DocumentArgument = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
 export type LineArgument = number | vscode.Position | vscode.Range | undefined;
@@ -72,39 +72,19 @@ function isTextEditor(documentIdentifier: DocumentArgument): documentIdentifier 
 }
 
 
-export async function sendContext(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined): Promise<boolean> {
-
-  if (context) {
-    const resourceConfig = getResourceConfig(context.httpFile);
-    const config = await getEnvironmentConfig(context.httpFile.fileName);
-    if (!context.scriptConsole) {
-      context.scriptConsole = new httpyac.io.Logger({
-        level: config.log?.level,
-        logMethod: logToOuputChannelFactory('Console'),
-      });
-    }
-    if (resourceConfig.logRequest && !context.logResponse) {
-      context.logResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
-        const requestChannel = getOutputChannel('Request');
-        requestChannel.appendLine(arg);
-      }, {
-        requestOutput: true,
-        requestHeaders: true,
-        requestBodyLength: 0,
-        responseHeaders: true,
-        responseBodyLength: resourceConfig.logResponseBodyLength,
-      });
-    }
-
-    if (!context.config) {
-      context.config = config;
-    }
-
-    context.require = {
-      vscode,
-      httpyac,
-    };
-    return await httpyac.send(context);
+export async function initContext(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext) : Promise<void> {
+  const config = await getEnvironmentConfig(context.httpFile.fileName);
+  if (!context.scriptConsole) {
+    context.scriptConsole = new httpyac.io.Logger({
+      level: config.log?.level,
+      logMethod: logToOuputChannelFactory('Console'),
+    });
   }
-  return false;
+  if (!context.config) {
+    context.config = config;
+  }
+  context.require = {
+    vscode,
+    httpyac,
+  };
 }

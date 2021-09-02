@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
+import { APP_NAME } from '../config';
 import { errorHandler } from './errorHandler';
-import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider, sendContext } from '../utils';
+import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider, initContext } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
 import { Request, Header, Param, QueryString } from './harRequest';
 import { DocumentStore } from '../documentStore';
-import { APP_NAME } from '../config';
 
 const commands = {
   generateCode: `${APP_NAME}.generateCode`,
@@ -45,6 +45,8 @@ export class HarCommandsController extends DisposeProvider {
           },
           report: data => progress.report(data),
         };
+        initContext(context);
+
         context.logResponse = async response => {
           if (response.request) {
             const harRequest: Request = this.getHarRequest(response.request);
@@ -56,7 +58,8 @@ export class HarCommandsController extends DisposeProvider {
             await vscode.window.showTextDocument(document);
           }
         };
-        await sendContext(context);
+
+        await httpyac.send(context);
       });
     }
 
@@ -88,7 +91,7 @@ export class HarCommandsController extends DisposeProvider {
     const harRequest: Request = {
       method: options.method || 'GET',
       url,
-      headers: options.headers && Object.entries(options.headers || {}).reduce((prev, current) => {
+      headers: Object.entries(options.headers || {}).reduce((prev, current) => {
         const [name, value] = current;
         if (Array.isArray(value)) {
           prev.push(...value.map(val => ({
@@ -98,11 +101,11 @@ export class HarCommandsController extends DisposeProvider {
         } else {
           prev.push({
             name,
-            value: `${value || ''}`
+            value: value || ''
           });
         }
         return prev;
-      }, initHeader) || []
+      }, initHeader)
     };
 
     if (indexOfQuery > 0) {

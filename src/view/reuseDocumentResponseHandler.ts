@@ -1,4 +1,4 @@
-import { HttpRegion } from 'httpyac';
+import { HttpResponse } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 import { ResponseHandlerResult } from '../extensionApi';
@@ -6,18 +6,17 @@ import { getLanguageId, showTextEditor, getContent, getResponseViewContext } fro
 
 
 export async function reuseDocumentResponseHandler(
-  httpRegion: HttpRegion,
-  visibleDocuments: Array<vscode.TextDocument>
+  response: HttpResponse
 ): Promise<boolean | ResponseHandlerResult> {
   const config = getConfigSetting();
 
-  if (httpRegion.response
-    && config.responseViewMode
+  if (config.responseViewMode
     && ['preview', 'reuse'].indexOf(config.responseViewMode) >= 0) {
 
-    const responseViewContent = getResponseViewContext(config.responseViewContent, !!httpRegion.response?.body);
+    const responseViewContent = getResponseViewContext(config.responseViewContent, !!response?.body);
 
-    const language = getLanguageId(httpRegion.response.contentType, responseViewContent);
+    const language = getLanguageId(response.contentType, responseViewContent);
+    const visibleDocuments = vscode.window.visibleTextEditors.map(obj => obj.document);
 
     const document = visibleDocuments.find(document => document.languageId === language && document.isUntitled);
     if (document) {
@@ -26,7 +25,7 @@ export async function reuseDocumentResponseHandler(
         editor = await showTextEditor(document, false);
       }
       if (editor) {
-        const content = getContent(httpRegion.response, responseViewContent);
+        const content = getContent(response, responseViewContent);
         await editor.edit((obj => obj.replace(new vscode.Range(0, 0, document.lineCount || 0, 0), content)));
 
         return {

@@ -7,10 +7,13 @@ export interface ResponseHandlerResult{
   deleteFile?: boolean;
 }
 
-export type ResponseHandler = (httpRegion: httpyac.HttpRegion, visibleDocuments: Array<vscode.TextDocument>) => Promise<boolean | ResponseHandlerResult>;
+export type ResponseHandler = (
+  response: httpyac.HttpResponse,
+  httpRegion?: httpyac.HttpRegion
+) => Promise<boolean | ResponseHandlerResult>;
 
 export interface ResponseOutputProcessor{
-  show(httpRegion: httpyac.HttpRegion): Promise<void>;
+  show: httpyac.RequestLogger;
 }
 
 export interface DocumentStore{
