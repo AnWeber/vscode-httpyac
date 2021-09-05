@@ -5,6 +5,7 @@ import { join, extname } from 'path';
 import * as vscode from 'vscode';
 import { getConfigSetting, ResponseViewContent } from '../config';
 
+
 export const TempPathFolder = 'httpyac_tmp';
 
 export function getExtension(httpRegion?: HttpRegion) : string {

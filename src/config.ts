@@ -4,8 +4,25 @@ import { toUri } from './io';
 
 export const APP_NAME = 'httpyac';
 
-export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
+export const commands = {
+  send: `${APP_NAME}.send`,
+  sendRepeat: `${APP_NAME}.sendRepeat`,
+  resend: `${APP_NAME}.resend`,
+  sendSelected: `${APP_NAME}.sendSelected`,
+  sendAll: `${APP_NAME}.sendall`,
+  clearHistory: `${APP_NAME}.clearHistory`,
+  show: `${APP_NAME}.show`,
+  viewHeader: `${APP_NAME}.viewHeader`,
+  showVariables: `${APP_NAME}.showVariables`,
+  save: `${APP_NAME}.save`,
+  new: `${APP_NAME}.new`,
+  generateCode: `${APP_NAME}.generateCode`,
+  showHistory: `${APP_NAME}.showHistory`,
+  removeHistory: `${APP_NAME}.removeHistory`,
+  showHistoryResponse: `${APP_NAME}.showHistoryResponse`,
+};
 
+export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
 
 export interface ResourceConfig {
   requestBodyInjectVariablesExtensions?: string[];
@@ -39,19 +56,21 @@ export interface AppConfig {
   decorationInactiveRegion?: DecorationRenderOptions,
   showNotificationPopup?: boolean,
   useCodeLensInNotebook?: boolean;
-  showCodeLensEnvironment?:boolean,
-  showCodeLensResetEnvironment?:boolean,
-  showCodeLensLogoutUserSession?:boolean,
-  showCodeLensRemoveCookies?:boolean,
-  showCodeLensSendAll?: boolean,
-  showCodeLensSendSelected?: boolean,
-  showCodeLensSend?: boolean,
-  showCodeLensClearAll?: boolean,
-  showCodeLensSendRepeat?: boolean,
-  showCodeLensTestResult?: boolean,
-  showCodeLensShowResponse?:boolean,
-  showCodeLensSaveResponse?:boolean,
-  showCodeLensShowResponseHeaders?:boolean,
+  codelens?: {
+    pickEnvironment: boolean,
+    resetEnvironment: boolean,
+    logoutUserSession: boolean,
+    removeCookies: boolean,
+    send: boolean,
+    sendRepeat: boolean,
+    sendAll: boolean,
+    sendSelected: boolean,
+    clearResponseHistory: boolean,
+    testResult: boolean,
+    showResponse: boolean,
+    saveResponse: boolean,
+    showResponseHeaders: boolean
+  }
 }
 
 export function getConfigSetting() : AppConfig {

@@ -11,12 +11,11 @@ export class DecorationProvider extends DisposeProvider {
   private decorationActive: vscode.TextEditorDecorationType | undefined;
 
   constructor(
-    refreshCodeLens: vscode.EventEmitter<void>,
     private readonly documentStore: DocumentStore
   ) {
     super();
     this.subscriptions = [
-      refreshCodeLens.event(() => this.setEditorDecoration(vscode.window.activeTextEditor)),
+      documentStore.documentStoreChanged(() => this.setEditorDecoration(vscode.window.activeTextEditor)),
       vscode.window.onDidChangeTextEditorSelection(this.onDidChangeTextEditorSelection, this),
       watchConfigSettings(config => {
         if (this.decorationInactive) {

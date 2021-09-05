@@ -1,29 +1,16 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { getConfigSetting, APP_NAME, getEnvironmentConfig } from '../config';
+import { getConfigSetting, commands, getEnvironmentConfig } from '../config';
 import { errorHandler } from './errorHandler';
 import { extension } from 'mime-types';
 import { httpDocumentSelector } from '../config';
 import { file } from 'tmp-promise';
 import * as utils from '../utils';
-import { ResponseOutputProcessor } from '../view/responseOutputProcessor';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
 import { showTextEditor } from '../view/responseHandlerUtils';
+import { ResponseStore } from '../responseStore';
 
-export const commands = {
-  send: `${APP_NAME}.send`,
-  sendRepeat: `${APP_NAME}.sendRepeat`,
-  resend: `${APP_NAME}.resend`,
-  sendSelected: `${APP_NAME}.sendSelected`,
-  sendAll: `${APP_NAME}.sendall`,
-  clearAll: `${APP_NAME}.clearall`,
-  show: `${APP_NAME}.show`,
-  showVariables: `${APP_NAME}.showVariables`,
-  viewHeader: `${APP_NAME}.viewHeader`,
-  save: `${APP_NAME}.save`,
-  new: `${APP_NAME}.new`,
-};
 
 export class RequestCommandsController extends DisposeProvider implements vscode.CodeLensProvider {
 
@@ -32,16 +19,14 @@ export class RequestCommandsController extends DisposeProvider implements vscode
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(
-    private readonly refreshCodeLens: vscode.EventEmitter<void>,
-    private readonly responseOutputProcessor: ResponseOutputProcessor,
-    private readonly documentStore: DocumentStore
+    private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore,
   ) {
     super();
-    this.onDidChangeCodeLenses = refreshCodeLens.event;
+    this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.send, this.send, this),
       vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),
-      vscode.commands.registerCommand(commands.clearAll, this.clearAll, this),
       vscode.commands.registerCommand(commands.sendAll, this.sendAll, this),
       vscode.commands.registerCommand(commands.sendSelected, this.sendSelected, this),
       vscode.commands.registerCommand(commands.resend, this.resend, this),
@@ -77,23 +62,23 @@ export class RequestCommandsController extends DisposeProvider implements vscode
     }
 
     if (httpFile && httpFile.httpRegions.length > 0) {
-      if (config?.showCodeLensSendAll) {
+      if (config?.codelens?.sendAll) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendAll,
           title: 'send all'
         }));
       }
 
-      if (config?.showCodeLensSendSelected) {
+      if (config?.codelens?.sendSelected) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.sendSelected,
           title: 'send selected'
         }));
       }
 
-      if (config?.showCodeLensClearAll) {
+      if (config?.codelens?.clearResponseHistory) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-          command: commands.clearAll,
+          command: commands.clearHistory,
           title: 'clear all'
         }));
       }
@@ -104,14 +89,14 @@ export class RequestCommandsController extends DisposeProvider implements vscode
         const args = [document.uri, requestLine];
 
         if (!!httpRegion.request && !httpRegion.metaData.disabled) {
-          if (config?.showCodeLensSend) {
+          if (config?.codelens?.send) {
             result.push(new vscode.CodeLens(range, {
               command: commands.send,
               arguments: args,
               title: config?.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
             }));
           }
-          if (config?.showCodeLensSendRepeat) {
+          if (config?.codelens?.sendRepeat) {
             result.push(new vscode.CodeLens(range, {
               command: commands.sendRepeat,
               arguments: args,
@@ -120,7 +105,7 @@ export class RequestCommandsController extends DisposeProvider implements vscode
           }
         }
 
-        if (httpRegion.testResults && config?.showCodeLensTestResult) {
+        if (httpRegion.testResults && config?.codelens?.testResult) {
           result.push(new vscode.CodeLens(range, {
             arguments: [httpRegion],
             title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${httpRegion.testResults.length}`,
@@ -129,7 +114,7 @@ export class RequestCommandsController extends DisposeProvider implements vscode
         }
 
         if (httpRegion.response) {
-          if (config?.showCodeLensShowResponse) {
+          if (config?.codelens?.showResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.show,
               arguments: args,
@@ -137,7 +122,7 @@ export class RequestCommandsController extends DisposeProvider implements vscode
             }));
           }
 
-          if (config?.showCodeLensSaveResponse) {
+          if (config?.codelens?.saveResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.save,
               arguments: args,
@@ -145,7 +130,7 @@ export class RequestCommandsController extends DisposeProvider implements vscode
             }));
           }
 
-          if (config?.showCodeLensShowResponseHeaders) {
+          if (config?.codelens?.showResponseHeaders) {
             result.push(new vscode.CodeLens(range, {
               command: commands.viewHeader,
               arguments: args,
@@ -246,11 +231,8 @@ export class RequestCommandsController extends DisposeProvider implements vscode
           },
           report: data => progress.report(data),
         };
-
-        await this.responseOutputProcessor.sendContext(context);
-        if (this.refreshCodeLens) {
-          this.refreshCodeLens.fire();
-        }
+        context.logResponse = this.responseStore.add.bind(this.responseStore);
+        await this.documentStore.send(context);
       });
     }
 
@@ -258,23 +240,13 @@ export class RequestCommandsController extends DisposeProvider implements vscode
 
 
   @errorHandler()
-  private async clearAll() : Promise<void> {
-    const document = vscode.window.activeTextEditor?.document;
-    if (document) {
-      const httpFile = await this.documentStore.getHttpFile(document);
-      if (httpFile) {
-        for (const httpRegion of httpFile.httpRegions) {
-          delete httpRegion.response;
-        }
-      }
-    }
-  }
-
-  @errorHandler()
   private async show(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (context?.httpRegion?.response) {
-      await this.responseOutputProcessor.show(context.httpRegion.response, context.httpRegion);
+      const responseItem = this.responseStore.responseCache.find(obj => obj.response === context.httpRegion.response);
+      if (responseItem) {
+        await this.responseStore.show(responseItem);
+      }
     }
   }
 

@@ -34,13 +34,14 @@ export async function previewDocumentResponseHandler(response: HttpResponse, htt
 
     const fileName = await writeTempFileName(content, httpRegion, extension);
     if (fileName) {
+      const uri = vscode.Uri.file(fileName);
 
-      const document = await vscode.workspace.openTextDocument(vscode.Uri.file(fileName));
+      const document = await vscode.workspace.openTextDocument(uri);
       const editor = await showTextEditor(document, true);
       return {
         document,
         editor,
-        deleteFile: true
+        uri
       };
     }
   }

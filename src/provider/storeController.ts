@@ -16,13 +16,14 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   onDidChangeCodeLenses: vscode.Event<void>;
 
+  private environmentChangedEmitter: vscode.EventEmitter<string[] | undefined>;
+
   constructor(
-    private readonly environmentChanged: vscode.EventEmitter<string[] | undefined>,
-    refreshCodeLens: vscode.EventEmitter<void>,
     private readonly documentStore: DocumentStore
   ) {
     super();
-    this.onDidChangeCodeLenses = refreshCodeLens.event;
+    this.environmentChangedEmitter = new vscode.EventEmitter<string[] | undefined>();
+    this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toggleEnv, this.toggleEnv, this),
       vscode.commands.registerCommand(commands.reset, this.reset, this),
@@ -30,7 +31,10 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
     ];
+  }
 
+  get environmentChanged(): vscode.Event<string[] | undefined> {
+    return this.environmentChangedEmitter.event;
   }
 
   async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
@@ -42,7 +46,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     const httpFile = await this.documentStore.getHttpFile(document);
     const args = [document.uri];
 
-    if (config.showCodeLensEnvironment) {
+    if (config.codelens?.pickEnvironment) {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.toggleEnv,
@@ -52,7 +56,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       }
     }
 
-    if (config.showCodeLensResetEnvironment) {
+    if (config.codelens?.resetEnvironment) {
       if (httpFile) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.reset,
@@ -61,13 +65,13 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       }
     }
 
-    if (store.userSessionStore.userSessions.length > 0 && config.showCodeLensLogoutUserSession) {
+    if (store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.logout,
         title: `oauth2 session (${store.userSessionStore.userSessions.length})`,
       }));
     }
-    if (httpFile && config.showCodeLensRemoveCookies) {
+    if (httpFile && config.codelens?.removeCookies) {
       const cookies = store.cookieStore.getCookies(httpFile);
       if (cookies.length > 0) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
@@ -121,7 +125,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         activeEnvironment = undefined;
       }
       this.documentStore.activeEnvironment = activeEnvironment;
-      this.environmentChanged.fire(activeEnvironment);
+      this.environmentChangedEmitter.fire(activeEnvironment);
       if (config.environmentStoreSelectedOnStart) {
         const config = vscode.workspace.getConfiguration(APP_NAME);
         await config.update('environmentSelectedOnStart', activeEnvironment);

@@ -1,16 +1,13 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { APP_NAME } from '../config';
+import { commands } from '../config';
 import { errorHandler } from './errorHandler';
-import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider, initContext } from '../utils';
+import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
 import { Request, Header, Param, QueryString } from './harRequest';
 import { DocumentStore } from '../documentStore';
 
-const commands = {
-  generateCode: `${APP_NAME}.generateCode`,
-};
 
 export class HarCommandsController extends DisposeProvider {
 
@@ -45,8 +42,6 @@ export class HarCommandsController extends DisposeProvider {
           },
           report: data => progress.report(data),
         };
-        initContext(context);
-
         context.logResponse = async response => {
           if (response.request) {
             const harRequest: Request = this.getHarRequest(response.request);
@@ -58,8 +53,7 @@ export class HarCommandsController extends DisposeProvider {
             await vscode.window.showTextDocument(document);
           }
         };
-
-        await httpyac.send(context);
+        await this.documentStore.send(context);
       });
     }
 

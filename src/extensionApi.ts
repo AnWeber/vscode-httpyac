@@ -4,7 +4,17 @@ import * as httpyac from 'httpyac';
 export interface ResponseHandlerResult{
   document: vscode.TextDocument;
   editor: vscode.TextEditor;
-  deleteFile?: boolean;
+  uri?: vscode.Uri;
+}
+
+
+export interface ResponseItem {
+  created: Date;
+  name: string;
+  response: httpyac.HttpResponse;
+  httpRegion?: httpyac.HttpRegion;
+  document?: vscode.TextDocument;
+  uri?: vscode.Uri;
 }
 
 export type ResponseHandler = (
@@ -17,6 +27,7 @@ export interface ResponseOutputProcessor{
 }
 
 export interface DocumentStore{
+  readonly httpFileStore: httpyac.store.HttpFileStore;
   activeEnvironment: Array<string> | undefined;
   getDocumentPathLike: (document: vscode.TextDocument) => httpyac.PathLike;
   getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile>;
@@ -24,18 +35,23 @@ export interface DocumentStore{
   getOrCreate(path: httpyac.PathLike, getText: () => Promise<string>, version: number): Promise<httpyac.HttpFile>;
   parse(uri: vscode.Uri | undefined, text: string): Promise<httpyac.HttpFile>;
   remove(document: vscode.TextDocument): void;
+  send: (context: httpyac.HttpFileSendContext | httpyac.HttpRegionsSendContext) => Promise<boolean>,
+}
+
+
+export interface ResponseStore {
+  readonly historyChanged: vscode.Event<void>;
+  add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): ResponseItem;
+  remove(responseItem: ResponseItem): boolean
+  clear(): void;
 }
 
 export interface HttpYacExtensionApi{
   httpyac: typeof httpyac,
-  responseHandlers: Array<ResponseHandler>,
-  responseOutputProcessor: ResponseOutputProcessor,
-  httpFileStore: httpyac.store.HttpFileStore,
   documentStore: DocumentStore,
+  responseStore: ResponseStore,
   httpDocumentSelector: vscode.DocumentSelector,
-  refreshCodeLens: vscode.EventEmitter<void>,
-  environementChanged: vscode.EventEmitter<string[] | undefined>,
+  environmentChanged: vscode.Event<string[] | undefined>,
   getEnvironmentConfig(path: httpyac.PathLike): Promise<httpyac.EnvironmentConfig>;
   getErrorQuickFix: (err: Error) => string | undefined;
-  sendContext: (context: httpyac.HttpFileSendContext | httpyac.HttpRegionsSendContext) => Promise<boolean>
 }

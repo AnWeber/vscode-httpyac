@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { DocumentStore } from '../documentStore';
-import { logToOuputChannelFactory } from '../io';
-import { getEnvironmentConfig } from '../config';
 
 export type DocumentArgument = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
 export type LineArgument = number | vscode.Position | vscode.Range | undefined;
@@ -69,22 +67,4 @@ function isTextDocument(documentIdentifier: DocumentArgument): documentIdentifie
 function isTextEditor(documentIdentifier: DocumentArgument): documentIdentifier is vscode.TextEditor {
   const editor = documentIdentifier as vscode.TextEditor;
   return editor && !!editor.document && isTextDocument(editor.document);
-}
-
-
-export async function initContext(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext) : Promise<void> {
-  const config = await getEnvironmentConfig(context.httpFile.fileName);
-  if (!context.scriptConsole) {
-    context.scriptConsole = new httpyac.io.Logger({
-      level: config.log?.level,
-      logMethod: logToOuputChannelFactory('Console'),
-    });
-  }
-  if (!context.config) {
-    context.config = config;
-  }
-  context.require = {
-    vscode,
-    httpyac,
-  };
 }
