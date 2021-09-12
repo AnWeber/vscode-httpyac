@@ -33,7 +33,7 @@ export class ResponseDocumentController
     const cacheItem = this.responseStore.findResponseByDocument(document);
     if (cacheItem && cacheItem.response) {
       const response = cacheItem.response;
-      const lenses = [`HTTP/${response.httpVersion} ${response.statusCode} - ${response.statusMessage}`];
+      const lenses = [`${response.protocol} ${response.statusCode}${response.statusMessage ? ` - ${response.statusMessage}` : ''}`];
 
       if (cacheItem.httpRegion?.testResults) {
         lenses.push(`TestResults ${cacheItem.httpRegion.testResults.filter(obj => obj.result).length}/${cacheItem.httpRegion.testResults.length}`);

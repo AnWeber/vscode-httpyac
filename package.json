@@ -1,996 +1,1040 @@
 {
-	"name": "vscode-httpyac",
-	"displayName": "httpYac - Rest Client",
-	"license": "MIT",
-	"publisher": "anweber",
-	"description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-	"version": "3.2.0",
-	"homepage": "https://github.com/AnWeber/vscode-httpyac",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/AnWeber/vscode-httpyac"
-	},
-	"bugs": {
-		"url": "https://github.com/AnWeber/vscode-httpyac/issues"
-	},
-	"qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
-	"icon": "icon.png",
-	"engines": {
-		"vscode": "^1.57.0"
-	},
-	"categories": [
-		"Other",
-		"Snippets",
-		"Programming Languages"
-	],
-	"keywords": [
-		"HTTP",
-		"REST",
-		"GraphQL",
-		"Intellij Http Client",
-		"Postman",
-		"Soap",
-		"rest-client"
-	],
-	"activationEvents": [
-		"onCommand:httpyac.new",
-		"onLanguage:http"
-	],
-	"main": "./dist/extension.js",
-	"capabilities": {
-		"virtualWorkspaces": true
-	},
-	"extensionKind": ["workspace", "ui"],
-	"contributes": {
-		"languages": [
-			{
-				"id": "http",
-				"aliases": [
-					"Http",
-					"HTTP"
-				],
-				"extensions": [
-					"http",
-					"rest"
-				],
-				"firstLine": "^\\s*(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*?$",
-				"configuration": "./language-configuration.json"
-			}
-		],
-		"snippets": [
-			{
-				"language": "http",
-				"path": "./snippets/http.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "http",
-				"scopeName": "source.http",
-				"path": "./syntaxes/http.tmLanguage.json",
-				"embeddedLanguages": {
-					"source.json": "json",
-					"source.js": "javascript",
-					"text.xml": "xml",
-					"source.graphql": "graphql"
-				}
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "httpyac",
-			"properties": {
-				"httpyac.requestDefaultHeaders": {
+  "name": "vscode-httpyac",
+  "displayName": "httpYac - Rest Client",
+  "license": "MIT",
+  "publisher": "anweber",
+  "description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
+  "version": "3.1.0",
+  "homepage": "https://github.com/AnWeber/vscode-httpyac",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnWeber/vscode-httpyac"
+  },
+  "bugs": {
+    "url": "https://github.com/AnWeber/vscode-httpyac/issues"
+  },
+  "qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.57.0"
+  },
+  "categories": [
+    "Other",
+    "Snippets",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "HTTP",
+    "REST",
+    "GraphQL",
+    "Intellij Http Client",
+    "Postman",
+    "Soap",
+    "rest-client"
+  ],
+  "activationEvents": [
+    "onCommand:httpyac.new",
+    "onCommand:httpyac.showHistory",
+    "onLanguage:http",
+    "onView:httpyacHistory"
+  ],
+  "main": "./dist/extension.js",
+  "capabilities": {
+    "virtualWorkspaces": true
+  },
+  "extensionKind": [
+    "workspace",
+    "ui"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "http",
+        "aliases": [
+          "Http",
+          "HTTP"
+        ],
+        "extensions": [
+          "http",
+          "rest"
+        ],
+        "firstLine": "^\\s*(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*?$",
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "http",
+        "path": "./snippets/http.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "http",
+        "scopeName": "source.http",
+        "path": "./syntaxes/http.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.json": "json",
+          "source.js": "javascript",
+          "text.xml": "xml",
+          "source.graphql": "graphql"
+        }
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "httpyac",
+      "properties": {
+        "httpyac.requestDefaultHeaders": {
+          "type": "object",
+          "properties": {
+            "A-IM": {
+              "description": "Acceptable instance-manipulations for the request.",
+              "type": "string"
+            },
+            "Accept": {
+              "description": "Media type(s) that is/are acceptable for the response. See Content negotiation.",
+              "type": "string"
+            },
+            "Accept-Charset": {
+              "description": "Character sets that are acceptable.",
+              "type": "string"
+            },
+            "Accept-Datetime": {
+              "description": "Acceptable version in time.",
+              "type": "string"
+            },
+            "Accept-Encoding": {
+              "description": "List of acceptable encodings. See HTTP compression.",
+              "type": "string"
+            },
+            "Accept-Language": {
+              "description": "List of acceptable human languages for response. See Content negotiation.",
+              "type": "string"
+            },
+            "Access-Control-Request-Method": {
+              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
+              "type": "string"
+            },
+            "Access-Control-Request-Headers": {
+              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
+              "type": "string"
+            },
+            "Authorization": {
+              "description": "Authentication credentials for HTTP authentication.",
+              "type": "string"
+            },
+            "Cache-Control": {
+              "description": "Used to specify directives that must be obeyed by all caching mechanisms along the request-response chain.",
+              "type": "string"
+            },
+            "Connection": {
+              "description": "Control options for the current connection and list of hop-by-hop request fields. Must not be used with HTTP/2.",
+              "type": "string"
+            },
+            "Content-Encoding": {
+              "description": "The type of encoding used on the data. See HTTP compression.",
+              "type": "string"
+            },
+            "Content-Length": {
+              "description": "The length of the request body in octets (8-bit bytes).",
+              "type": "string"
+            },
+            "Content-MD5": {
+              "description": "A Base64-encoded binary MD5 sum of the content of the request body.",
+              "type": "string"
+            },
+            "Content-Type": {
+              "description": "The Media type of the body of the request (used with POST and PUT requests).",
+              "type": "string"
+            },
+            "Cookie": {
+              "description": "An HTTP cookie previously sent by the server with Set-Cookie (below).",
+              "type": "string"
+            },
+            "Date": {
+              "description": "The date and time at which the message was originated (in HTTP-date format as defined by RFC 7231 Date/Time Formats).",
+              "type": "string"
+            },
+            "Expect": {
+              "description": "Indicates that particular server behaviors are required by the client.",
+              "type": "string"
+            },
+            "Forwarded": {
+              "description": "Disclose original information of a client connecting to a web server through an HTTP proxy.",
+              "type": "string"
+            },
+            "From": {
+              "description": "The email address of the user making the request.",
+              "type": "string"
+            },
+            "Host": {
+              "description": "The domain name of the server (for virtual hosting), and the TCP port number on which the server is listening. The port number may be omitted if the port is the standard port for the service requested. Mandatory since HTTP/1.1. If the request is generated directly in HTTP/2, it should not be used.",
+              "type": "string"
+            },
+            "HTTP2-Settings": {
+              "description": "A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly one HTTP2-Setting header field. The HTTP2-Settings header field is a connection-specific header field that includes parameters that govern the HTTP/2 connection, provided in anticipation of the server accepting the request to upgrade.",
+              "type": "string"
+            },
+            "If-Match": {
+              "description": "Only perform the action if the client supplied entity matches the same entity on the server. This is mainly for methods like PUT to only update a resource if it has not been modified since the user last updated it.",
+              "type": "string"
+            },
+            "If-Modified-Since": {
+              "description": "Allows a 304 Not Modified to be returned if content is unchanged.",
+              "type": "string"
+            },
+            "If-None-Match": {
+              "description": "Allows a 304 Not Modified to be returned if content is unchanged, see HTTP ETag.",
+              "type": "string"
+            },
+            "If-Range": {
+              "description": "If the entity is unchanged, send me the part(s) that I am missing; otherwise, send me the entire new entity.",
+              "type": "string"
+            },
+            "If-Unmodified-Since": {
+              "description": "Only send the response if the entity has not been modified since a specific time.",
+              "type": "string"
+            },
+            "Max-Forwards": {
+              "description": "Limit the number of times the message can be forwarded through proxies or gateways.",
+              "type": "string"
+            },
+            "Origin": {
+              "description": "Initiates a request for cross-origin resource sharing (asks server for Access-Control-* response fields).",
+              "type": "string"
+            },
+            "Pragma": {
+              "description": "Implementation-specific fields that may have various effects anywhere along the request-response chain.",
+              "type": "string"
+            },
+            "Proxy-Authorization": {
+              "description": "Authorization credentials for connecting to a proxy.",
+              "type": "string"
+            },
+            "Range": {
+              "description": "Request only part of an entity. Bytes are numbered from 0. See Byte serving.",
+              "type": "string"
+            },
+            "Referer": {
+              "description": "This is the address of the previous web page from which a link to the currently requested page was followed. (The word referrer has been misspelled in the RFC as well as in most implementations to the point that it has become standard usage and is considered correct terminology)",
+              "type": "string"
+            },
+            "TE": {
+              "description": "The transfer encodings the user agent is willing to accept: the same values as for the response header field Transfer-Encoding can be used, plus the trailers value (related to the chunked transfer method) to notify the server it expects to receive additional fields in the trailer after the last, zero-sized, chunk. Only trailers is supported in HTTP/2.",
+              "type": "string"
+            },
+            "Trailer": {
+              "description": "The Trailer general field value indicates that the given set of header fields is present in the trailer of a message encoded with chunked transfer coding.",
+              "type": "string"
+            },
+            "Transfer-Encoding": {
+              "description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity. Must not be used with HTTP/2",
+              "type": "string"
+            },
+            "User-Agent": {
+              "description": "The user agent string of the user agent.",
+              "type": "string"
+            },
+            "Upgrade": {
+              "description": "Ask the server to upgrade to another protocol. Must not be used in HTTP/2.",
+              "type": "string"
+            },
+            "Via": {
+              "description": "Informs the server of proxies through which the request was sent.",
+              "type": "string"
+            },
+            "Warning": {
+              "description": "A general warning about possible problems with the entity body.",
+              "type": "string"
+            },
+            "Upgrade-Insecure-Requests": {
+              "description": "Tells a server which (presumably in the middle of a HTTP -> HTTPS migration) hosts mixed content that the client would prefer redirection to HTTPS and can handle Content-Security-Policy: upgrade-insecure-requests Must not be used with HTTP/2",
+              "type": "string"
+            },
+            "X-Requested-With": {
+              "description": "Mainly used to identify Ajax requests (most JavaScript frameworks send this field with value of XMLHttpRequest); also identifies Android apps using WebView",
+              "type": "string"
+            },
+            "DNT": {
+              "description": "Requests a web application to disable their tracking of a user. This is Mozilla`s version of the X-Do-Not-Track header field (since Firefox 4.0 Beta 11). Safari and IE9 also have support for this field. On March 7, 2011, a draft proposal was submitted to IETF. The W3C Tracking Protection Working Group is producing a specification.",
+              "type": "string"
+            },
+            "X-Forwarded-For": {
+              "description": "A de facto standard for identifying the originating IP address of a client connecting to a web server through an HTTP proxy or load balancer. Superseded by Forwarded header.",
+              "type": "string"
+            },
+            "X-Forwarded-Host": {
+              "description": "A de facto standard for identifying the original host requested by the client in the Host HTTP request header, since the host name and/or port of the reverse proxy (load balancer) may differ from the origin server handling the request. Superseded by Forwarded header.",
+              "type": "string"
+            },
+            "X-Forwarded-Proto": {
+              "description": "A de facto standard for identifying the originating protocol of an HTTP request, since a reverse proxy (or a load balancer) may communicate with a web server using HTTP even if the request to the reverse proxy is HTTPS. An alternative form of the header (X-ProxyUser-Ip) is used by Google clients talking to Google servers. Superseded by Forwarded header.",
+              "type": "string"
+            },
+            "Front-End-Https": {
+              "description": "Non-standard header field used by Microsoft applications and load-balancers",
+              "type": "string"
+            },
+            "X-Http-Method-Override": {
+              "description": "Requests a web application to override the method specified in the request (typically POST) with the method given in the header field (typically PUT or DELETE). This can be used when a user agent or firewall prevents PUT or DELETE methods from being sent directly (note that this is either a bug in the software component, which ought to be fixed, or an intentional configuration, in which case bypassing it may be the wrong thing to do).",
+              "type": "string"
+            },
+            "X-ATT-DeviceId": {
+              "description": "Allows easier parsing of the MakeModel/Firmware that is usually found in the User-Agent String of AT&T Devices",
+              "type": "string"
+            },
+            "X-Wap-Profile": {
+              "description": "Links to an XML file on the Internet with a full description and details about the device currently connecting. In the example to the right is an XML file for an AT&T Samsung Galaxy S2.",
+              "type": "string"
+            },
+            "Proxy-Connection": {
+              "description": "Implemented as a misunderstanding of the HTTP specifications. Common because of mistakes in implementations of early HTTP versions. Has exactly the same functionality as standard Connection field. Must not be used with HTTP/2.",
+              "type": "string"
+            },
+            "X-UIDH": {
+              "description": "Server-side deep packet insertion of a unique ID identifying customers of Verizon Wireless; also known as perma-cookie or supercookie",
+              "type": "string"
+            },
+            "X-Csrf-Token": {
+              "description": "Used to prevent cross-site request forgery. Alternative header names are: X-CSRFToken and X-XSRF-TOKEN",
+              "type": "string"
+            },
+            "X-Request-ID": {
+              "description": "Correlates HTTP requests between a client and server.",
+              "type": "string"
+            },
+            "X-Correlation-ID": {
+              "description": "Correlates HTTP requests between a client and server.",
+              "type": "string"
+            },
+            "Save-Data": {
+              "description": "The Save-Data client hint request header available in Chrome, Opera, and Yandex browsers lets developers deliver lighter, faster applications to users who opt-in to data saving mode in their browser.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": true,
+          "scope": "resource",
+          "description": "default request headers if not overwritten"
+        },
+        "httpyac.requestBodyInjectVariablesExtensions": {
+          "type": "array",
+          "scope": "resource",
+          "description": "always inject variables in request body for these extensions"
+        },
+        "httpyac.requestGotOptions": {
+          "scope": "resource",
+          "type": "object",
+          "properties": {
+            "decompress": {
+              "type": "boolean"
+            },
+            "timeout": {
+              "type": "number"
+            },
+            "prefixUrl": {
+              "type": "string"
+            },
+            "followRedirect": {
+              "type": "boolean"
+            },
+            "maxRedirects": {
+              "type": "number"
+            },
+            "throwHttpErrors": {
+              "type": "boolean"
+            },
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "http2": {
+              "type": "boolean"
+            },
+            "retry": {
+              "type": "boolean"
+            },
+            "rejectUnauthorized": {
+              "type": "boolean"
+            },
+            "ignoreInvalidCookies": {
+              "type": "boolean"
+            },
+            "https": {
+              "type": "object",
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                },
+                "pfx": {
+                  "type": "string"
+                },
+                "passphrase": {
+                  "type": "string"
+                },
+                "rejectUnauthorized": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": true,
+          "description": "got options used as default"
+        },
+        "httpyac.cookieJarEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "is cookiejar support enabled"
+        },
+        "httpyac.clientCertficates": {
+          "type": "object",
+          "scope": "resource",
+          "description": "Certificate paths for different hosts. The path can be absolute path or relative path to workspace",
+          "pattern": "^(?!http(s?)://)",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "default": {},
+                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "properties": {
+                  "cert": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Public x509 certificate"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Private key"
+                  },
+                  "pfx": {
+                    "type": "string",
+                    "description": "Absolute or relative path of PKCS #12 certificate"
+                  },
+                  "passphrase": {
+                    "type": "string",
+                    "description": "[Optional] A string of passphrase for the private key or pfx"
+                  }
+                },
+                "dependencies": {
+                  "cert": [
+                    "key"
+                  ],
+                  "key": [
+                    "cert"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "httpyac.environmentSelectedOnStart": {
+          "type": "array",
+          "scope": "resource",
+          "description": "list of default environment on startup"
+        },
+        "httpyac.environmentStoreSelectedOnStart": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "store env in setting `environmentSelectedOnStart` after change"
+        },
+        "httpyac.environmentPickMany": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "allow picking many environments at the same time"
+        },
+        "httpyac.environmentVariables": {
+          "type": "object",
+          "scope": "resource",
+          "default": {
+            "$shared": {}
+          },
+          "description": "environment variables (e.g {\"dev\":{\"password\": \"123456\"}, prod: {\"password\": \"secure\"}}`)"
+        },
+        "httpyac.envDirName": {
+          "type": "string",
+          "scope": "resource",
+          "default": "env",
+          "description": "relative or absolute path to folder with env files"
+        },
+        "httpyac.responseViewHeader": {
+          "type": "array",
+          "default": [
+            "timings.total",
+            "content-type",
+            "content-length"
+          ],
+          "scope": "resource",
+          "description": "headers, testResults, timings, meta data visible in code lens of response"
+        },
+        "httpyac.responseViewPrettyPrint": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation)"
+        },
+        "httpyac.responseViewPreserveFocus": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "response view will not take focus after receiving response"
+        },
+        "httpyac.responseViewLanguageMap": {
+          "type": "object",
+          "scope": "resource",
+          "description": "mimetype to languageId map for response view"
+        },
+        "httpyac.responseViewColumn": {
+          "type": "string",
+          "enum": [
+            "current",
+            "beside"
+          ],
+          "markdownEnumDescriptions": [
+            "Preview in the column of current request file",
+            "previewing at the side of the current active column and the side direction depends on `workbench.editor.openSideBySideDirection` setting, either right or below the current editor column"
+          ],
+          "default": "beside",
+          "scope": "resource",
+          "description": "response preview column option"
+        },
+        "httpyac.responseViewMode": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "reuse",
+            "open",
+            "none"
+          ],
+          "markdownEnumDescriptions": [
+            "open editor in preview mode. The value is ignored when workbench.editor.previewEnabled is disabled",
+            "reuse editor with same language",
+            "always open in new editor",
+            "use only output console"
+          ],
+          "default": "preview",
+          "scope": "resource",
+          "description": "response view mode of file"
+        },
+        "httpyac.responseViewContent": {
+          "type": "string",
+          "enum": [
+            "body",
+            "headers",
+            "full",
+            "exchange"
+          ],
+          "markdownEnumDescriptions": [
+            "only view response body",
+            "view only response headers",
+            "view response (statusline, header, body)",
+            "view request and response"
+          ],
+          "default": "body",
+          "scope": "resource",
+          "description": "content of respnse view"
+        },
+        "httpyac.logLevel": {
+          "type": "string",
+          "default": "warn",
+          "scope": "resource",
+          "enum": [
+            "trace",
+            "debug",
+            "warn",
+            "error",
+            "info"
+          ],
+          "description": "log level of output channel"
+        },
+        "httpyac.logResponseBodyLength": {
+          "type": "number",
+          "default": 0,
+          "scope": "resource",
+          "description": "length of response body in output channel requests"
+        },
+        "httpyac.logRequest": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "log request in output channel requests"
+        },
+        "httpyac.useCodeLensInNotebook": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "show codelens if httpbook is used"
+        },
+        "httpyac.useMethodInSendCodeLens": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "use request method in send code lens"
+        },
+        "httpyac.useDecorationProvider": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "show border lines around request"
+        },
+        "httpyac.decorationActiveRegion": {
+          "type": "object",
+          "default": {
+            "borderColor": "theme.editor.selectionBackground",
+            "border": "solid",
+            "borderWidth": "0 0 3px 0",
+            "isWholeLine": true
+          },
+          "scope": "window",
+          "description": "decoration for active region (colors starting with theme. use vscode color)"
+        },
+        "httpyac.decorationInactiveRegion": {
+          "type": "object",
+          "default": {
+            "border": "dotted rgba(0, 0, 0, 20%)",
+            "borderWidth": "0 0 2px 0",
+            "isWholeLine": true
+          },
+          "scope": "window",
+          "description": "decoration for inactive region (colors starting with theme. use vscode color)"
+        },
+        "httpyac.showNotificationPopup": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "show information, warning and error notifiation message"
+        },
+        "httpyac.codelens": {
 					"type": "object",
+					"default": {
+						"pickEnvironment": true,
+						"resetEnvironment": false,
+            "logoutUserSession": true,
+            "removeCookies": true,
+            "send": true,
+            "sendRepeat": false,
+            "sendAll": false,
+            "sendSelected": true,
+            "clearHistory": false,
+            "testResult": true,
+            "showResponse": false,
+            "saveResponse": false,
+            "showResponseHeaders": false
+					},
 					"properties": {
-						"A-IM": {
-							"description": "Acceptable instance-manipulations for the request.",
-							"type": "string"
+						"pickEnvironment": {
+							"type": "boolean",
+							"default": false
 						},
-						"Accept": {
-							"description": "Media type(s) that is/are acceptable for the response. See Content negotiation.",
-							"type": "string"
+						"resetEnvironment": {
+							"type": "boolean",
+							"default": false
 						},
-						"Accept-Charset": {
-							"description": "Character sets that are acceptable.",
-							"type": "string"
+						"logoutUserSession": {
+							"type": "boolean",
+							"default": false
 						},
-						"Accept-Datetime": {
-							"description": "Acceptable version in time.",
-							"type": "string"
+						"removeCookies": {
+							"type": "boolean",
+							"default": false
 						},
-						"Accept-Encoding": {
-							"description": "List of acceptable encodings. See HTTP compression.",
-							"type": "string"
+						"send": {
+							"type": "boolean",
+							"default": false
 						},
-						"Accept-Language": {
-							"description": "List of acceptable human languages for response. See Content negotiation.",
-							"type": "string"
+						"sendRepeat": {
+							"type": "boolean",
+							"default": false
 						},
-						"Access-Control-Request-Method": {
-							"description": "Initiates a request for cross-origin resource sharing with Origin (below).",
-							"type": "string"
+						"sendAll": {
+							"type": "boolean",
+							"default": false
 						},
-						"Access-Control-Request-Headers": {
-							"description": "Initiates a request for cross-origin resource sharing with Origin (below).",
-							"type": "string"
+						"sendSelected": {
+							"type": "boolean",
+							"default": false
 						},
-						"Authorization": {
-							"description": "Authentication credentials for HTTP authentication.",
-							"type": "string"
+						"testResult": {
+							"type": "boolean",
+							"default": false
 						},
-						"Cache-Control": {
-							"description": "Used to specify directives that must be obeyed by all caching mechanisms along the request-response chain.",
-							"type": "string"
+						"clearHistory": {
+							"type": "boolean",
+							"default": false
 						},
-						"Connection": {
-							"description": "Control options for the current connection and list of hop-by-hop request fields. Must not be used with HTTP/2.",
-							"type": "string"
+						"showResponse": {
+							"type": "boolean",
+							"default": false
 						},
-						"Content-Encoding": {
-							"description": "The type of encoding used on the data. See HTTP compression.",
-							"type": "string"
+						"saveResponse": {
+							"type": "boolean",
+							"default": false
 						},
-						"Content-Length": {
-							"description": "The length of the request body in octets (8-bit bytes).",
-							"type": "string"
-						},
-						"Content-MD5": {
-							"description": "A Base64-encoded binary MD5 sum of the content of the request body.",
-							"type": "string"
-						},
-						"Content-Type": {
-							"description": "The Media type of the body of the request (used with POST and PUT requests).",
-							"type": "string"
-						},
-						"Cookie": {
-							"description": "An HTTP cookie previously sent by the server with Set-Cookie (below).",
-							"type": "string"
-						},
-						"Date": {
-							"description": "The date and time at which the message was originated (in HTTP-date format as defined by RFC 7231 Date/Time Formats).",
-							"type": "string"
-						},
-						"Expect": {
-							"description": "Indicates that particular server behaviors are required by the client.",
-							"type": "string"
-						},
-						"Forwarded": {
-							"description": "Disclose original information of a client connecting to a web server through an HTTP proxy.",
-							"type": "string"
-						},
-						"From": {
-							"description": "The email address of the user making the request.",
-							"type": "string"
-						},
-						"Host": {
-							"description": "The domain name of the server (for virtual hosting), and the TCP port number on which the server is listening. The port number may be omitted if the port is the standard port for the service requested. Mandatory since HTTP/1.1. If the request is generated directly in HTTP/2, it should not be used.",
-							"type": "string"
-						},
-						"HTTP2-Settings": {
-							"description": "A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly one HTTP2-Setting header field. The HTTP2-Settings header field is a connection-specific header field that includes parameters that govern the HTTP/2 connection, provided in anticipation of the server accepting the request to upgrade.",
-							"type": "string"
-						},
-						"If-Match": {
-							"description": "Only perform the action if the client supplied entity matches the same entity on the server. This is mainly for methods like PUT to only update a resource if it has not been modified since the user last updated it.",
-							"type": "string"
-						},
-						"If-Modified-Since": {
-							"description": "Allows a 304 Not Modified to be returned if content is unchanged.",
-							"type": "string"
-						},
-						"If-None-Match": {
-							"description": "Allows a 304 Not Modified to be returned if content is unchanged, see HTTP ETag.",
-							"type": "string"
-						},
-						"If-Range": {
-							"description": "If the entity is unchanged, send me the part(s) that I am missing; otherwise, send me the entire new entity.",
-							"type": "string"
-						},
-						"If-Unmodified-Since": {
-							"description": "Only send the response if the entity has not been modified since a specific time.",
-							"type": "string"
-						},
-						"Max-Forwards": {
-							"description": "Limit the number of times the message can be forwarded through proxies or gateways.",
-							"type": "string"
-						},
-						"Origin": {
-							"description": "Initiates a request for cross-origin resource sharing (asks server for Access-Control-* response fields).",
-							"type": "string"
-						},
-						"Pragma": {
-							"description": "Implementation-specific fields that may have various effects anywhere along the request-response chain.",
-							"type": "string"
-						},
-						"Proxy-Authorization": {
-							"description": "Authorization credentials for connecting to a proxy.",
-							"type": "string"
-						},
-						"Range": {
-							"description": "Request only part of an entity. Bytes are numbered from 0. See Byte serving.",
-							"type": "string"
-						},
-						"Referer": {
-							"description": "This is the address of the previous web page from which a link to the currently requested page was followed. (The word referrer has been misspelled in the RFC as well as in most implementations to the point that it has become standard usage and is considered correct terminology)",
-							"type": "string"
-						},
-						"TE": {
-							"description": "The transfer encodings the user agent is willing to accept: the same values as for the response header field Transfer-Encoding can be used, plus the trailers value (related to the chunked transfer method) to notify the server it expects to receive additional fields in the trailer after the last, zero-sized, chunk. Only trailers is supported in HTTP/2.",
-							"type": "string"
-						},
-						"Trailer": {
-							"description": "The Trailer general field value indicates that the given set of header fields is present in the trailer of a message encoded with chunked transfer coding.",
-							"type": "string"
-						},
-						"Transfer-Encoding": {
-							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity. Must not be used with HTTP/2",
-							"type": "string"
-						},
-						"User-Agent": {
-							"description": "The user agent string of the user agent.",
-							"type": "string"
-						},
-						"Upgrade": {
-							"description": "Ask the server to upgrade to another protocol. Must not be used in HTTP/2.",
-							"type": "string"
-						},
-						"Via": {
-							"description": "Informs the server of proxies through which the request was sent.",
-							"type": "string"
-						},
-						"Warning": {
-							"description": "A general warning about possible problems with the entity body.",
-							"type": "string"
-						},
-						"Upgrade-Insecure-Requests": {
-							"description": "Tells a server which (presumably in the middle of a HTTP -> HTTPS migration) hosts mixed content that the client would prefer redirection to HTTPS and can handle Content-Security-Policy: upgrade-insecure-requests Must not be used with HTTP/2",
-							"type": "string"
-						},
-						"X-Requested-With": {
-							"description": "Mainly used to identify Ajax requests (most JavaScript frameworks send this field with value of XMLHttpRequest); also identifies Android apps using WebView",
-							"type": "string"
-						},
-						"DNT": {
-							"description": "Requests a web application to disable their tracking of a user. This is Mozilla`s version of the X-Do-Not-Track header field (since Firefox 4.0 Beta 11). Safari and IE9 also have support for this field. On March 7, 2011, a draft proposal was submitted to IETF. The W3C Tracking Protection Working Group is producing a specification.",
-							"type": "string"
-						},
-						"X-Forwarded-For": {
-							"description": "A de facto standard for identifying the originating IP address of a client connecting to a web server through an HTTP proxy or load balancer. Superseded by Forwarded header.",
-							"type": "string"
-						},
-						"X-Forwarded-Host": {
-							"description": "A de facto standard for identifying the original host requested by the client in the Host HTTP request header, since the host name and/or port of the reverse proxy (load balancer) may differ from the origin server handling the request. Superseded by Forwarded header.",
-							"type": "string"
-						},
-						"X-Forwarded-Proto": {
-							"description": "A de facto standard for identifying the originating protocol of an HTTP request, since a reverse proxy (or a load balancer) may communicate with a web server using HTTP even if the request to the reverse proxy is HTTPS. An alternative form of the header (X-ProxyUser-Ip) is used by Google clients talking to Google servers. Superseded by Forwarded header.",
-							"type": "string"
-						},
-						"Front-End-Https": {
-							"description": "Non-standard header field used by Microsoft applications and load-balancers",
-							"type": "string"
-						},
-						"X-Http-Method-Override": {
-							"description": "Requests a web application to override the method specified in the request (typically POST) with the method given in the header field (typically PUT or DELETE). This can be used when a user agent or firewall prevents PUT or DELETE methods from being sent directly (note that this is either a bug in the software component, which ought to be fixed, or an intentional configuration, in which case bypassing it may be the wrong thing to do).",
-							"type": "string"
-						},
-						"X-ATT-DeviceId": {
-							"description": "Allows easier parsing of the MakeModel/Firmware that is usually found in the User-Agent String of AT&T Devices",
-							"type": "string"
-						},
-						"X-Wap-Profile": {
-							"description": "Links to an XML file on the Internet with a full description and details about the device currently connecting. In the example to the right is an XML file for an AT&T Samsung Galaxy S2.",
-							"type": "string"
-						},
-						"Proxy-Connection": {
-							"description": "Implemented as a misunderstanding of the HTTP specifications. Common because of mistakes in implementations of early HTTP versions. Has exactly the same functionality as standard Connection field. Must not be used with HTTP/2.",
-							"type": "string"
-						},
-						"X-UIDH": {
-							"description": "Server-side deep packet insertion of a unique ID identifying customers of Verizon Wireless; also known as perma-cookie or supercookie",
-							"type": "string"
-						},
-						"X-Csrf-Token": {
-							"description": "Used to prevent cross-site request forgery. Alternative header names are: X-CSRFToken and X-XSRF-TOKEN",
-							"type": "string"
-						},
-						"X-Request-ID": {
-							"description": "Correlates HTTP requests between a client and server.",
-							"type": "string"
-						},
-						"X-Correlation-ID": {
-							"description": "Correlates HTTP requests between a client and server.",
-							"type": "string"
-						},
-						"Save-Data": {
-							"description": "The Save-Data client hint request header available in Chrome, Opera, and Yandex browsers lets developers deliver lighter, faster applications to users who opt-in to data saving mode in their browser.",
-							"type": "string"
+						"showResponseHeaders": {
+							"type": "boolean",
+							"default": false
 						}
 					},
-					"additionalProperties": true,
-					"scope": "resource",
-					"description": "default request headers if not overwritten"
-				},
-				"httpyac.requestBodyInjectVariablesExtensions": {
-					"type": "array",
-					"scope": "resource",
-					"description": "always inject variables in request body for these extensions"
-				},
-				"httpyac.requestGotOptions": {
-					"scope": "resource",
-					"type": "object",
-					"properties": {
-						"decompress": {
-							"type": "boolean"
-						},
-						"timeout": {
-							"type": "number"
-						},
-						"prefixUrl": {
-							"type": "string"
-						},
-						"followRedirect": {
-							"type": "boolean"
-						},
-						"maxRedirects": {
-							"type": "number"
-						},
-						"throwHttpErrors": {
-							"type": "boolean"
-						},
-						"username": {
-							"type": "string"
-						},
-						"password": {
-							"type": "string"
-						},
-						"http2": {
-							"type": "boolean"
-						},
-						"retry": {
-							"type": "boolean"
-						},
-						"rejectUnauthorized": {
-							"type": "boolean"
-						},
-						"ignoreInvalidCookies": {
-							"type": "boolean"
-						},
-						"https": {
-							"type": "object",
-							"properties": {
-								"cert": {
-									"type": "string"
-								},
-								"key": {
-									"type": "string"
-								},
-								"pfx": {
-									"type": "string"
-								},
-								"passphrase": {
-									"type": "string"
-								},
-								"rejectUnauthorized": {
-									"type": "boolean"
-								}
-							},
-							"additionalProperties": false
-						}
-					},
-					"additionalProperties": true,
-					"description": "got options used as default"
-				},
-				"httpyac.cookieJarEnabled": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "is cookiejar support enabled"
-				},
-				"httpyac.clientCertficates": {
-					"type": "object",
-					"scope": "resource",
-					"description": "Certificate paths for different hosts. The path can be absolute path or relative path to workspace",
-					"pattern": "^(?!http(s?)://)",
-					"additionalProperties": {
-						"anyOf": [
-							{
-								"type": "object",
-								"default": {},
-								"description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
-								"properties": {
-									"cert": {
-										"type": "string",
-										"description": "Absolute or relative path of Public x509 certificate"
-									},
-									"key": {
-										"type": "string",
-										"description": "Absolute or relative path of Private key"
-									},
-									"pfx": {
-										"type": "string",
-										"description": "Absolute or relative path of PKCS #12 certificate"
-									},
-									"passphrase": {
-										"type": "string",
-										"description": "[Optional] A string of passphrase for the private key or pfx"
-									}
-								},
-								"dependencies": {
-									"cert": [
-										"key"
-									],
-									"key": [
-										"cert"
-									]
-								}
-							}
-						]
-					}
-				},
-				"httpyac.environmentSelectedOnStart": {
-					"type": "array",
-					"scope": "resource",
-					"description": "list of default environment on startup"
-				},
-				"httpyac.environmentStoreSelectedOnStart": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "store env in setting `environmentSelectedOnStart` after change"
-				},
-				"httpyac.environmentPickMany": {
-					"type": "boolean",
-					"scope": "resource",
-					"default": true,
-					"description": "allow picking many environments at the same time"
-				},
-				"httpyac.environmentVariables": {
-					"type": "object",
-					"scope": "resource",
-					"default": {
-						"$shared": {}
-					},
-					"description": "environment variables (e.g {\"dev\":{\"password\": \"123456\"}, prod: {\"password\": \"secure\"}}`)"
-				},
-				"httpyac.envDirName": {
-					"type": "string",
-					"scope": "resource",
-					"default": "env",
-					"description": "relative or absolute path to folder with env files"
-				},
-				"httpyac.responseViewHeader": {
-					"type": "array",
-					"default": [
-						"timings.total",
-						"content-type",
-						"content-length"
-					],
-					"scope": "resource",
-					"description": "headers, testResults, timings, meta data visible in code lens of response"
-				},
-				"httpyac.responseViewPrettyPrint": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation)"
-				},
-				"httpyac.responseViewPreserveFocus": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "response view will not take focus after receiving response"
-				},
-				"httpyac.responseViewLanguageMap": {
-					"type": "object",
-					"scope": "resource",
-					"description": "mimetype to languageId map for response view"
-				},
-				"httpyac.responseViewColumn": {
-					"type": "string",
-					"enum": [
-						"current",
-						"beside"
-					],
-					"markdownEnumDescriptions": [
-						"Preview in the column of current request file",
-						"previewing at the side of the current active column and the side direction depends on `workbench.editor.openSideBySideDirection` setting, either right or below the current editor column"
-					],
-					"default": "beside",
-					"scope": "resource",
-					"description": "response preview column option"
-				},
-				"httpyac.responseViewMode": {
-					"type": "string",
-					"enum": [
-						"preview",
-						"reuse",
-						"open",
-						"none"
-					],
-					"markdownEnumDescriptions": [
-						"open editor in preview mode. The value is ignored when workbench.editor.previewEnabled is disabled",
-						"reuse editor with same language",
-						"always open in new editor",
-						"use only output console"
-					],
-					"default": "preview",
-					"scope": "resource",
-					"description": "response view mode of file"
-				},
-				"httpyac.responseViewContent": {
-					"type": "string",
-					"enum": [
-						"body",
-						"headers",
-						"full",
-						"exchange"
-					],
-					"markdownEnumDescriptions": [
-						"only view response body",
-						"view only response headers",
-						"view response (statusline, header, body)",
-						"view request and response"
-					],
-					"default": "body",
-					"scope": "resource",
-					"description": "content of respnse view"
-				},
-				"httpyac.logLevel": {
-					"type": "string",
-					"default": "warn",
-					"scope": "resource",
-					"enum": [
-						"trace",
-						"debug",
-						"warn",
-						"error",
-						"info"
-					],
-					"description": "log level of output channel"
-				},
-				"httpyac.logResponseBodyLength": {
-					"type": "number",
-					"default": 0,
-					"scope": "resource",
-					"description": "length of response body in output channel requests"
-				},
-				"httpyac.logRequest": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "log request in output channel requests"
-				},
-				"httpyac.useCodeLensInNotebook": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show codelens if httpbook is used"
-				},
-				"httpyac.useMethodInSendCodeLens": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "use request method in send code lens"
-				},
-				"httpyac.useDecorationProvider": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show border lines around request"
-				},
-				"httpyac.decorationActiveRegion": {
-					"type": "object",
-					"default": {
-						"borderColor": "theme.editor.selectionBackground",
-						"border": "solid",
-						"borderWidth": "0 0 3px 0",
-						"isWholeLine": true
-					},
-					"scope": "window",
-					"description": "decoration for active region (colors starting with theme. use vscode color)"
-				},
-				"httpyac.decorationInactiveRegion": {
-					"type": "object",
-					"default": {
-						"border": "dotted rgba(0, 0, 0, 20%)",
-						"borderWidth": "0 0 2px 0",
-						"isWholeLine": true
-					},
-					"scope": "window",
-					"description": "decoration for inactive region (colors starting with theme. use vscode color)"
-				},
-				"httpyac.showNotificationPopup": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show information, warning and error notifiation message"
-				},
-				"httpyac.showCodeLensEnvironment": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for toggle environment"
-				},
-				"httpyac.showCodeLensResetEnvironment": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for reset environment"
-				},
-				"httpyac.showCodeLensLogoutUserSession": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for 'logout usersession'"
-				},
-				"httpyac.showCodeLensRemoveCookies": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for 'remove cookies'"
-				},
-				"httpyac.showCodeLensSendAll": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for 'send all' requests"
-				},
-				"httpyac.showCodeLensSendSelected": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for 'send selected' requests"
-				},
-				"httpyac.showCodeLensClearAll": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for 'clear all' requests"
-				},
-				"httpyac.showCodeLensSend": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for 'send' requests"
-				},
-				"httpyac.showCodeLensSendRepeat": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for 'send repeat' requests"
-				},
-				"httpyac.showCodeLensTestResult": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for Test Results"
-				},
-				"httpyac.showCodeLensShowResponse": {
-					"type": "boolean",
-					"default": true,
-					"scope": "resource",
-					"description": "show code lens for 'show' requests"
-				},
-				"httpyac.showCodeLensSaveResponse": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for 'save' requests"
-				},
-				"httpyac.showCodeLensShowResponseHeaders": {
-					"type": "boolean",
-					"default": false,
-					"scope": "resource",
-					"description": "show code lens for show response headers"
-				},
-				"httpyac.httpRegionScript": {
-					"type": "string",
-					"scope": "resource",
-					"description": "absolute or relative path to a script which gets executed for every http request in a file"
+					"additionalProperties": false,
+					"markdownDescription": "Specifies which codelens should be suppressed",
+					"scope": "window"
 				}
-			}
-		},
-		"commands": [
-			{
-				"command": "httpyac.new",
-				"title": "Create empty http file",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.send",
-				"title": "Send",
-				"category": "httpYac",
-				"icon": "$(debug-start)"
-			},
-			{
-				"command": "httpyac.sendRepeat",
-				"title": "Send (repeat)",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.sendall",
-				"title": "Send all",
-				"category": "httpYac",
-				"icon": "$(run-all)"
-			},
-			{
-				"command": "httpyac.sendSelected",
-				"title": "Send selected",
-				"category": "httpYac",
-				"icon": "$(run-all)"
-			},
-			{
-				"command": "httpyac.generateCode",
-				"title": "Generate Code",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.resend",
-				"title": "Resend last",
-				"category": "httpYac",
-				"icon": "$(redo)"
-			},
-			{
-				"command": "httpyac.show",
-				"title": "Show response",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.showVariables",
-				"title": "Show variables",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.viewHeader",
-				"title": "Show headers",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.save",
-				"title": "Save response",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.clearall",
-				"title": "Clear all responses",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.toggle-env",
-				"title": "Toggle environment",
-				"category": "httpYac",
-				"icon": "$(settings-gear)"
-			},
-			{
-				"command": "httpyac.reset",
-				"title": "Reset environments",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.logout",
-				"title": "Logout user sessions",
-				"category": "httpYac"
-			},
-			{
-				"command": "httpyac.removeCookies",
-				"title": "remove cookies",
-				"category": "httpYac"
-			}
-		],
-		"menus": {
-			"commandPalette": [
-				{
-					"command": "httpyac.send",
-					"when": "editorTextFocus && editorLangId == http"
-				},
-				{
-					"command": "httpyac.sendRepeat",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.sendall",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.sendSelected",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.generateCode",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.resend",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.show",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.showVariables",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.viewHeader",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.save",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.clearall",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.toggle-env",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.reset",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.logout",
-					"when": "editorLangId == http"
-				},
-				{
-					"command": "httpyac.removeCookies",
-					"when": "editorLangId == http"
-				}
-			],
-			"editor/title": [
-				{
-					"command": "httpyac.send",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "1_run@1"
-				},
-				{
-					"command": "httpyac.sendall",
-					"when": "editorLangId == http",
-					"group": "1_run@1"
-				},
-				{
-					"command": "httpyac.toggle-env",
-					"when": "editorLangId == http",
-					"group": "1_run@1"
-				},
-				{
-					"command": "httpyac.clearall",
-					"when": "editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.logout",
-					"when": "editorLangId == 'http'",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.resend",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.generateCode",
-					"when": "editorTextFocus && editorLangId == 'http'",
-					"group": "httpyac@1"
-				}
-			],
-			"editor/context": [
-				{
-					"command": "httpyac.send",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.sendRepeat",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.resend",
-					"when": "editorTextFocus && editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.toggle-env",
-					"when": "editorLangId == http",
-					"group": "httpyac@1"
-				},
-				{
-					"command": "httpyac.generateCode",
-					"when": "editorTextFocus && editorLangId == 'http'",
-					"group": "httpyac@1"
-				}
-			]
-		},
-		"keybindings": [
-			{
-				"command": "httpyac.new",
-				"key": "ctrl+alt+n",
-				"mac": "cmd+alt+n"
-			},
-			{
-				"command": "httpyac.send",
-				"key": "ctrl+alt+r",
-				"mac": "cmd+alt+r",
-				"when": "editorTextFocus && editorLangId == 'http'"
-			},
-			{
-				"command": "httpyac.resend",
-				"key": "ctrl+alt+l",
-				"mac": "cmd+alt+l",
-				"when": "editorTextFocus && editorLangId == 'http'"
-			},
-			{
-				"command": "httpyac.toggle-env",
-				"key": "ctrl+alt+e",
-				"mac": "cmd+alt+e",
-				"when": "editorTextFocus && editorLangId == 'http'"
-			},
-			{
-				"command": "httpyac.generateCode",
-				"key": "ctrl+alt+g",
-				"mac": "cmd+alt+g",
-				"when": "editorTextFocus && editorLangId == 'http'"
-			}
-		],
-		"jsonValidation": [
-			{
-				"fileMatch": ".httpyac.json",
-				"url": "./schemas/httpyac-schema.json"
-			},
-			{
-				"fileMatch": "http-client.env.json",
-				"url": "./schemas/http-client.env-schema.json"
-			},
-			{
-				"fileMatch": "http-client.private.env.json",
-				"url": "./schemas/http-client.private.env-schema.json"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "webpack --config ./webpack.config.js",
-		"watch": "webpack --watch --config ./webpack.config.js",
-		"lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
-		"eslint": "eslint src --ext ts",
-		"lint": "npm run eslint && npm run lockfile-lint",
-		"prepare": "husky install"
-	},
-	"lint-staged": {
-		"*.ts": "eslint --cache --fix"
-	},
-	"devDependencies": {
-		"@types/lodash": "^4.14.172",
-		"@types/mime-types": "^2.1.1",
-		"@types/node": "^16.9.1",
-		"@types/uuid": "^8.3.1",
-		"@types/vscode": "1.57.0",
-		"@typescript-eslint/eslint-plugin": "^4.31.0",
-		"@typescript-eslint/parser": "^4.29.1",
-		"eslint": "^7.32.0",
-		"eslint-plugin-node": "^11.1.0",
-		"fork-ts-checker-webpack-plugin": "^6.3.3",
-		"husky": "^7.0.2",
-		"lint-staged": "^11.1.2",
-		"lockfile-lint": "^4.6.2",
-		"mkdirp": "^1.0.4",
-		"thread-loader": "^3.0.4",
-		"ts-loader": "^9.2.5",
-		"typescript": "^4.4.3",
-		"webpack": "^5.52.1",
-		"webpack-cli": "^4.7.2"
-	},
-	"dependencies": {
-		"httpsnippet": "^2.0.0",
-		"httpyac": "^3.2.0",
-		"lodash": "^4.17.21",
-		"mime-types": "^2.1.32",
-		"tmp-promise": "^3.0.2"
-	}
+      }
+    },
+    "commands": [
+      {
+        "command": "httpyac.new",
+        "title": "Create empty http file",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.send",
+        "title": "Send",
+        "category": "httpYac",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "httpyac.sendRepeat",
+        "title": "Send (Repeat)",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.sendall",
+        "title": "Send All",
+        "category": "httpYac",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "httpyac.sendSelected",
+        "title": "Send Selected",
+        "category": "httpYac",
+        "icon": "$(run-all)"
+      },
+      {
+        "command": "httpyac.generateCode",
+        "title": "Generate Code",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.resend",
+        "title": "Resend last",
+        "category": "httpYac",
+        "icon": "$(redo)"
+      },
+      {
+        "command": "httpyac.show",
+        "title": "Show Response",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.showVariables",
+        "title": "Show Variables",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.viewHeader",
+        "title": "Show Response Headers",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.save",
+        "title": "Save response",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.toggle-env",
+        "title": "Toggle Environment",
+        "category": "httpYac",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "httpyac.reset",
+        "title": "Reset Environments",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.logout",
+        "title": "Logout User Sessions",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.removeCookies",
+        "title": "Remove Cookies",
+        "category": "httpYac"
+      },
+      {
+        "command": "httpyac.showHistory",
+        "title": "Show History",
+        "category": "httpYac",
+        "icon": "$(history)"
+      },
+      {
+        "command": "httpyac.clearHistory",
+        "title": "Clear Response History",
+        "category": "httpYac",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "httpyac.removeHistory",
+        "title": "Remove History item",
+        "category": "httpYac",
+        "icon": "$(close)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "httpyac.send",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.sendRepeat",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.sendall",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.sendSelected",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.generateCode",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.resend",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.show",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.showVariables",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.viewHeader",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.save",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.clearHistory",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.toggle-env",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.reset",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.logout",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.removeCookies",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.removeHistory",
+          "when": "false"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "httpyac.send",
+          "when": "editorLangId == http",
+          "group": "1_run@1"
+        },
+        {
+          "command": "httpyac.sendall",
+          "when": "editorLangId == http",
+          "group": "1_run@1"
+        },
+        {
+          "command": "httpyac.toggle-env",
+          "when": "editorLangId == http",
+          "group": "1_run@1"
+        },
+        {
+          "command": "httpyac.clearHistory",
+          "when": "editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.logout",
+          "when": "editorLangId == 'http'",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.resend",
+          "when": "editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.generateCode",
+          "when": "editorLangId == 'http'",
+          "group": "httpyac@1"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "httpyac.send",
+          "when": "editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.sendRepeat",
+          "when": "editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.resend",
+          "when": "editorTextFocus && editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.toggle-env",
+          "when": "editorLangId == http",
+          "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.generateCode",
+          "when": "editorTextFocus && editorLangId == 'http'",
+          "group": "httpyac@1"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "httpyac.clearHistory",
+          "when": "view == httpyacHistory",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "httpyac.removeHistory",
+          "when": "view == httpyacHistory",
+          "group": "inline"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "httpyac.new",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n"
+      },
+      {
+        "command": "httpyac.send",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "httpyac.resend",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "httpyac.toggle-env",
+        "key": "ctrl+alt+e",
+        "mac": "cmd+alt+e",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "httpyac.generateCode",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": ".httpyac.json",
+        "url": "./schemas/httpyac-schema.json"
+      },
+      {
+        "fileMatch": "http-client.env.json",
+        "url": "./schemas/http-client.env-schema.json"
+      },
+      {
+        "fileMatch": "http-client.private.env.json",
+        "url": "./schemas/http-client.private.env-schema.json"
+      }
+    ],
+    "viewsWelcome": [
+      {
+        "view": "httpyacHistory",
+        "contents": "No history available."
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "httpyacHistory",
+          "name": "httpYac History",
+          "visibility": "collapsed",
+          "when": "httpyacHistoryEnabled"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "webpack --config ./webpack.config.js",
+    "watch": "webpack --watch --config ./webpack.config.js",
+    "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
+    "eslint": "eslint src --ext ts",
+    "lint": "npm run eslint && npm run lockfile-lint",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.172",
+    "@types/mime-types": "^2.1.1",
+    "@types/node": "^16.9.1",
+    "@types/uuid": "^8.3.1",
+    "@types/vscode": "1.57.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-node": "^11.1.0",
+    "fork-ts-checker-webpack-plugin": "^6.3.3",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2",
+    "lockfile-lint": "^4.6.2",
+    "mkdirp": "^1.0.4",
+    "thread-loader": "^3.0.4",
+    "ts-loader": "^9.2.5",
+    "typescript": "^4.4.3",
+    "webpack": "^5.52.1",
+    "webpack-cli": "^4.8.0"
+  },
+  "dependencies": {
+    "httpsnippet": "^2.0.0",
+    "httpyac": "^3.1.0",
+    "lodash": "^4.17.21",
+    "mime-types": "^2.1.32",
+    "tmp-promise": "^3.0.2"
+  }
 }

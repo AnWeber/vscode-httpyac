@@ -44,10 +44,12 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
 
   if (viewContent === 'exchange' && response.request) {
     result.push(`${response.request.method} ${response.request.url}`);
-    result.push(...Object.entries(response.request.headers)
-      .filter(([key]) => !key.startsWith(':'))
-      .map(([key, value]) => `${key}: ${value}`)
-      .sort());
+    if (response.request.headers) {
+      result.push(...Object.entries(response.request.headers)
+        .filter(([key]) => !key.startsWith(':'))
+        .map(([key, value]) => `${key}: ${value}`)
+        .sort());
+    }
     if (response.request.body) {
       result.push('');
       if (utils.isString(response.request.body)) {
@@ -60,7 +62,7 @@ export function getContent(response: HttpResponse, viewContent?: ResponseViewCon
   }
 
   if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0) {
-    result.push(`HTTP/${response.httpVersion || ''} ${response.statusCode} ${response.statusMessage}`);
+    result.push(`${response.protocol} ${response.statusCode} ${response.statusMessage}`);
     result.push(...Object.entries(response.headers)
       .filter(([key]) => !key.startsWith(':'))
       .map(([key, value]) => `${key}: ${value}`)

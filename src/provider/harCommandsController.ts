@@ -75,7 +75,7 @@ export class HarCommandsController extends DisposeProvider {
   }
 
 
-  getHarRequest(options: httpyac.HttpResponseRequest): Request {
+  getHarRequest(options: httpyac.Request): Request {
 
     const initHeader: Header[] = [];
 
@@ -85,7 +85,7 @@ export class HarCommandsController extends DisposeProvider {
     const harRequest: Request = {
       method: options.method || 'GET',
       url,
-      headers: Object.entries(options.headers || {}).reduce((prev, current) => {
+      headers: options.headers && Object.entries(options.headers || {}).reduce((prev, current) => {
         const [name, value] = current;
         if (Array.isArray(value)) {
           prev.push(...value.map(val => ({
@@ -95,11 +95,11 @@ export class HarCommandsController extends DisposeProvider {
         } else {
           prev.push({
             name,
-            value: value || ''
+            value: `${value || ''}`
           });
         }
         return prev;
-      }, initHeader)
+      }, initHeader) || []
     };
 
     if (indexOfQuery > 0) {

@@ -3,7 +3,6 @@ import * as httpyac from 'httpyac';
 import { ResponseHandler, ResponseItem, ResponseStore as IResponseStore } from './extensionApi';
 import * as view from './view';
 import { DisposeProvider } from './utils';
-import { getConfigSetting } from './config';
 
 
 export class ResponseStore extends DisposeProvider implements IResponseStore {
@@ -73,7 +72,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     if (response.request) {
       return `${response.request?.method} ${response.request?.url}`;
     }
-    return `HTTP/${response.httpVersion} ${response.statusCode}`;
+    return `${response.protocol} ${response.statusCode}`;
   }
 
   remove(responseItem: ResponseItem): boolean {

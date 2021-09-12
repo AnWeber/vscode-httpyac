@@ -33,18 +33,16 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
   private toDocumentSymbolKind(kind: HttpSymbolKind) {
     switch (kind) {
       case HttpSymbolKind.metaData: return vscode.SymbolKind.Field;
-      case HttpSymbolKind.metaDataKey: return vscode.SymbolKind.Key;
-      case HttpSymbolKind.metaDataValue: return vscode.SymbolKind.String;
-      case HttpSymbolKind.requestMethod: return vscode.SymbolKind.Operator;
+      case HttpSymbolKind.key: return vscode.SymbolKind.Key;
+      case HttpSymbolKind.value: return vscode.SymbolKind.String;
+      case HttpSymbolKind.operator: return vscode.SymbolKind.Operator;
       case HttpSymbolKind.requestLine: return vscode.SymbolKind.Method;
-      case HttpSymbolKind.requestUrl: return vscode.SymbolKind.String;
+      case HttpSymbolKind.proto: return vscode.SymbolKind.Method;
+      case HttpSymbolKind.url: return vscode.SymbolKind.String;
       case HttpSymbolKind.script: return vscode.SymbolKind.Function;
       case HttpSymbolKind.requestHeader: return vscode.SymbolKind.Key;
-      case HttpSymbolKind.requestHeaderKey: return vscode.SymbolKind.Key;
-      case HttpSymbolKind.requestHeaderValue: return vscode.SymbolKind.String;
       case HttpSymbolKind.variable: return vscode.SymbolKind.Variable;
-      case HttpSymbolKind.variableName: return vscode.SymbolKind.Variable;
-      case HttpSymbolKind.varialbeValue: return vscode.SymbolKind.String;
+      case HttpSymbolKind.text: return vscode.SymbolKind.String;
       case HttpSymbolKind.gql: return vscode.SymbolKind.String;
       default:
         return vscode.SymbolKind.Object;
