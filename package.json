@@ -787,7 +787,7 @@
 				},
 				{
 					"command": "httpyac.sendRepeat",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.sendall",
@@ -799,15 +799,15 @@
 				},
 				{
 					"command": "httpyac.generateCode",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.resend",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.show",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.showVariables",
@@ -815,11 +815,11 @@
 				},
 				{
 					"command": "httpyac.viewHeader",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.save",
-					"when": "editorTextFocus && editorLangId == http"
+					"when": "editorLangId == http"
 				},
 				{
 					"command": "httpyac.clearall",
@@ -967,27 +967,27 @@
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.14.172",
-		"@types/mime-types": "^2.1.0",
-		"@types/node": "^16.4.13",
+		"@types/mime-types": "^2.1.1",
+		"@types/node": "^16.9.1",
 		"@types/uuid": "^8.3.1",
 		"@types/vscode": "1.57.0",
-		"@typescript-eslint/eslint-plugin": "^4.29.1",
+		"@typescript-eslint/eslint-plugin": "^4.31.0",
 		"@typescript-eslint/parser": "^4.29.1",
 		"eslint": "^7.32.0",
 		"eslint-plugin-node": "^11.1.0",
-		"fork-ts-checker-webpack-plugin": "^6.3.2",
-		"husky": "^7.0.1",
+		"fork-ts-checker-webpack-plugin": "^6.3.3",
+		"husky": "^7.0.2",
 		"lint-staged": "^11.1.2",
 		"lockfile-lint": "^4.6.2",
 		"mkdirp": "^1.0.4",
 		"thread-loader": "^3.0.4",
 		"ts-loader": "^9.2.5",
-		"typescript": "^4.3.5",
-		"webpack": "^5.50.0",
+		"typescript": "^4.4.3",
+		"webpack": "^5.52.1",
 		"webpack-cli": "^4.7.2"
 	},
 	"dependencies": {
-		"httpsnippet": "^1.25.0",
+		"httpsnippet": "^2.0.0",
 		"httpyac": "^3.1.0",
 		"lodash": "^4.17.21",
 		"mime-types": "^2.1.32",

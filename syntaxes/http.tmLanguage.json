@@ -138,6 +138,21 @@
       "name": "http.headers"
     },
     {
+      "captures": {
+        "1": {
+          "name": "entity.name.tag.http"
+        },
+        "2": {
+          "name": "keyword.other.http"
+        },
+        "3": {
+          "name": "string.other.http"
+        }
+      },
+      "match": "^(gql|proto)\\s*(<)\\s+(.*)\\s*$",
+      "name": "http.import"
+    },
+    {
       "include": "#metadata"
     },
     {
