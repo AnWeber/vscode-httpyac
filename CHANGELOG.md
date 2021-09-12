@@ -1,3 +1,10 @@
+## 3.2.0 (2021-09-12)
+
+#### Fix
+* markdown requests supports sending heading
+* fix import of http files in global context
+* fix `generate code` works again
+
 ## 3.1.0 (2021-08-10)
 
 #### Features
