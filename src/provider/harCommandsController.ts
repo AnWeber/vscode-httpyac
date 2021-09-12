@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
-import { HttpRegionSendContext, HttpFileSendContext, utils, HttpRequest, HttpResponse, HttpClientContext, io } from 'httpyac';
-import { APP_NAME } from '../config';
+import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
-import { DocumentArgument, getHttpRegionFromLine, LineArgument, sendContext, DisposeProvider } from '../utils';
+import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider, sendContext } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
 
 import { Request, Header, Param, QueryString } from './harRequest';
 import { DocumentStore } from '../documentStore';
+import { APP_NAME } from '../config';
 
 const commands = {
   generateCode: `${APP_NAME}.generateCode`,
@@ -29,7 +29,7 @@ export class HarCommandsController extends DisposeProvider {
     }
   }
 
-  private async generateCodeRequest(context: HttpRegionSendContext | HttpFileSendContext) {
+  private async generateCodeRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext) {
     const target = await this.pickHttpSnippetResult();
     if (target && context) {
       await vscode.window.withProgress({
@@ -45,22 +45,16 @@ export class HarCommandsController extends DisposeProvider {
           },
           report: data => progress.report(data),
         };
-
-        const httpClient = io.initHttpClient(context);
-
-        context.httpClient = async (request: HttpRequest, context: HttpClientContext): Promise<HttpResponse | false> => {
-
-          if (context.showProgressBar) {
-            const harRequest: Request = this.getHarRequest(request);
+        context.logResponse = async response => {
+          if (response.request) {
+            const harRequest: Request = this.getHarRequest(response.request);
             const snippet = new HttpSnippet(harRequest);
             const content = snippet.convert(target.target, target.client);
             const document = await vscode.workspace.openTextDocument({
               content
             });
             await vscode.window.showTextDocument(document);
-            return false;
           }
-          return await httpClient(request, context);
         };
         await sendContext(context);
       });
@@ -84,17 +78,17 @@ export class HarCommandsController extends DisposeProvider {
   }
 
 
-  getHarRequest(options: HttpRequest): Request {
+  getHarRequest(options: httpyac.HttpResponseRequest): Request {
 
     const initHeader: Header[] = [];
 
-    const url = options.url || '';
+    const url: string = options.url ? `${options.url}` : '';
     const indexOfQuery = url.indexOf('?');
 
     const harRequest: Request = {
       method: options.method || 'GET',
       url,
-      headers: Object.entries(options.headers || {}).reduce((prev, current) => {
+      headers: options.headers && Object.entries(options.headers || {}).reduce((prev, current) => {
         const [name, value] = current;
         if (Array.isArray(value)) {
           prev.push(...value.map(val => ({
@@ -104,11 +98,11 @@ export class HarCommandsController extends DisposeProvider {
         } else {
           prev.push({
             name,
-            value: value || ''
+            value: `${value || ''}`
           });
         }
         return prev;
-      }, initHeader)
+      }, initHeader) || []
     };
 
     if (indexOfQuery > 0) {
@@ -121,10 +115,10 @@ export class HarCommandsController extends DisposeProvider {
       }, initQueryString);
     }
 
-    if (utils.isString(options.body)) {
+    if (httpyac.utils.isString(options.body)) {
       let mimeType = 'application/json';
-      const header = utils.getHeader(options.headers || {}, 'content-type');
-      if (utils.isString(header)) {
+      const header = httpyac.utils.getHeader(options.headers || {}, 'content-type');
+      if (httpyac.utils.isString(header)) {
         mimeType = header;
       }
       if (mimeType === 'application/x-www-form-urlencoded') {
