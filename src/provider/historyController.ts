@@ -37,6 +37,7 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
       vscode.window.registerTreeDataProvider('httpyacHistory', this),
       vscode.commands.registerCommand(commands.showHistory, this.showHistory, this),
       vscode.commands.registerCommand(commands.clearHistory, this.clearHistory, this),
+      vscode.commands.registerCommand(commands.removeHistory, this.removeHistory, this),
       vscode.commands.registerCommand(commands.showHistoryResponse, this.responseStore.show, this.responseStore),
     ];
   }
@@ -64,7 +65,6 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
     }
   }
 
-
   @errorHandler()
   private async clearHistory() : Promise<void> {
     const document = vscode.window.activeTextEditor?.document;
@@ -77,5 +77,12 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
       }
     }
     this.responseStore.clear();
+  }
+
+  @errorHandler()
+  private async removeHistory(responseItem: ResponseItem): Promise<void> {
+    if (responseItem) {
+      this.responseStore.remove(responseItem);
+    }
   }
 }
