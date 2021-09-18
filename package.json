@@ -986,13 +986,27 @@
         "contents": "No history available."
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "httpyac-explorer",
+          "title": "httpyac",
+          "icon": "icon.svg"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "httpyac-explorer": [
         {
           "id": "httpyacHistory",
-          "name": "httpYac History",
+          "name": "History",
           "visibility": "collapsed",
           "when": "httpyacHistoryEnabled"
+        },
+        {
+          "id": "httpyacSessions",
+          "name": "Sessions",
+          "visibility": "collapsed"
         }
       ]
     }

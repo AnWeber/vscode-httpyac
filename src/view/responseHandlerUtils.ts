@@ -8,7 +8,7 @@ import { getConfigSetting, ResponseViewContent } from '../config';
 
 export const TempPathFolder = 'httpyac_tmp';
 
-export function getExtension(httpRegion?: HttpRegion) : string {
+export function getExtension(response: HttpResponse, httpRegion?: HttpRegion) : string {
   if (httpRegion?.metaData?.extension) {
     return httpRegion.metaData.extension;
   }
@@ -23,18 +23,17 @@ export function getExtension(httpRegion?: HttpRegion) : string {
       return ext.slice(1);
     }
   }
-  return extension(httpRegion?.response?.contentType?.contentType || 'application/octet-stream') || 'json';
+  return extension(response?.contentType?.contentType || 'application/octet-stream') || 'json';
 }
 
 
-export async function writeTempFileName(content: Buffer, httpRegion?: HttpRegion, extension?: string | undefined) : Promise<string> {
-  const ext = extension || getExtension(httpRegion);
+export async function writeTempFileName(content: Buffer, displayName: string, extension: string) : Promise<string> {
+
   const { path } = await dir();
-  const displayName = httpRegion ? utils.getDisplayName(httpRegion, 'response') : 'response';
   const name = utils.shortenFileName(utils.replaceInvalidChars(displayName));
 
   await vscode.workspace.fs.createDirectory(vscode.Uri.file(join(path, TempPathFolder)));
-  const fileName = join(path, TempPathFolder, `${name}.${ext}`);
+  const fileName = join(path, TempPathFolder, `${name}.${extension}`);
   await vscode.workspace.fs.writeFile(vscode.Uri.file(fileName), content);
   return fileName;
 }

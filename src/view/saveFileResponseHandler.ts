@@ -8,7 +8,7 @@ export async function saveFileResponseHandler(response: HttpResponse, httpRegion
     const filters: Record<string, Array<string>> = {
       'All Files': ['*']
     };
-    const ext = getExtension(httpRegion);
+    const ext = getExtension(response, httpRegion);
     if (ext) {
       filters[ext] = [ext];
     }

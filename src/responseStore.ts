@@ -48,7 +48,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     return this.responseCache.find(obj => obj.document === document);
   }
 
-  public add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): ResponseItem {
+  public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<ResponseItem> {
     let responseItem = this.responseCache.find(obj => obj.response === response);
     if (!responseItem) {
       responseItem = {
@@ -60,7 +60,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
       this.responseCache.splice(0, 0, responseItem);
       this.refreshHistory.fire();
       vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
-      this.show(responseItem);
+      await this.show(responseItem);
     }
     return responseItem;
   }
@@ -105,7 +105,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
 
           const cacheItem = this.responseCache.find(obj => obj.document === result.document);
           if (cacheItem) {
-            this.removeDocument(cacheItem);
+            await this.removeDocument(cacheItem);
           }
           responseItem.document = result.document;
           responseItem.uri = result.uri;

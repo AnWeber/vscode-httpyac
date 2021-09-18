@@ -136,8 +136,8 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
             responseHeaders: true,
             responseBodyLength: resourceConfig.logResponseBodyLength,
           });
-          context.logResponse = (response, httpRegion) => {
-            logResponse?.(response, httpRegion);
+          context.logResponse = async (response, httpRegion) => {
+            await logResponse?.(response, httpRegion);
             outputChannelLogResponse(response, httpRegion);
           };
         }

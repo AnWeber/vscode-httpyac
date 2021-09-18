@@ -231,7 +231,9 @@ export class RequestCommandsController extends DisposeProvider implements vscode
           },
           report: data => progress.report(data),
         };
-        context.logResponse = this.responseStore.add.bind(this.responseStore);
+        context.logResponse = async response => {
+          await this.responseStore.add(response);
+        };
         await this.documentStore.send(context);
       });
     }

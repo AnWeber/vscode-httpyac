@@ -2,7 +2,7 @@ import { HttpRegion, HttpResponse, utils } from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
 import { ResponseHandlerResult } from '../extensionApi';
-import { writeTempFileName, showTextEditor, getContent, getResponseViewContext } from './responseHandlerUtils';
+import { writeTempFileName, showTextEditor, getContent, getResponseViewContext, getExtension } from './responseHandlerUtils';
 
 
 export async function previewDocumentResponseHandler(response: HttpResponse, httpRegion?: HttpRegion) :Promise<boolean | ResponseHandlerResult> {
@@ -32,7 +32,7 @@ export async function previewDocumentResponseHandler(response: HttpResponse, htt
       extension = 'http';
     }
 
-    const fileName = await writeTempFileName(content, httpRegion, extension);
+    const fileName = await writeTempFileName(content, utils.getDisplayName(httpRegion, 'response'), extension || getExtension(response, httpRegion));
     if (fileName) {
       const uri = vscode.Uri.file(fileName);
 

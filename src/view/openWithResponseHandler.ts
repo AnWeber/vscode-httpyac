@@ -1,12 +1,12 @@
 import { HttpRegion, HttpResponse, utils } from 'httpyac';
 import { commands, extensions, Uri } from 'vscode';
-import { writeTempFileName } from './responseHandlerUtils';
+import { getExtension, writeTempFileName } from './responseHandlerUtils';
 
 
 export async function openWithResponseHandler(response: HttpResponse, httpRegion?: HttpRegion): Promise<boolean> {
   const openWith = getOpenWith(response, httpRegion);
-  if (httpRegion?.response?.rawBody && openWith) {
-    const fileName = await writeTempFileName(httpRegion.response.rawBody, httpRegion);
+  if (response?.rawBody && openWith) {
+    const fileName = await writeTempFileName(response.rawBody, utils.getDisplayName(httpRegion, 'response'), getExtension(response, httpRegion));
     if (fileName) {
       await commands.executeCommand('vscode.openWith', Uri.file(fileName), openWith);
       return true;
