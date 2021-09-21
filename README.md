@@ -2,9 +2,9 @@
 <img src="https://raw.githubusercontent.com/AnWeber/vscode-httpyac/master/icon.png" alt="HttpYac Logo" />
 </p>
 
-# httpYac - Yet another Rest Client
+# httpYac - Yet another Client
 
-> Quickly and easily send REST, SOAP, and GraphQL requests directly in Editor
+> Quickly and easily send REST, SOAP, GraphQL or gRPC requests directly in Editor
 
 <p align="center">
 <a href="https://httpyac.github.io/">
@@ -45,6 +45,9 @@ more [examples](https://httpyac.github.io/guide/examples) and [guide](https://ht
 | `httpyac.logout` | see current oauth2 sessions and logout |
 | `httpyac.removeCookies` | remove received cookies |
 | `httpyac.new` | create empty http file |
+| `httpyac.showHistory` | show response history |
+| `httpyac.clearHistory` | clear response history |
+| `httpyac.removeHistory` | remove history entry |
 
 ## Keybindings
 
@@ -96,10 +99,8 @@ keybindings are only active in files with language http
 | `httpyac.showNotificationPopup` | show information, warning and error notifiation message | `true` |
 | `httpyac.useMethodInSendCodeLens` | use request method in send code lens | `false` |
 | `httpyac.logLevel` | log level of output channel | `warn` |
+| `httpyac.maxHistoryItems` | number of max history items | `50` |
 
-## Next Steps
-
-* import OpenApi / Postman
 
 ## License
 [MIT License](LICENSE)

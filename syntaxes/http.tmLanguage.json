@@ -69,6 +69,7 @@
       "begin": "^\\s*(?=<\\S)",
       "name": "http.request.body.xml",
       "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "contentName": "source.html",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
@@ -134,7 +135,7 @@
           "name": "string.other.http"
         }
       },
-      "match": "^([\\w\\-]+)\\s*(\\:)\\s*(.*?)\\s*$",
+      "match": "^\\s*([\\w\\-]+)\\s*(\\:)\\s*(.*?)\\s*$",
       "name": "http.headers"
     },
     {
@@ -246,7 +247,7 @@
           ]
         }
       },
-      "match": "^\\s*(?:(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
+      "match": "^\\s*(?:(GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
       "name": "http.requestline"
     },
     "response-line": {
