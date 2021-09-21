@@ -52,6 +52,7 @@ export interface AppConfig {
   responseViewColumn?:string,
   useMethodInSendCodeLens?:boolean,
   useDecorationProvider?: boolean,
+  maxHistoryItems?: number;
   decorationActiveRegion?: DecorationRenderOptions,
   decorationInactiveRegion?: DecorationRenderOptions,
   showNotificationPopup?: boolean,

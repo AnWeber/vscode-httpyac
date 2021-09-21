@@ -3,6 +3,7 @@ import * as httpyac from 'httpyac';
 import { ResponseHandler, ResponseItem, ResponseStore as IResponseStore } from './extensionApi';
 import * as view from './view';
 import { DisposeProvider } from './utils';
+import { getConfigSetting } from './config';
 
 
 export class ResponseStore extends DisposeProvider implements IResponseStore {
@@ -48,9 +49,10 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     return this.responseCache.find(obj => obj.document === document);
   }
 
-  public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<ResponseItem> {
+  public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void> {
+    const config = getConfigSetting();
     let responseItem = this.responseCache.find(obj => obj.response === response);
-    if (!responseItem) {
+    if (!responseItem && config.maxHistoryItems && config.maxHistoryItems > 0) {
       responseItem = {
         name: this.getName(response, httpRegion),
         created: new Date(),
@@ -58,11 +60,11 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
         httpRegion,
       };
       this.responseCache.splice(0, 0, responseItem);
+      this.responseCache.length = Math.min(this.responseCache.length, config.maxHistoryItems);
       this.refreshHistory.fire();
       vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
       await this.show(responseItem);
     }
-    return responseItem;
   }
 
   private getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {

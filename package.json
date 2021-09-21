@@ -612,6 +612,12 @@
           "scope": "window",
           "description": "show information, warning and error notifiation message"
         },
+        "httpyac.maxHistoryItems":{
+          "type": "number",
+          "default": 50,
+          "scope": "window",
+          "description": "max entries in response history"
+        },
         "httpyac.codelens": {
 					"type": "object",
 					"default": {
@@ -622,7 +628,7 @@
             "send": true,
             "sendRepeat": false,
             "sendAll": false,
-            "sendSelected": true,
+            "sendSelected": false,
             "clearHistory": false,
             "testResult": true,
             "showResponse": false,
@@ -989,24 +995,19 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "httpyac-explorer",
+          "id": "httpyac-views",
           "title": "httpyac",
           "icon": "icon.svg"
         }
       ]
     },
     "views": {
-      "httpyac-explorer": [
+      "explorer": [
         {
           "id": "httpyacHistory",
           "name": "History",
           "visibility": "collapsed",
           "when": "httpyacHistoryEnabled"
-        },
-        {
-          "id": "httpyacSessions",
-          "name": "Sessions",
-          "visibility": "collapsed"
         }
       ]
     }
