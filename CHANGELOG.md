@@ -1,3 +1,19 @@
+## 4.0.0 (2021-09-22)
+
+#### Features
+* [gRPC Request support](https://httpyac.github.io/guide/request.html#grpc)
+  * Unary RPC
+  * Server Streaming
+  * Client Streaming
+  * Bi-Directional Streaming
+* add history view to explorer activity bar (visible when history entries exists)
+* add meta option sleep (wait x milliseconds before request)
+* Basic Authentication with Whitespace in username or password (`Basic {{username}}:{{password}}`)
+* register script task for event hooks (streaming, request, response, after)
+
+#### Fix
+* input and quickpick variable replacer fixed
+
 ## 3.2.0 (2021-09-12)
 
 #### Fix
