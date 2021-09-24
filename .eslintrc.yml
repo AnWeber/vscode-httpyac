@@ -17,7 +17,6 @@ extends:
 - plugin:@typescript-eslint/recommended
 ignorePatterns:
 - "**/examples/**/*.js"
-- webpack.config.js
 rules:
     array-bracket-spacing: "error"
     array-callback-return: "error"

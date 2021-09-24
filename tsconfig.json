@@ -19,6 +19,6 @@
 		"esModuleInterop": true
 	},
 	"exclude": [
-		"node_modules", "dist", "webpack.config.js"
+		"node_modules", "dist"
 	]
 }

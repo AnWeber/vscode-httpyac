@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -613,17 +613,17 @@
           "scope": "window",
           "description": "show information, warning and error notifiation message"
         },
-        "httpyac.maxHistoryItems":{
+        "httpyac.maxHistoryItems": {
           "type": "number",
           "default": 50,
           "scope": "window",
           "description": "max entries in response history"
         },
         "httpyac.codelens": {
-					"type": "object",
-					"default": {
-						"pickEnvironment": true,
-						"resetEnvironment": false,
+          "type": "object",
+          "default": {
+            "pickEnvironment": true,
+            "resetEnvironment": false,
             "logoutUserSession": true,
             "removeCookies": true,
             "send": true,
@@ -635,65 +635,65 @@
             "showResponse": false,
             "saveResponse": false,
             "showResponseHeaders": false
-					},
-					"properties": {
-						"pickEnvironment": {
-							"type": "boolean",
-							"default": false
-						},
-						"resetEnvironment": {
-							"type": "boolean",
-							"default": false
-						},
-						"logoutUserSession": {
-							"type": "boolean",
-							"default": false
-						},
-						"removeCookies": {
-							"type": "boolean",
-							"default": false
-						},
-						"send": {
-							"type": "boolean",
-							"default": false
-						},
-						"sendRepeat": {
-							"type": "boolean",
-							"default": false
-						},
-						"sendAll": {
-							"type": "boolean",
-							"default": false
-						},
-						"sendSelected": {
-							"type": "boolean",
-							"default": false
-						},
-						"testResult": {
-							"type": "boolean",
-							"default": false
-						},
-						"clearHistory": {
-							"type": "boolean",
-							"default": false
-						},
-						"showResponse": {
-							"type": "boolean",
-							"default": false
-						},
-						"saveResponse": {
-							"type": "boolean",
-							"default": false
-						},
-						"showResponseHeaders": {
-							"type": "boolean",
-							"default": false
-						}
-					},
-					"additionalProperties": false,
-					"markdownDescription": "Specifies which codelens should be suppressed",
-					"scope": "window"
-				}
+          },
+          "properties": {
+            "pickEnvironment": {
+              "type": "boolean",
+              "default": false
+            },
+            "resetEnvironment": {
+              "type": "boolean",
+              "default": false
+            },
+            "logoutUserSession": {
+              "type": "boolean",
+              "default": false
+            },
+            "removeCookies": {
+              "type": "boolean",
+              "default": false
+            },
+            "send": {
+              "type": "boolean",
+              "default": false
+            },
+            "sendRepeat": {
+              "type": "boolean",
+              "default": false
+            },
+            "sendAll": {
+              "type": "boolean",
+              "default": false
+            },
+            "sendSelected": {
+              "type": "boolean",
+              "default": false
+            },
+            "testResult": {
+              "type": "boolean",
+              "default": false
+            },
+            "clearHistory": {
+              "type": "boolean",
+              "default": false
+            },
+            "showResponse": {
+              "type": "boolean",
+              "default": false
+            },
+            "saveResponse": {
+              "type": "boolean",
+              "default": false
+            },
+            "showResponseHeaders": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "additionalProperties": false,
+          "markdownDescription": "Specifies which codelens should be suppressed",
+          "scope": "window"
+        }
       }
     },
     "commands": [
@@ -1015,12 +1015,13 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "webpack --config ./webpack.config.js",
-    "watch": "webpack --watch --config ./webpack.config.js",
+    "compile": "esbuild ./src/extension.ts --bundle --outdir=dist/ --minify --sourcemap --platform=node --external:vscode --format=cjs",
+    "watch": "npm run compile -- --watch",
     "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
     "eslint": "eslint src --ext ts",
     "lint": "npm run eslint && npm run lockfile-lint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "package": "npx vsce package"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix"
@@ -1035,20 +1036,15 @@
     "@typescript-eslint/parser": "^4.31.2",
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
-    "fork-ts-checker-webpack-plugin": "^6.3.3",
     "husky": "^7.0.2",
     "lint-staged": "^11.1.2",
     "lockfile-lint": "^4.6.2",
-    "mkdirp": "^1.0.4",
-    "thread-loader": "^3.0.4",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.4.3",
-    "webpack": "^5.53.0",
-    "webpack-cli": "^4.8.0"
+    "typescript": "^4.4.3"
   },
   "dependencies": {
+    "esbuild": "^0.13.2",
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.0.3",
+    "httpyac": "^4.0.4",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.32",
     "tmp-promise": "^3.0.2"
