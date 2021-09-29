@@ -1042,7 +1042,7 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "esbuild": "^0.13.2",
+    "esbuild": "^0.13.3",
     "httpsnippet": "^2.0.0",
     "httpyac": "^4.0.4",
     "lodash": "^4.17.21",
