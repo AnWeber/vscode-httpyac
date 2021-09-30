@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     responseStore,
     storeController,
     initUserInteractionProvider(),
+    new provider.CodeLensProvider(documentStore),
     new provider.HistoryController(documentStore, responseStore),
     new provider.ResponseDocumentController(responseStore),
     new provider.HarCommandsController(documentStore),

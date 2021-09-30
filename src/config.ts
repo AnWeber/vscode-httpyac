@@ -17,6 +17,7 @@ export const commands = {
   save: `${APP_NAME}.save`,
   new: `${APP_NAME}.new`,
   generateCode: `${APP_NAME}.generateCode`,
+  generateCodeSelectLanguage: `${APP_NAME}.generateCodeSelectLanguage`,
   showHistory: `${APP_NAME}.showHistory`,
   removeHistory: `${APP_NAME}.removeHistory`,
   showHistoryResponse: `${APP_NAME}.showHistoryResponse`,
@@ -57,11 +58,18 @@ export interface AppConfig {
   decorationInactiveRegion?: DecorationRenderOptions,
   showNotificationPopup?: boolean,
   useCodeLensInNotebook?: boolean;
+  generateCodeDefaultLanguage?: {
+    target: string;
+    client: string;
+  },
+  generateCodeTargetOutput?: 'clipboard' | 'window',
   codelens?: {
     pickEnvironment: boolean,
     resetEnvironment: boolean,
     logoutUserSession: boolean,
     removeCookies: boolean,
+    generateCode: boolean,
+    generateCodeSelectLanguage: boolean,
     send: boolean,
     sendRepeat: boolean,
     sendAll: boolean,

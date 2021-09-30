@@ -1,3 +1,15 @@
+## 4.0.3 (2021-09-30)
+
+#### Features
+
+* new Setting `httpyac.generateCodeDefaultLanguage` to set default Language for Code Generation
+* new Setting `httpyac.generateCodeTargetOutput` to specify Output Target of generated code (Clipboard or Window)
+* new Command `httpyac.generateCodeSelectLanguage` to always select Language of Code Generation 
+* CodeLens support for `httpyac.generateCode` and `httpyac.generateCodeSelectLanguage`
+
+#### Fix
+* generateCode does not send request
+
 ## 4.0.2 (2021-09-24)
 
 #### Fix

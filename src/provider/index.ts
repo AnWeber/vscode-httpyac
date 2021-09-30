@@ -1,3 +1,4 @@
+export * from './codeLensProvider';
 export * from './decorationProvider';
 export * from './errorHandler';
 export * from './harCommandsController';

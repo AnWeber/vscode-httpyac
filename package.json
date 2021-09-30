@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -619,22 +619,53 @@
           "scope": "window",
           "description": "max entries in response history"
         },
+        "httpyac.generateCodeDefaultLanguage": {
+          "type": "object",
+          "default": {
+            "target": "shell",
+            "client": "curl"
+          },
+          "properties": {
+            "target": {
+              "type": "string",
+              "default": "shell"
+            },
+            "client": {
+              "type": "string",
+              "default": "curl"
+            }
+          },
+          "scope": "window",
+          "description": "Language Target and Client used for code generation"
+        },
+        "httpyac.generateCodeTargetOutput": {
+          "type": "string",
+          "default": "window",
+          "scope": "window",
+          "enum": [
+            "window",
+            "clipboard"
+          ],
+          "description": "target and client used as code generation defaults"
+        },
         "httpyac.codelens": {
           "type": "object",
           "default": {
-            "pickEnvironment": true,
-            "resetEnvironment": false,
-            "logoutUserSession": true,
-            "removeCookies": true,
-            "send": true,
-            "sendRepeat": false,
-            "sendAll": false,
-            "sendSelected": false,
             "clearHistory": false,
-            "testResult": true,
-            "showResponse": false,
+            "generateCode": false,
+            "generateCodeSelectLanguage": false,
+            "logoutUserSession": true,
+            "pickEnvironment": true,
+            "removeCookies": true,
+            "resetEnvironment": false,
             "saveResponse": false,
-            "showResponseHeaders": false
+            "send": true,
+            "sendAll": false,
+            "sendRepeat": false,
+            "sendSelected": false,
+            "showResponse": false,
+            "showResponseHeaders": false,
+            "testResult": true
           },
           "properties": {
             "pickEnvironment": {
@@ -731,6 +762,11 @@
         "category": "httpYac"
       },
       {
+        "command": "httpyac.generateCodeSelectLanguage",
+        "title": "Generate Code with Language Selection",
+        "category": "httpYac"
+      },
+      {
         "command": "httpyac.resend",
         "title": "Resend last",
         "category": "httpYac",
@@ -816,6 +852,10 @@
         },
         {
           "command": "httpyac.generateCode",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.generateCodeSelectLanguage",
           "when": "editorLangId == http"
         },
         {
@@ -1016,6 +1056,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "esbuild ./src/extension.ts --bundle --outdir=dist/ --minify --sourcemap --platform=node --external:vscode --format=cjs",
+    "tsc-watch": "tsc --watch",
     "watch": "npm run compile -- --watch",
     "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
     "eslint": "eslint src --ext ts",
@@ -1027,13 +1068,14 @@
     "*.ts": "eslint --cache --fix"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.173",
+    "@types/lodash": "^4.14.175",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^16.9.6",
+    "@types/node": "^16.10.2",
     "@types/uuid": "^8.3.1",
     "@types/vscode": "1.57.0",
-    "@typescript-eslint/eslint-plugin": "^4.31.2",
-    "@typescript-eslint/parser": "^4.31.2",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "esbuild": "^0.13.3",
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
     "husky": "^7.0.2",
@@ -1042,9 +1084,8 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "esbuild": "^0.13.2",
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.0.4",
+    "httpyac": "^4.0.5",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.32",
     "tmp-promise": "^3.0.2"

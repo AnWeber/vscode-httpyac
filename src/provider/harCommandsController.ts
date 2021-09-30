@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { commands } from '../config';
+import { commands, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider } from '../utils';
 import { default as HttpSnippet, availableTargets } from 'httpsnippet';
@@ -15,6 +15,7 @@ export class HarCommandsController extends DisposeProvider {
     super();
     this.subscriptions = [
       vscode.commands.registerCommand(commands.generateCode, this.generateCode, this),
+      vscode.commands.registerCommand(commands.generateCodeSelectLanguage, this.generateCodeSelectLanguage, this),
     ];
   }
 
@@ -22,13 +23,28 @@ export class HarCommandsController extends DisposeProvider {
   private async generateCode(document?: DocumentArgument, line?: LineArgument) {
     const context = await getHttpRegionFromLine(document, line, this.documentStore);
     if (context) {
-      await this.generateCodeRequest(context);
+      const config = getConfigSetting();
+      if (config.generateCodeDefaultLanguage) {
+        await this.generateCodeRequest(context, config.generateCodeDefaultLanguage);
+      } else {
+        this.generateCodeSelectLanguage(document, line);
+      }
+
+    }
+  }
+  @errorHandler()
+  private async generateCodeSelectLanguage(document?: DocumentArgument, line?: LineArgument) {
+    const context = await getHttpRegionFromLine(document, line, this.documentStore);
+    if (context) {
+      const codeTarget = await this.pickHttpSnippetResult();
+      if (codeTarget) {
+        await this.generateCodeRequest(context, codeTarget);
+      }
     }
   }
 
-  private async generateCodeRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext) {
-    const target = await this.pickHttpSnippetResult();
-    if (target && context) {
+  private async generateCodeRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext, codeTarget: {target: string, client: string}) {
+    if (context) {
       await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         cancellable: true,
@@ -42,21 +58,31 @@ export class HarCommandsController extends DisposeProvider {
           },
           report: data => progress.report(data),
         };
-        context.logResponse = async response => {
-          if (response.request) {
-            const harRequest: Request = this.getHarRequest(response.request);
-            const snippet = new HttpSnippet(harRequest);
-            const content = snippet.convert(target.target, target.client);
+        const hookId = 'code_generation';
+        context.httpFile.hooks.onRequest.addHook(hookId, async request => {
+          const harRequest: Request = this.getHarRequest(request);
+          const snippet = new HttpSnippet(harRequest);
+          const content = snippet.convert(codeTarget.target, codeTarget.client);
+          if (getConfigSetting().generateCodeTargetOutput === 'clipboard') {
+            await vscode.env.clipboard.writeText(content);
+          } else {
             const document = await vscode.workspace.openTextDocument({
               content
             });
             await vscode.window.showTextDocument(document);
           }
-        };
-        await this.documentStore.send(context);
+          if (httpyac.utils.isHttpRegionSendContext(context)) {
+            return httpyac.HookCancel;
+          }
+          return request;
+        });
+        try {
+          await this.documentStore.send(context);
+        } finally {
+          context.httpFile.hooks.onRequest.removeHook(hookId);
+        }
       });
     }
-
   }
 
   private async pickHttpSnippetResult() {
