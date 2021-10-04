@@ -1058,6 +1058,7 @@
     "esbuild": "esbuild ./src/extension.ts --bundle --outdir=dist/ --sourcemap --platform=node --external:vscode --format=cjs",
     "compile": "npm run esbuild -- --minify",
     "tsc-watch": "tsc --watch",
+    "tsc": "tsc --b",
     "watch": "npm run esbuild -- --watch",
     "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
     "eslint": "eslint src --ext ts",
