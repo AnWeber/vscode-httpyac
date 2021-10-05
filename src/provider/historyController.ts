@@ -59,6 +59,7 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
       value: responseItem,
     })), {
       placeHolder: 'select history entry',
+      ignoreFocusOut: true
     });
     if (pickedObj) {
       await this.responseStore.show(pickedObj.value);

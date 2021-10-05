@@ -113,6 +113,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         picked: this.documentStore.activeEnvironment && this.documentStore.activeEnvironment.indexOf(env) >= 0
       })), {
         placeHolder: 'select environment',
+        ignoreFocusOut: true,
         canPickMany: getConfigSetting().environmentPickMany,
       });
       if (pickedObj) {
@@ -150,6 +151,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     })), {
       placeHolder: 'select oauth2 sessions to logout',
       canPickMany: true,
+      ignoreFocusOut: true,
       onDidSelectItem: (item: vscode.QuickPickItem & {data: UserSession}) => {
         io.log.info(JSON.stringify(item.data, null, 2));
       }
@@ -188,6 +190,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
           })), {
           placeHolder: 'select cookies to remove',
           canPickMany: true,
+          ignoreFocusOut: true,
           onDidSelectItem: (item: vscode.QuickPickItem & { data: unknown }) => {
             io.log.info(JSON.stringify(item.data, null, 2));
           }

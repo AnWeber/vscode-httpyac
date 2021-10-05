@@ -97,7 +97,7 @@ export class HarCommandsController extends DisposeProvider {
       prev.push(...clients);
       return prev;
     }, init);
-    return await vscode.window.showQuickPick(items);
+    return await vscode.window.showQuickPick(items, { ignoreFocusOut: true });
   }
 
 
