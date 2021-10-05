@@ -14,7 +14,7 @@ export function getOutputChannel(channel: string): OutputChannel {
   return outputChannel;
 }
 
-export function logToOuputChannelFactory(channel: string) : (level: LogLevel, ...params: Array<unknown>) => void {
+export function logToOuputChannelFactory(channel: string): (level: LogLevel, ...params: Array<unknown>) => void {
   return function logToOuputChannel(level: LogLevel, ...params: Array<unknown>) {
     const outputChannel = getOutputChannel(channel);
 
@@ -54,7 +54,8 @@ export function initUserInteractionProvider(): Disposable {
   io.userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string) => await window.showInputBox({
     placeHolder: message,
     value: defaultValue,
-    prompt: message
+    prompt: message,
+    ignoreFocusOut: true
   });
   io.userInteractionProvider.showListPrompt = async (message: string, values: string[]) => await window.showQuickPick(values, {
     placeHolder: message
