@@ -62,9 +62,12 @@ export class RequestCommandsController extends DisposeProvider {
     const repeatOrder = await vscode.window.showQuickPick([
       { label: 'parallel', value: httpyac.RepeatOrder.parallel },
       { label: 'sequential', value: httpyac.RepeatOrder.sequential }
-    ]);
+    ], {
+      ignoreFocusOut: true,
+    });
     const count = await vscode.window.showInputBox({
       placeHolder: 'repeat count',
+      ignoreFocusOut: true
     });
 
     if (repeatOrder && count && +count > 0 && this.httpRegionSendContext) {
@@ -107,6 +110,7 @@ export class RequestCommandsController extends DisposeProvider {
       })), {
         placeHolder: 'select requests',
         canPickMany: true,
+        ignoreFocusOut: true
       });
 
       if (pickedObjs) {

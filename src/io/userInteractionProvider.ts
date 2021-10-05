@@ -58,7 +58,8 @@ export function initUserInteractionProvider(): Disposable {
     ignoreFocusOut: true
   });
   io.userInteractionProvider.showListPrompt = async (message: string, values: string[]) => await window.showQuickPick(values, {
-    placeHolder: message
+    placeHolder: message,
+    ignoreFocusOut: true
   });
 
   return {
