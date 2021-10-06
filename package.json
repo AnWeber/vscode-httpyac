@@ -665,6 +665,7 @@
             "sendSelected": false,
             "showResponse": false,
             "showResponseHeaders": false,
+            "showVariables": false,
             "testResult": true
           },
           "properties": {

@@ -50,6 +50,13 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
         }));
       }
 
+      if (!config?.codelens?.showVariables) {
+        result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          command: commands.showVariables,
+          title: 'show variables'
+        }));
+      }
+
       for (const httpRegion of httpFile.httpRegions) {
         const requestLine = httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine || httpRegion.symbol.startLine;
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);

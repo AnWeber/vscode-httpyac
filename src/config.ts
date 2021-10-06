@@ -78,7 +78,8 @@ export interface AppConfig {
     testResult: boolean,
     showResponse: boolean,
     saveResponse: boolean,
-    showResponseHeaders: boolean
+    showResponseHeaders: boolean,
+    showVariables: false,
   }
 }
 
