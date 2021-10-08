@@ -666,6 +666,7 @@
             "showResponse": false,
             "showResponseHeaders": false,
             "showVariables": false,
+            "validateVariables": false,
             "testResult": true
           },
           "properties": {
@@ -784,6 +785,11 @@
         "category": "httpYac"
       },
       {
+        "command": "httpyac.validateVariables",
+        "title": "Validate Variables",
+        "category": "httpYac"
+      },
+      {
         "command": "httpyac.viewHeader",
         "title": "Show Response Headers",
         "category": "httpYac"
@@ -869,6 +875,10 @@
         },
         {
           "command": "httpyac.showVariables",
+          "when": "editorLangId == http"
+        },
+        {
+          "command": "httpyac.validateVariables",
           "when": "editorLangId == http"
         },
         {

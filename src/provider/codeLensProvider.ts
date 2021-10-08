@@ -77,6 +77,14 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
               title: config?.useMethodInSendCodeLens ? `send repeat (${httpRegion.request.method})` : 'send repeat'
             }));
           }
+
+          if (config?.codelens?.validateVariables) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.validateVariables,
+              arguments: args,
+              title: 'validate'
+            }));
+          }
         }
 
         if (httpRegion.testResults && config?.codelens?.testResult) {

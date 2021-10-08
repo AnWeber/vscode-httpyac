@@ -7,7 +7,7 @@ import { file } from 'tmp-promise';
 import * as utils from '../utils';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
-import { showTextEditor } from '../view/responseHandlerUtils';
+import { openJsonInTextEditor } from '../view/responseHandlerUtils';
 import { ResponseStore } from '../responseStore';
 
 
@@ -31,6 +31,7 @@ export class RequestCommandsController extends DisposeProvider {
       vscode.commands.registerCommand(commands.resend, this.resend, this),
       vscode.commands.registerCommand(commands.show, this.show, this),
       vscode.commands.registerCommand(commands.showVariables, this.showVariables, this),
+      vscode.commands.registerCommand(commands.validateVariables, this.validateVariables, this),
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
       vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
@@ -166,15 +167,47 @@ export class RequestCommandsController extends DisposeProvider {
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
-        const variables = await httpyac.getVariables({
-          httpFile,
-          config: await getEnvironmentConfig(httpFile.fileName)
-        });
-        const document = await vscode.workspace.openTextDocument({
-          language: 'json',
-          content: JSON.stringify(variables, null, 2),
-        });
-        showTextEditor(document, true);
+        await this.openVariablesInEditor(httpFile);
+      }
+    }
+  }
+
+  private async openVariablesInEditor(httpFile: httpyac.HttpFile, status?: unknown) {
+    let variables = await httpyac.getVariables({
+      httpFile,
+      config: await getEnvironmentConfig(httpFile.fileName)
+    });
+    if (status) {
+      variables = {
+        '_status': status,
+        ...variables
+      };
+    }
+    openJsonInTextEditor('variables', JSON.stringify(variables, null, 2));
+  }
+
+  @errorHandler()
+  private async validateVariables(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+    const result = await utils.getHttpRegionFromLine(document, line, this.documentStore);
+    if (result) {
+      let status: unknown;
+      const abortInterceptor = {
+        afterLoop: async () => false
+      };
+      try {
+        result.httpFile.hooks.onRequest.addInterceptor(abortInterceptor);
+        await this.sendRequest(result);
+        status = {
+          message: 'variables are valid',
+        };
+      } catch (err) {
+        status = {
+          message: 'variables are invalid',
+          err
+        };
+      } finally {
+        result.httpFile.hooks.onRequest.removeInterceptor(abortInterceptor);
+        await this.openVariablesInEditor(result.httpFile, status);
       }
     }
   }

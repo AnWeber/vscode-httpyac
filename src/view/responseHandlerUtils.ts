@@ -136,3 +136,26 @@ export async function showTextEditor(document: vscode.TextDocument, preview: boo
     preview,
   });
 }
+
+
+export async function openJsonInTextEditor(name: string, content: string): Promise<void> {
+  const editorConfig = vscode.workspace.getConfiguration('workbench.editor');
+  let document: vscode.TextDocument | undefined;
+  if (editorConfig.enablePreview) {
+    const fileName = await writeTempFileName(Buffer.from(content), name, 'json');
+    if (fileName) {
+      const uri = vscode.Uri.file(fileName);
+
+      document = await vscode.workspace.openTextDocument(uri);
+    }
+  }
+  if (!document) {
+    document = await vscode.workspace.openTextDocument({
+      language: 'json',
+      content,
+    });
+  }
+  if (document) {
+    await showTextEditor(document, true);
+  }
+}

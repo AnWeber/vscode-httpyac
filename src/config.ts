@@ -14,6 +14,7 @@ export const commands = {
   show: `${APP_NAME}.show`,
   viewHeader: `${APP_NAME}.viewHeader`,
   showVariables: `${APP_NAME}.showVariables`,
+  validateVariables: `${APP_NAME}.validateVariables`,
   save: `${APP_NAME}.save`,
   new: `${APP_NAME}.new`,
   generateCode: `${APP_NAME}.generateCode`,
@@ -80,6 +81,7 @@ export interface AppConfig {
     saveResponse: boolean,
     showResponseHeaders: boolean,
     showVariables: false,
+    validateVariables: false,
   }
 }
 
