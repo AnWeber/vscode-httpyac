@@ -50,7 +50,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
         }));
       }
 
-      if (!config?.codelens?.showVariables) {
+      if (config?.codelens?.showVariables) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.showVariables,
           title: 'show variables'
