@@ -556,17 +556,65 @@
           ],
           "description": "log level of output channel"
         },
-        "httpyac.logResponseBodyLength": {
-          "type": "number",
-          "default": 0,
-          "scope": "resource",
-          "description": "length of response body in output channel requests"
-        },
         "httpyac.logRequest": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
           "description": "log request in output channel requests"
+        },
+        "httpyac.logOutputChannelOptions": {
+          "type": "object",
+          "default": {
+            "requestOutput": true,
+            "requestHeaders": true,
+            "requestBodyLength": 1024,
+            "responseHeaders": true,
+            "responseBodyLength": 1024
+          },
+          "properties": {
+            "useShort": {
+              "type": "boolean",
+              "default": false,
+              "description": "log only request line and status line"
+            },
+            "requestOutput": {
+              "type": "boolean",
+              "default": true,
+              "description": "log request"
+            },
+            "requestHeaders": {
+              "type": "boolean",
+              "default": true,
+              "description": "log request headers"
+            },
+            "requestBodyLength": {
+              "type": "number",
+              "default": 1024,
+              "description": "log request body character length"
+            },
+            "responseHeaders": {
+              "type": "boolean",
+              "default": true,
+              "description": "log response headers"
+            },
+            "responseBodyPrettyPrint": {
+              "type": "boolean",
+              "default": false,
+              "description": "use pretty print output if available"
+            },
+            "responseBodyLength": {
+              "type": "number",
+              "default": 1024,
+              "description": "log response body character length"
+            },
+            "onlyFailed": {
+              "type": "boolean",
+              "default": false,
+              "description": "log only requests with failed tests"
+            }
+          },
+          "scope": "resource",
+          "description": "options to modify output logging"
         },
         "httpyac.useCodeLensInNotebook": {
           "type": "boolean",

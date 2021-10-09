@@ -36,7 +36,7 @@ export interface ResourceConfig {
   envDirName?: string,
   rootDir?: string,
   logLevel?: string,
-  logResponseBodyLength?:number,
+  logOutputChannelOptions?:httpyac.utils.RequestLoggerFactoryOptions,
   logRequest?: boolean,
 }
 

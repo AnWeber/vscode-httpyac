@@ -11,6 +11,8 @@ export interface ResponseHandlerResult{
 export interface ResponseItem {
   created: Date;
   name: string;
+  description: string;
+  tooltip: string;
   response: httpyac.HttpResponse;
   httpRegion?: httpyac.HttpRegion;
   document?: vscode.TextDocument;

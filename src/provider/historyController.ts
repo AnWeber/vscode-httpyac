@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as httpyac from 'httpyac';
 import { DisposeProvider, getTimeAgo } from '../utils';
 import { commands } from '../config';
 import { ResponseStore } from '../responseStore';
@@ -9,8 +8,8 @@ import { errorHandler } from './errorHandler';
 class ResponseTreeItem extends vscode.TreeItem {
   constructor(readonly responseItem: ResponseItem) {
     super(responseItem.name);
-    this.description = `${responseItem.response.statusCode} - ${getTimeAgo(responseItem.created)}`;
-    this.tooltip = httpyac.utils.toHttpString(responseItem.response);
+    this.description = `${responseItem.description} - ${getTimeAgo(responseItem.created)}`;
+    this.tooltip = responseItem.tooltip;
     this.iconPath = new vscode.ThemeIcon('gist');
     this.command = {
       title: 'show response',

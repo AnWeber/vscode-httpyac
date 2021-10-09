@@ -56,6 +56,8 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
       responseItem = {
         name: this.getName(response, httpRegion),
         created: new Date(),
+        description: `${response.statusCode}`,
+        tooltip: httpyac.utils.toHttpString(response),
         response,
         httpRegion,
       };
