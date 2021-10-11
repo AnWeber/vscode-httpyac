@@ -1,3 +1,14 @@
+## 4.2.0 (2021-10-10)
+
+#### Features
+* ViewMode `reuse` saves file to prevent unwanted Save Dialog
+* accept output options for utils.toHttpString
+* response in HttpRegion is deleted after run to optimize memory
+* history saves response to file, to reduce memory
+
+#### Fix
+* variables with `2` got not replaced in Javascript Substitution 
+
 ## 4.1.1 (2021-10-06)
 
 #### Features

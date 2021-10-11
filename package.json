@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, SOAP, and GraphQL requests directly within Visual Studio Code",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -885,6 +885,12 @@
         "title": "Remove History item",
         "category": "httpYac",
         "icon": "$(close)"
+      },
+      {
+        "command": "httpyac.pruneStorage",
+        "title": "remove all files in cache dir",
+        "category": "httpYac",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -927,10 +933,6 @@
         },
         {
           "command": "httpyac.validateVariables",
-          "when": "editorLangId == http"
-        },
-        {
-          "command": "httpyac.viewHeader",
           "when": "editorLangId == http"
         },
         {
@@ -1140,15 +1142,15 @@
     "eslint": "^7.32.0",
     "eslint-plugin-node": "^11.1.0",
     "husky": "^7.0.2",
-    "lint-staged": "^11.2.0",
+    "lint-staged": "^11.2.3",
     "lockfile-lint": "^4.6.2",
     "typescript": "^4.4.3"
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.1.1",
+    "httpyac": "^4.2.1",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.33",
-    "tmp-promise": "^3.0.2"
+		"uuid": "^8.3.2"
   }
 }

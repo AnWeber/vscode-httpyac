@@ -5,11 +5,13 @@ import { errorHandler } from './errorHandler';
 import * as utils from '../utils';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
+import { ResponseStore } from '../responseStore';
 
 export class CodeLensProvider extends DisposeProvider implements vscode.CodeLensProvider {
 
   constructor(
     private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore,
   ) {
     super();
     this.subscriptions = [
@@ -87,31 +89,15 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
           }
         }
 
-        if (httpRegion.testResults && config?.codelens?.testResult) {
-          result.push(new vscode.CodeLens(range, {
-            arguments: [httpRegion],
-            title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${httpRegion.testResults.length}`,
-            command: commands.viewHeader
-          }));
-        }
-
-        if (httpyac.utils.isHttpRequest(httpRegion.request)) {
-          if (config?.codelens?.generateCode && config.generateCodeDefaultLanguage) {
+        const responseItem = await this.responseStore.findResponseByHttpRegion(httpRegion);
+        if (responseItem) {
+          if (httpRegion.testResults && config?.codelens?.testResult) {
             result.push(new vscode.CodeLens(range, {
-              command: commands.generateCode,
-              arguments: args,
-              title: `generate ${config.generateCodeDefaultLanguage.target}${config.generateCodeDefaultLanguage.client ? ` - ${config.generateCodeDefaultLanguage.client}` : ''}`
+              arguments: [httpRegion],
+              title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${httpRegion.testResults.length}`,
+              command: commands.viewHeader
             }));
           }
-          if (config?.codelens?.generateCodeSelectLanguage) {
-            result.push(new vscode.CodeLens(range, {
-              command: commands.generateCodeSelectLanguage,
-              arguments: args,
-              title: 'generate code'
-            }));
-          }
-        }
-        if (httpRegion.response) {
           if (config?.codelens?.showResponse) {
             result.push(new vscode.CodeLens(range, {
               command: commands.show,
@@ -133,6 +119,22 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
               command: commands.viewHeader,
               arguments: args,
               title: 'show headers'
+            }));
+          }
+        }
+        if (httpyac.utils.isHttpRequest(httpRegion.request)) {
+          if (config?.codelens?.generateCode && config.generateCodeDefaultLanguage) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.generateCode,
+              arguments: args,
+              title: `generate ${config.generateCodeDefaultLanguage.target}${config.generateCodeDefaultLanguage.client ? ` - ${config.generateCodeDefaultLanguage.client}` : ''}`
+            }));
+          }
+          if (config?.codelens?.generateCodeSelectLanguage) {
+            result.push(new vscode.CodeLens(range, {
+              command: commands.generateCodeSelectLanguage,
+              arguments: args,
+              title: 'generate code'
             }));
           }
         }

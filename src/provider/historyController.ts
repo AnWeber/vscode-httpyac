@@ -4,12 +4,13 @@ import { commands } from '../config';
 import { ResponseStore } from '../responseStore';
 import { DocumentStore, ResponseItem } from '../extensionApi';
 import { errorHandler } from './errorHandler';
+import * as httpyac from 'httpyac';
 
 class ResponseTreeItem extends vscode.TreeItem {
   constructor(readonly responseItem: ResponseItem) {
     super(responseItem.name);
-    this.description = `${responseItem.description} - ${getTimeAgo(responseItem.created)}`;
-    this.tooltip = responseItem.tooltip;
+    this.description = `${responseItem.response.statusCode} - ${getTimeAgo(responseItem.created)}`;
+    this.tooltip = httpyac.utils.toHttpString(responseItem.response);
     this.iconPath = new vscode.ThemeIcon('gist');
     this.command = {
       title: 'show response',
@@ -76,13 +77,13 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
         }
       }
     }
-    this.responseStore.clear();
+    await this.responseStore.clear();
   }
 
   @errorHandler()
   private async removeHistory(responseItem: ResponseItem): Promise<void> {
     if (responseItem) {
-      this.responseStore.remove(responseItem);
+      await this.responseStore.remove(responseItem);
     }
   }
 }

@@ -1,28 +1,23 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 
-export interface ResponseHandlerResult{
-  document: vscode.TextDocument;
-  editor: vscode.TextEditor;
-  uri?: vscode.Uri;
-}
-
 
 export interface ResponseItem {
-  created: Date;
-  name: string;
-  description: string;
-  tooltip: string;
-  response: httpyac.HttpResponse;
-  httpRegion?: httpyac.HttpRegion;
-  document?: vscode.TextDocument;
-  uri?: vscode.Uri;
+  readonly id: string;
+  readonly created: Date;
+  readonly name: string;
+  readonly openWith?: string;
+  readonly extension: string;
+  readonly testResults?: Array<httpyac.TestResult>;
+  readonly metaData: Record<string, unknown>;
+  readonly response: httpyac.HttpResponse;
+  responseUri?: vscode.Uri;
+  documentUri?: vscode.Uri;
+  isCachedResponse: boolean;
+  loadResponseBody?(): Promise<void>;
 }
 
-export type ResponseHandler = (
-  response: httpyac.HttpResponse,
-  httpRegion?: httpyac.HttpRegion
-) => Promise<boolean | ResponseHandlerResult>;
+export type ResponseHandler = (responseItem: ResponseItem) => Promise<boolean>;
 
 export interface ResponseOutputProcessor{
   show: httpyac.RequestLogger;
@@ -44,8 +39,8 @@ export interface DocumentStore{
 export interface ResponseStore {
   readonly historyChanged: vscode.Event<void>;
   add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void>;
-  remove(responseItem: ResponseItem): boolean
-  clear(): void;
+  remove(responseItem: ResponseItem): Promise<boolean>;
+  clear(): Promise<void>;
 }
 
 export interface HttpYacExtensionApi{

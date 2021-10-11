@@ -1,22 +1,24 @@
-import { HttpRegion, HttpResponse } from 'httpyac';
-import { window, workspace } from 'vscode';
-import { getExtension } from './responseHandlerUtils';
+import * as vscode from 'vscode';
+import { ResponseItem } from '../extensionApi';
 
 
-export async function saveFileResponseHandler(response: HttpResponse, httpRegion?: HttpRegion): Promise<boolean> {
-  if (response?.rawBody && httpRegion?.metaData?.save) {
+export async function saveFileResponseHandler(responseItem: ResponseItem): Promise<boolean> {
+  if (responseItem.metaData.save) {
+    await responseItem.loadResponseBody?.();
+    if (!responseItem.response?.rawBody) {
+      return false;
+    }
     const filters: Record<string, Array<string>> = {
       'All Files': ['*']
     };
-    const ext = getExtension(response, httpRegion);
-    if (ext) {
-      filters[ext] = [ext];
+    if (responseItem.extension) {
+      filters[responseItem.extension] = [responseItem.extension];
     }
-    const uri = await window.showSaveDialog({
+    const uri = await vscode.window.showSaveDialog({
       filters
     });
-    if (uri && response.rawBody) {
-      await workspace.fs.writeFile(uri, response.rawBody);
+    if (uri && responseItem.response.rawBody) {
+      await vscode.workspace.fs.writeFile(uri, responseItem.response.rawBody);
       return true;
     }
   }

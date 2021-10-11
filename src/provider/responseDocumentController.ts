@@ -2,7 +2,6 @@ import * as httpyac from 'httpyac';
 
 import * as vscode from 'vscode';
 import { getConfigSetting, commands } from '../config';
-import { TempPathFolder } from '../view/responseHandlerUtils';
 import { DisposeProvider } from '../utils';
 import { ResponseStore } from '../responseStore';
 
@@ -15,10 +14,8 @@ export class ResponseDocumentController
     super();
 
     const documentFilter = [{
-      scheme: 'untitled',
-    }, {
       scheme: 'file',
-      pattern: `**/${TempPathFolder}/**`
+      pattern: '**/_httpyac_/**'
     }];
 
     this.subscriptions = [
@@ -27,16 +24,16 @@ export class ResponseDocumentController
     ];
   }
 
-  public provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
+  public async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     const result: Array<vscode.CodeLens> = [];
 
     const cacheItem = this.responseStore.findResponseByDocument(document);
-    if (cacheItem && cacheItem.response) {
-      const response = cacheItem.response;
+    if (cacheItem?.response) {
+      const response = await cacheItem.response;
       const lenses = [`${response.protocol} ${response.statusCode}${response.statusMessage ? ` - ${response.statusMessage}` : ''}`];
 
-      if (cacheItem.httpRegion?.testResults) {
-        lenses.push(`TestResults ${cacheItem.httpRegion.testResults.filter(obj => obj.result).length}/${cacheItem.httpRegion.testResults.length}`);
+      if (cacheItem?.testResults) {
+        lenses.push(`TestResults ${cacheItem.testResults.filter(obj => obj.result).length}/${cacheItem.testResults.length}`);
       }
       const headers = getConfigSetting().responseViewHeader;
       if (headers) {
@@ -55,9 +52,9 @@ export class ResponseDocumentController
             }
           }
           const testsProperty = 'tests.';
-          if (headerName.startsWith(testsProperty) && cacheItem.httpRegion?.testResults) {
+          if (headerName.startsWith(testsProperty) && cacheItem?.testResults) {
             const prop = headerName.slice(metaProperty.length);
-            const testResults = cacheItem.httpRegion.testResults;
+            const testResults = cacheItem.testResults;
             if (prop === 'failed') {
               return `${prop}: ${testResults.filter(obj => !obj.result).length}`;
             }
@@ -77,23 +74,23 @@ export class ResponseDocumentController
       }
       result.push(
         ...lenses.map(title => new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-          arguments: [cacheItem.httpRegion],
+          arguments: [cacheItem],
           title,
           command: commands.viewHeader
         }))
       );
     }
 
-    return Promise.resolve(result);
+    return result;
   }
 
 
-  provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
+  async provideHover(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {
     if (position.line === 0) {
       const responseItem = this.responseStore.findResponseByDocument(document);
       if (responseItem?.response) {
         const responseHover = httpyac.utils.toMarkdown(responseItem.response, {
-          testResults: responseItem.httpRegion?.testResults,
+          testResults: responseItem?.testResults,
           responseBody: false,
           requestBody: false,
           timings: true,

@@ -1,31 +1,20 @@
-import { HttpRegion, HttpResponse, utils } from 'httpyac';
-import { commands, extensions, Uri } from 'vscode';
-import { getExtension, writeTempFileName } from './responseHandlerUtils';
+import { commands } from 'vscode';
+import { ResponseHandler, ResponseItem } from '../extensionApi';
+import { StorageProvider } from '../io';
 
-
-export async function openWithResponseHandler(response: HttpResponse, httpRegion?: HttpRegion): Promise<boolean> {
-  const openWith = getOpenWith(response, httpRegion);
-  if (response?.rawBody && openWith) {
-    const fileName = await writeTempFileName(response.rawBody, utils.getDisplayName(httpRegion, 'response'), getExtension(response, httpRegion));
-    if (fileName) {
-      await commands.executeCommand('vscode.openWith', Uri.file(fileName), openWith);
-      return true;
+export function openWithResponseHandlerFactory(storageProvider: StorageProvider) : ResponseHandler {
+  return async function openWithResponseHandler(responseItem: ResponseItem): Promise<boolean> {
+    if (responseItem.openWith) {
+      await responseItem.loadResponseBody?.();
+      if (responseItem.response?.rawBody) {
+        const uri = await storageProvider.writeFile(responseItem.response.rawBody, `${responseItem.name}.${responseItem.extension}`);
+        if (uri) {
+          responseItem.documentUri = uri;
+          await commands.executeCommand('vscode.openWith', uri, responseItem.openWith);
+          return true;
+        }
+      }
     }
-  }
-  return false;
-}
-
-function getOpenWith(response: HttpResponse, httpRegion?: HttpRegion): string | undefined {
-
-  if (httpRegion?.metaData?.openWith) {
-    return httpRegion.metaData.openWith;
-  }
-  if (utils.isMimeTypeImage(response.contentType)) {
-    return 'imagePreview.previewEditor';
-  }
-  if (utils.isMimeTypePdf(response.contentType)
-    && extensions.getExtension('tomoki1207.pdf')) {
-    return 'pdf.preview';
-  }
-  return undefined;
+    return false;
+  };
 }

@@ -4,36 +4,30 @@ import { ResponseHandler, ResponseItem, ResponseStore as IResponseStore } from '
 import * as view from './view';
 import { DisposeProvider } from './utils';
 import { getConfigSetting } from './config';
-
+import { StorageProvider } from './io';
 
 export class ResponseStore extends DisposeProvider implements IResponseStore {
-  readonly responseCache: Array<ResponseItem> = [];
+  readonly responseCache: Array<view.ResponseItem> = [];
   private readonly refreshHistory: vscode.EventEmitter<void>;
-  private prettyPrintDocuments: Array<vscode.TextDocument> = [];
+  private prettyPrintDocuments: Array<vscode.Uri> = [];
 
+  readonly responseHandlers: Array<ResponseHandler>;
 
-  readonly responseHandlers: Array<ResponseHandler> = [
-    view.saveFileResponseHandler,
-    view.openWithResponseHandler,
-    view.previewDocumentResponseHandler,
-    view.reuseDocumentResponseHandler,
-    view.openDocumentResponseHandler,
-  ];
-
-  constructor() {
+  constructor(
+    private readonly storageProvider: StorageProvider
+  ) {
     super();
+    this.responseHandlers = [
+      view.saveFileResponseHandler,
+      view.openWithResponseHandlerFactory(storageProvider),
+      view.previewResponseHandlerFactory(storageProvider),
+    ];
     this.subscriptions = [
       vscode.window.onDidChangeActiveTextEditor(async editor => {
-        const indexOfDocument = editor?.document && this.prettyPrintDocuments.indexOf(editor.document) || -1;
+        const indexOfDocument = editor?.document && this.prettyPrintDocuments.indexOf(editor.document.uri) || -1;
         if (editor && indexOfDocument >= 0) {
           await this.prettyPrint(editor);
           this.prettyPrintDocuments.splice(indexOfDocument, 1);
-        }
-      }),
-      vscode.workspace.onDidCloseTextDocument(document => {
-        const responseItem = this.findResponseByDocument(document);
-        if (responseItem) {
-          this.removeDocument(responseItem);
         }
       }),
     ];
@@ -45,43 +39,45 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     return this.refreshHistory.event;
   }
 
-  findResponseByDocument(document: vscode.TextDocument): Readonly<ResponseItem> | undefined {
-    return this.responseCache.find(obj => obj.document === document);
+  findResponseByDocument(document: vscode.TextDocument): view.ResponseItem | undefined {
+    const docUri = document.uri.toString();
+    return this.responseCache.find(obj => obj.documentUri?.toString() === docUri);
+  }
+
+  findResponseByHttpRegion(httpRegion: httpyac.HttpRegion): view.ResponseItem | undefined {
+    return this.responseCache.find(obj => obj.name === httpRegion.symbol.name && obj.line === httpRegion.symbol.startLine);
   }
 
   public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void> {
+    const responseItem = new view.ResponseItem(response, httpRegion);
+    await this.show(responseItem);
+    this.addToCache(responseItem);
+  }
+
+
+  private shrinkResponseItem(response: httpyac.HttpResponse) {
+    delete response.request?.body;
+    delete response.parsedBody;
+    delete response.body;
+    delete response.rawBody;
+    delete response.prettyPrintBody;
+  }
+
+  private addToCache(responseItem: view.ResponseItem) {
     const config = getConfigSetting();
-    let responseItem = this.responseCache.find(obj => obj.response === response);
-    if (!responseItem && config.maxHistoryItems && config.maxHistoryItems > 0) {
-      responseItem = {
-        name: this.getName(response, httpRegion),
-        created: new Date(),
-        description: `${response.statusCode}`,
-        tooltip: httpyac.utils.toHttpString(response),
-        response,
-        httpRegion,
-      };
-      this.responseCache.splice(0, 0, responseItem);
-      this.responseCache.length = Math.min(this.responseCache.length, config.maxHistoryItems);
-      this.refreshHistory.fire();
-      vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
-      await this.show(responseItem);
-    }
+    this.responseCache.splice(0, 0, responseItem);
+    this.responseCache.length = Math.min(this.responseCache.length, config.maxHistoryItems || 50);
+    this.refreshHistory.fire();
+    vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
   }
 
-  private getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
-    if (httpRegion) {
-      return httpRegion.symbol.name;
-    }
-    if (response.request) {
-      return `${response.request?.method} ${response.request?.url}`;
-    }
-    return `${response.protocol} ${response.statusCode}`;
-  }
 
-  remove(responseItem: ResponseItem): boolean {
-    const index = this.responseCache.indexOf(responseItem);
+  async remove(responseItem: ResponseItem): Promise<boolean> {
+    const index = this.responseCache.findIndex(obj => obj.id === responseItem.id);
     if (index >= 0) {
+      if (responseItem.responseUri) {
+        await this.storageProvider.deleteFile(responseItem.responseUri);
+      }
       this.responseCache.splice(index, 1);
       this.refreshHistory.fire();
       if (this.responseCache.length === 0) {
@@ -92,58 +88,61 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     return false;
   }
 
-  clear(): void {
+  async clear(): Promise<void> {
+    for (const responseItem of this.responseCache) {
+      if (responseItem.responseUri) {
+        await this.storageProvider.deleteFile(responseItem.responseUri);
+      }
+    }
     this.responseCache.length = 0;
     this.refreshHistory.fire();
     vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', false);
   }
 
+
+  public async shrink(responseItem: ResponseItem): Promise<void> {
+    const response = responseItem.response;
+    if (response.rawBody) {
+      const responseUri = responseItem.responseUri || await this.storageProvider.writeFile(response.rawBody, `${responseItem.id}.${responseItem.extension}`);
+      if (responseUri) {
+        this.shrinkResponseItem(response);
+        responseItem.responseUri = responseUri;
+        responseItem.isCachedResponse = true;
+        responseItem.loadResponseBody = async () => {
+          const buffer = await vscode.workspace.fs.readFile(responseUri);
+          response.rawBody = Buffer.from(buffer);
+          response.body = response.rawBody.toString('utf-8');
+          responseItem.isCachedResponse = false;
+          delete responseItem.loadResponseBody;
+        };
+      } else {
+        await this.remove(responseItem);
+      }
+    }
+  }
+
   public async show(responseItem: ResponseItem): Promise<void> {
     for (const responseHandler of this.responseHandlers) {
-      const result = await responseHandler(responseItem.response, responseItem.httpRegion);
+      const result = await responseHandler(responseItem);
       if (result) {
-        if (result !== true) {
-          await this.prettyPrint(result.editor);
-
-          result.editor.revealRange(new vscode.Range(0, 0, result.editor.document.lineCount, 0), vscode.TextEditorRevealType.AtTop);
-
-          const cacheItem = this.responseCache.find(obj => obj.document === result.document);
-          if (cacheItem) {
-            await this.removeDocument(cacheItem);
-          }
-          responseItem.document = result.document;
-          responseItem.uri = result.uri;
+        if (getConfigSetting().responseViewPrettyPrint && vscode.window.activeTextEditor) {
+          await this.prettyPrint(vscode.window.activeTextEditor);
         }
-        return;
+        break;
       }
     }
 
+    await this.shrink(responseItem);
   }
 
   private async prettyPrint(editor: vscode.TextEditor): Promise<void> {
     if (editor) {
       if (vscode.window.activeTextEditor?.document === editor.document) {
-        if (await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', vscode.window.activeTextEditor)) {
-          this.prettyPrintDocuments.push(editor.document);
+        if (await vscode.commands.executeCommand<boolean>('editor.action.formatDocument', editor)) {
+          this.prettyPrintDocuments.push(editor.document.uri);
         }
       } else {
-        this.prettyPrintDocuments.push(editor.document);
-      }
-    }
-  }
-
-  private async removeDocument(responseItem: ResponseItem): Promise<void> {
-    if (responseItem.document) {
-      try {
-        if (responseItem.uri) {
-          await vscode.workspace.fs.delete(responseItem.uri);
-        }
-      } catch (err) {
-        httpyac.io.log.error(err);
-      } finally {
-        delete responseItem.uri;
-        delete responseItem.document;
-        delete responseItem.httpRegion;
+        this.prettyPrintDocuments.push(editor.document.uri);
       }
     }
   }

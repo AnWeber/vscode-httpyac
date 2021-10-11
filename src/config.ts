@@ -22,6 +22,7 @@ export const commands = {
   showHistory: `${APP_NAME}.showHistory`,
   removeHistory: `${APP_NAME}.removeHistory`,
   showHistoryResponse: `${APP_NAME}.showHistoryResponse`,
+  pruneStorage: `${APP_NAME}.pruneStorage`,
 };
 
 export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';

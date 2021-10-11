@@ -2,24 +2,22 @@ import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { commands, getEnvironmentConfig } from '../config';
 import { errorHandler } from './errorHandler';
-import { extension } from 'mime-types';
-import { file } from 'tmp-promise';
 import * as utils from '../utils';
+import { StorageProvider } from '../io';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
-import { openJsonInTextEditor } from '../view/responseHandlerUtils';
 import { ResponseStore } from '../responseStore';
+import { ResponseItem } from '../view';
 
 
 export class RequestCommandsController extends DisposeProvider {
-
-  private tmpFiles: Array<vscode.Uri> = [];
 
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(
     private readonly documentStore: DocumentStore,
     private readonly responseStore: ResponseStore,
+    private readonly storageProvider: StorageProvider
   ) {
     super();
     this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
@@ -35,17 +33,6 @@ export class RequestCommandsController extends DisposeProvider {
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
       vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
-      vscode.workspace.onDidCloseTextDocument(async doc => {
-        const index = this.tmpFiles.indexOf(doc.uri);
-        if (index >= 0) {
-          try {
-            this.tmpFiles.splice(index, 1);
-            await vscode.workspace.fs.delete(doc.uri);
-          } catch (err) {
-            httpyac.io.log.error(err);
-          }
-        }
-      })
     ];
   }
 
@@ -106,7 +93,7 @@ export class RequestCommandsController extends DisposeProvider {
       const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
 
       const pickedObjs = await vscode.window.showQuickPick(httpRegions.map(httpRegion => ({
-        label: httpyac.utils.getDisplayName(httpRegion),
+        label: httpRegion.symbol.name,
         data: httpRegion
       })), {
         placeHolder: 'select requests',
@@ -153,8 +140,8 @@ export class RequestCommandsController extends DisposeProvider {
   @errorHandler()
   private async show(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    if (context?.httpRegion?.response) {
-      const responseItem = this.responseStore.responseCache.find(obj => obj.response === context.httpRegion.response);
+    if (context?.httpRegion) {
+      const responseItem = this.responseStore.findResponseByHttpRegion(context.httpRegion);
       if (responseItem) {
         await this.responseStore.show(responseItem);
       }
@@ -183,7 +170,11 @@ export class RequestCommandsController extends DisposeProvider {
         ...variables
       };
     }
-    openJsonInTextEditor('variables', JSON.stringify(variables, null, 2));
+
+    const uri = await this.storageProvider.writeFile(Buffer.from(JSON.stringify(variables, null, 2)), 'variables.json');
+    if (uri) {
+      await utils.showTextEditor(uri);
+    }
   }
 
   @errorHandler()
@@ -213,33 +204,34 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async viewHeader(document: utils.DocumentArgument | httpyac.HttpRegion | undefined, line: utils.LineArgument) : Promise<void> {
+  private async viewHeader(document: utils.DocumentArgument | ResponseItem | undefined, line: utils.LineArgument) : Promise<void> {
     if (document) {
-      let httpRegion: httpyac.HttpRegion | undefined;
-      if (this.isHttpRegion(document)) {
-        httpRegion = document;
+      let responseItem: ResponseItem | undefined;
+      if (document instanceof ResponseItem) {
+        responseItem = document;
       } else {
         const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
         if (context) {
-          httpRegion = context.httpRegion;
+          responseItem = this.responseStore.findResponseByHttpRegion(context.httpRegion);
         }
       }
+      if (responseItem) {
+        if (responseItem?.response) {
+          await responseItem.loadResponseBody?.();
 
-      if (httpRegion?.response) {
-        const content = httpyac.utils.toMarkdown(httpRegion.response, {
-          testResults: httpRegion.testResults,
-          meta: true,
-          timings: true,
-          responseBody: true,
-          requestBody: true,
-          prettyPrint: true,
-        });
-        const { path } = await file({ postfix: '.md' });
-        const uri = vscode.Uri.file(path);
-        if (uri) {
-          await vscode.workspace.fs.writeFile(uri, Buffer.from(content, 'utf-8'));
-          this.tmpFiles.push(uri);
-          await vscode.commands.executeCommand('vscode.openWith', uri, 'vscode.markdown.preview.editor');
+          const content = httpyac.utils.toMarkdown(responseItem.response, {
+            testResults: responseItem.testResults,
+            meta: true,
+            timings: true,
+            responseBody: true,
+            requestBody: true,
+            prettyPrint: true,
+          });
+          const uri = await this.storageProvider.writeFile(Buffer.from(content), `${responseItem.name}.md`);
+          if (uri) {
+            await vscode.commands.executeCommand('vscode.openWith', uri, 'vscode.markdown.preview.editor');
+          }
+          await this.responseStore.shrink(responseItem);
         }
       }
     }
@@ -248,18 +240,22 @@ export class RequestCommandsController extends DisposeProvider {
   @errorHandler()
   private async save(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    if (context?.httpRegion?.response) {
-      const { response, metaData } = context.httpRegion;
-      const ext = metaData.extension || extension(response.contentType?.contentType || 'application/octet-stream');
-      const filters: Record<string, Array<string>> = {};
-      if (ext) {
-        filters[ext] = [ext];
-      }
-      const uri = await vscode.window.showSaveDialog({
-        filters
-      });
-      if (uri && response.rawBody) {
-        await vscode.workspace.fs.writeFile(uri, new Uint8Array(response.rawBody));
+    if (context?.httpRegion) {
+      const responseItem = this.responseStore.findResponseByHttpRegion(context.httpRegion);
+      if (responseItem?.response) {
+        await responseItem.loadResponseBody?.();
+        const ext = responseItem.extension;
+        const filters: Record<string, Array<string>> = {};
+        if (ext) {
+          filters[ext] = [ext];
+        }
+        const uri = await vscode.window.showSaveDialog({
+          filters
+        });
+        if (uri && responseItem.response.rawBody) {
+          await vscode.workspace.fs.writeFile(uri, new Uint8Array(responseItem.response.rawBody));
+        }
+        await this.responseStore.shrink(responseItem);
       }
     }
   }
@@ -269,10 +265,5 @@ export class RequestCommandsController extends DisposeProvider {
     const language = 'http';
     const document = await vscode.workspace.openTextDocument({ language, content: '' });
     await vscode.window.showTextDocument(document);
-  }
-
-  private isHttpRegion(obj: unknown): obj is httpyac.HttpRegion {
-    const guard = obj as httpyac.HttpRegion;
-    return !!guard.symbol && !!guard.metaData;
   }
 }
