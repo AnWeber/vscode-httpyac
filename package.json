@@ -1098,7 +1098,7 @@
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.1.1",
+    "httpyac": "^4.2.0",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.33",
     "tmp-promise": "^3.0.2"
