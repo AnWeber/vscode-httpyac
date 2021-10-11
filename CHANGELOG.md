@@ -8,6 +8,7 @@
 
 #### Fix
 * variables with `2` got not replaced in Javascript Substitution 
+* infinte loop if `@ref` in `@import` disabled or not found
 
 ## 4.1.1 (2021-10-06)
 
