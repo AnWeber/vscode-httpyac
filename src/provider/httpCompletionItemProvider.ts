@@ -33,6 +33,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     result.push(...this.getRequstMethodCompletionItems(textLine, isInRequestLine));
     result.push(...this.getRequestHeaders(textLine, isInRequestLine));
     result.push(...this.getMimetypes(textLine, isInRequestLine));
+    result.push(...this.getAuthorization(textLine, isInRequestLine));
     result.push(...this.getMetaData(textLine, isInRequestLine));
     result.push(...(await this.getRefName(textLine, httpFile)));
 
@@ -179,17 +180,49 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
   private getMimetypes(line: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
     if (isInRequestLine && line.toLowerCase().indexOf('content-type') >= 0) {
-      const result = Object.entries(types).map(([key, value]) => ({
-        name: value,
-        description: key,
-        kind: vscode.CompletionItemKind.Value,
-      }));
+      const result = Object.entries(types)
+        .map(([key, value]) => ({
+          name: value,
+          description: key,
+          kind: vscode.CompletionItemKind.Value,
+        }));
       result.push({
         name: 'application/x-www-form-urlencoded',
         description: 'application/x-www-form-urlencoded',
         kind: vscode.CompletionItemKind.Value,
       });
       return result;
+    }
+    return [];
+  }
+
+  private getAuthorization(line: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
+    if (isInRequestLine && line.toLowerCase().indexOf('authorization') >= 0) {
+      return [{
+        name: 'Basic',
+        description: 'Basic Authentication',
+        kind: vscode.CompletionItemKind.Value,
+      }, {
+        name: 'Digest',
+        description: 'Digest Authentication',
+        kind: vscode.CompletionItemKind.Value,
+      }, {
+        name: 'AWS',
+        description: 'AWS Signnature v4',
+        kind: vscode.CompletionItemKind.Value,
+      }, {
+        name: 'OAuth2',
+        description: 'OAuth2',
+        kind: vscode.CompletionItemKind.Value,
+      }, {
+        name: 'OpenId',
+        description: 'OpenId',
+        kind: vscode.CompletionItemKind.Value,
+      }, {
+        name: 'Bearer',
+        description: 'Bearer Authentication',
+        kind: vscode.CompletionItemKind.Value,
+      }];
     }
     return [];
   }
