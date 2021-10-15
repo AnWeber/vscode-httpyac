@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { commands, getEnvironmentConfig } from '../config';
+import { commands, getEnvironmentConfig, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import * as utils from '../utils';
 import { StorageProvider } from '../io';
@@ -115,7 +115,7 @@ export class RequestCommandsController extends DisposeProvider {
 
     if (context) {
       await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
+        location: getConfigSetting().progressDefaultLocation === 'window' ? vscode.ProgressLocation.Window : vscode.ProgressLocation.Notification,
         cancellable: true,
         title: 'send',
       }, async (progress, token) => {

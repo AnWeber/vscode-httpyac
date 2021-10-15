@@ -45,8 +45,9 @@ export class HarCommandsController extends DisposeProvider {
 
   private async generateCodeRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext, codeTarget: {target: string, client: string}) {
     if (context) {
+      const config = getConfigSetting();
       await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
+        location: config.progressDefaultLocation === 'window' ? vscode.ProgressLocation.Window : vscode.ProgressLocation.Notification,
         cancellable: true,
         title: 'create har',
       }, async (progress, token) => {
@@ -63,7 +64,7 @@ export class HarCommandsController extends DisposeProvider {
           const harRequest: Request = this.getHarRequest(request);
           const snippet = new HttpSnippet(harRequest);
           const content = snippet.convert(codeTarget.target, codeTarget.client);
-          if (getConfigSetting().generateCodeTargetOutput === 'clipboard') {
+          if (config.generateCodeTargetOutput === 'clipboard') {
             await vscode.env.clipboard.writeText(content);
           } else {
             const document = await vscode.workspace.openTextDocument({

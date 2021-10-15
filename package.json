@@ -800,6 +800,20 @@
           "default": "none",
           "scope": "window",
           "description": "default color for statusbaritem, if changed corresponding color is used for default env detection"
+        },
+        "httpyac.progressDefaultLocation": {
+          "type": "string",
+          "enum": [
+            "window",
+            "notification"
+          ],
+          "markdownEnumDescriptions": [
+            "Show progress in the status bar of the editor. Neither supports cancellation nor discrete progress.",
+            "Show progress as notification with an optional cancel button. Supports to show infinite and discrete progress."
+          ],
+          "default": "notification",
+          "scope": "window",
+          "description": "The location at which progress should show."
         }
       }
     },

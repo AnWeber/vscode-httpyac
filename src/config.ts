@@ -87,7 +87,8 @@ export interface AppConfig {
     showResponseHeaders: boolean,
     showVariables: false,
     validateVariables: false,
-  }
+  },
+  progressDefaultLocation?: 'notification' | 'window';
 }
 
 export function getConfigSetting() : AppConfig {
