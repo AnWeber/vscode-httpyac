@@ -45,6 +45,10 @@ export interface ResourceConfig {
 export interface AppConfig {
   environmentSelectedOnStart?: Array<string>,
   environmentStoreSelectedOnStart?: boolean,
+  environmentStatusBarItemDefaultBackground?: 'none' | 'warning' | 'error';
+  environmentStatusBarItemWarningEnvs?: Array<string>;
+  environmentStatusBarItemErrorEnvs?: Array<string>;
+  environmentShowStatusBarItem?: boolean;
   environmentPickMany?:boolean,
   responseViewHeader?:Array<string>,
   responseViewContent?: ResponseViewContent,

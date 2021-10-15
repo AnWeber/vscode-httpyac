@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { APP_NAME, httpDocumentSelector, getConfigSetting, getEnvironmentConfig } from '../config';
-import { UserSession, store, io, HttpFile, getEnvironments } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
 import * as utils from '../utils';
@@ -15,6 +15,12 @@ const commands = {
 export class StoreController extends utils.DisposeProvider implements vscode.CodeLensProvider {
 
   onDidChangeCodeLenses: vscode.Event<void>;
+  private envStatusBarItem: vscode.StatusBarItem;
+
+  private readonly statusBarBackground = {
+    error: new vscode.ThemeColor('statusBarItem.errorBackground'),
+    warning: new vscode.ThemeColor('statusBarItem.warningBackground')
+  };
 
   private environmentChangedEmitter: vscode.EventEmitter<string[] | undefined>;
 
@@ -22,6 +28,9 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     private readonly documentStore: DocumentStore
   ) {
     super();
+    this.envStatusBarItem = vscode.window.createStatusBarItem('vscode_httpyac_env', vscode.StatusBarAlignment.Right);
+    this.envStatusBarItem.hide();
+    this.refreshStatusBarItemWithEditor(vscode.window.activeTextEditor);
     this.environmentChangedEmitter = new vscode.EventEmitter<string[] | undefined>();
     this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
     this.subscriptions = [
@@ -30,8 +39,12 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
       vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
+      vscode.window.onDidChangeActiveTextEditor(async editor => {
+        await this.refreshStatusBarItemWithEditor(editor);
+      }),
     ];
   }
+
 
   get environmentChanged(): vscode.Event<string[] | undefined> {
     return this.environmentChangedEmitter.event;
@@ -51,7 +64,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.toggleEnv,
           arguments: args,
-          title: `env: ${httpFile.activeEnvironment || '-'}`,
+          title: `env: ${this.getEnvironmentTitle(httpFile.activeEnvironment)}`,
         }));
       }
     }
@@ -65,14 +78,14 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       }
     }
 
-    if (store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
+    if (httpyac.store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.logout,
-        title: `oauth2 session (${store.userSessionStore.userSessions.length})`,
+        title: `oauth2 session (${httpyac.store.userSessionStore.userSessions.length})`,
       }));
     }
     if (httpFile && config.codelens?.removeCookies) {
-      const cookies = store.cookieStore.getCookies(httpFile);
+      const cookies = httpyac.store.cookieStore.getCookies(httpFile);
       if (cookies.length > 0) {
         result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
           command: commands.removeCookies,
@@ -84,6 +97,72 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     return result;
   }
 
+  private getEnvironmentTitle(activeEnvironment: string[] | undefined) {
+    if (activeEnvironment && activeEnvironment.length > 0) {
+      return activeEnvironment.join(', ');
+    }
+    return '-';
+  }
+
+
+  private async refreshStatusBarItemWithEditor(editor: vscode.TextEditor | undefined) {
+    if (getConfigSetting().environmentShowStatusBarItem) {
+      if (editor?.document
+        && vscode.languages.match(httpDocumentSelector, editor.document)) {
+        const httpFile = await this.documentStore.getHttpFile(editor.document);
+        this.refreshEnvStatusBarItem(httpFile);
+      } else {
+        this.envStatusBarItem.hide();
+      }
+    }
+  }
+
+  @errorHandler()
+  private refreshEnvStatusBarItem(httpFile: httpyac.HttpFile) {
+    const config = getConfigSetting();
+
+    if (config.environmentShowStatusBarItem) {
+      const env = this.getEnvironmentTitle(httpFile.activeEnvironment);
+      this.envStatusBarItem.text = env;
+      this.envStatusBarItem.command = {
+        command: commands.toggleEnv,
+        arguments: [httpFile.fileName],
+        title: 'reset environments',
+      };
+      this.envStatusBarItem.backgroundColor = this.getDefaultBackgroundColor(config.environmentStatusBarItemDefaultBackground);
+      if (config.environmentStatusBarItemErrorEnvs
+        && config.environmentStatusBarItemErrorEnvs.some(obj => env.indexOf(obj) >= 0)
+      ) {
+        if (config.environmentStatusBarItemDefaultBackground !== 'error') {
+          this.envStatusBarItem.backgroundColor = this.statusBarBackground.error;
+        } else {
+          this.envStatusBarItem.backgroundColor = undefined;
+        }
+      } else if (config.environmentStatusBarItemWarningEnvs
+        && config.environmentStatusBarItemWarningEnvs.some(obj => env.indexOf(obj) >= 0)
+      ) {
+        if (config.environmentStatusBarItemDefaultBackground !== 'warning') {
+          this.envStatusBarItem.backgroundColor = this.statusBarBackground.warning;
+        } else {
+          this.envStatusBarItem.backgroundColor = undefined;
+        }
+      }
+      this.envStatusBarItem.show();
+    } else {
+      this.envStatusBarItem.hide();
+    }
+  }
+
+  private getDefaultBackgroundColor(type?: 'none' | 'warning' | 'error') {
+    if (type === 'error') {
+      return this.statusBarBackground.error;
+    }
+    if (type === 'warning') {
+      return this.statusBarBackground.warning;
+    }
+    return undefined;
+  }
+
 
   @errorHandler()
   private async toggleEnv(document?: utils.DocumentArgument): Promise<void> {
@@ -93,15 +172,16 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       if (httpFile) {
         const env = await this.pickEnv(httpFile);
         httpFile.activeEnvironment = env;
+        this.refreshEnvStatusBarItem(httpFile);
       }
     }
   }
 
   @errorHandler()
-  private async pickEnv(httpFile: HttpFile) {
+  private async pickEnv(httpFile: httpyac.HttpFile) {
 
     const config = getConfigSetting();
-    const envs: Array<string> = await getEnvironments({
+    const envs: Array<string> = await httpyac.getEnvironments({
       httpFile,
       config: await getEnvironmentConfig(httpFile),
     });
@@ -138,12 +218,12 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   }
 
   private async reset(): Promise<void> {
-    await store.userSessionStore.reset();
-    await store.cookieStore.reset();
+    await httpyac.store.userSessionStore.reset();
+    await httpyac.store.cookieStore.reset();
   }
 
   private async logout() : Promise<void> {
-    const userSessions = await vscode.window.showQuickPick(store.userSessionStore.userSessions.map(userSession => ({
+    const userSessions = await vscode.window.showQuickPick(httpyac.store.userSessionStore.userSessions.map(userSession => ({
       id: userSession.id,
       description: userSession.description,
       label: userSession.title,
@@ -152,15 +232,15 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       placeHolder: 'select oauth2 sessions to logout',
       canPickMany: true,
       ignoreFocusOut: true,
-      onDidSelectItem: (item: vscode.QuickPickItem & {data: UserSession}) => {
-        io.log.info(JSON.stringify(item.data, null, 2));
+      onDidSelectItem: (item: vscode.QuickPickItem & {data: httpyac.UserSession}) => {
+        httpyac.io.log.info(JSON.stringify(item.data, null, 2));
       }
     });
 
     if (userSessions) {
       for (const userSession of userSessions) {
-        store.userSessionStore.removeUserSession(userSession.id);
-        io.log.info(`${userSession.label} removed`);
+        httpyac.store.userSessionStore.removeUserSession(userSession.id);
+        httpyac.io.log.info(`${userSession.label} removed`);
       }
     }
   }
@@ -171,7 +251,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     if (editor) {
       const httpFile = await this.documentStore.getHttpFile(editor.document);
       if (httpFile) {
-        const cookies = await vscode.window.showQuickPick(store.cookieStore.getCookies(httpFile)
+        const cookies = await vscode.window.showQuickPick(httpyac.store.cookieStore.getCookies(httpFile)
           .map(cookie => ({
             label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
               .filter(([key]) => ['key', 'value'].indexOf(key) < 0)
@@ -192,12 +272,12 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
           canPickMany: true,
           ignoreFocusOut: true,
           onDidSelectItem: (item: vscode.QuickPickItem & { data: unknown }) => {
-            io.log.info(JSON.stringify(item.data, null, 2));
+            httpyac.io.log.info(JSON.stringify(item.data, null, 2));
           }
         });
 
         if (cookies) {
-          store.cookieStore.removeCookies(httpFile, cookies.map(obj => obj.data));
+          httpyac.store.cookieStore.removeCookies(httpFile, cookies.map(obj => obj.data));
         }
       }
     }

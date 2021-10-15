@@ -16,7 +16,7 @@
   "qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
   "icon": "icon.png",
   "engines": {
-    "vscode": "^1.57.0"
+    "vscode": "^1.61.0"
   },
   "categories": [
     "Other",
@@ -437,18 +437,18 @@
         },
         "httpyac.environmentSelectedOnStart": {
           "type": "array",
-          "scope": "resource",
+          "scope": "window",
           "description": "list of default environment on startup"
         },
         "httpyac.environmentStoreSelectedOnStart": {
           "type": "boolean",
           "default": false,
-          "scope": "resource",
+          "scope": "window",
           "description": "store env in setting `environmentSelectedOnStart` after change"
         },
         "httpyac.environmentPickMany": {
           "type": "boolean",
-          "scope": "resource",
+          "scope": "window",
           "default": true,
           "description": "allow picking many environments at the same time"
         },
@@ -774,6 +774,32 @@
           "additionalProperties": false,
           "markdownDescription": "Specifies which codelens should be suppressed",
           "scope": "window"
+        },
+        "httpyac.environmentShowStatusBarItem": {
+          "type": "boolean",
+          "scope": "window",
+          "description": "show status bar item for environment reset"
+        },
+        "httpyac.environmentStatusBarItemErrorEnvs": {
+          "type": "array",
+          "scope": "window",
+          "description": "use statusbarItem.errorBackgroundColor for envs"
+        },
+        "httpyac.environmentStatusBarItemWarningEnvs": {
+          "type": "array",
+          "scope": "window",
+          "description": "use statusbarItem.warningBackgroundColor for envs"
+        },
+        "httpyac.environmentStatusBarItemDefaultBackground": {
+          "type": "string",
+          "enum": [
+            "none",
+            "warning",
+            "error"
+          ],
+          "default": "none",
+          "scope": "window",
+          "description": "default color for statusbaritem, if changed corresponding color is used for default env detection"
         }
       }
     },
@@ -1133,18 +1159,18 @@
   "devDependencies": {
     "@types/lodash": "^4.14.175",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^16.10.3",
+    "@types/node": "^16.11.0",
     "@types/uuid": "^8.3.1",
-    "@types/vscode": "1.57.0",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "esbuild": "^0.13.4",
-    "eslint": "^7.32.0",
+    "@types/vscode": "1.61.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "esbuild": "^0.13.6",
+    "eslint": "^8.0.1",
     "eslint-plugin-node": "^11.1.0",
     "husky": "^7.0.2",
     "lint-staged": "^11.2.3",
     "lockfile-lint": "^4.6.2",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.4"
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
