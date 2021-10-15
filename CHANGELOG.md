@@ -1,3 +1,19 @@
+## 4.3.0 (2021-10-15)
+
+#### Features
+* support comments between request line and headers
+* Setting to activate StatusBarItem for current environments (`httpyacenvironmentShowStatusBarItem`)
+  * use setting `httpyac.environmentStatusBarItemDefaultBackground` to set default color
+  * use setting `httpyac.environmentStatusBarItemWarningEnvs` and `httpyac.environmentStatusBarItemErrorEnvs` to set environment specific color
+* progress location while sending can be changed to statusbar (setting `httpyac.progressDefaultLocation`)
+* update to @grpc/js v1.4.1
+* better auto completion for authorization header
+
+#### Fix
+* pretty print max size too low, 1kb instead fo 1Mb (AnWeber/httpyac#84)
+* cookies are not cleared while editing in vscode (#77)
+* responseViewMode `reuse` really reuses same document as previous request
+
 ## 4.2.0 (2021-10-10)
 
 #### Features
