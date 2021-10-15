@@ -6,7 +6,6 @@ import { StorageProvider } from '../io';
 import { showTextEditor } from '../utils/textEditorUtils';
 
 export function previewResponseHandlerFactory(storageProvider: StorageProvider) : ResponseHandler {
-  let previousDocument: vscode.TextDocument | undefined;
   return async function previewResponseHandler(responseItem: ResponseItem): Promise<boolean> {
     const config = getConfigSetting();
 
@@ -33,21 +32,8 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider) 
         content = getContent(response, responseViewContent);
         extension = 'http';
       }
-      if (previousDocument) {
-        const editor = vscode.window.visibleTextEditors.find(obj => obj.document === previousDocument);
-        if (editor) {
-          await vscode.window.showTextDocument(previousDocument.uri, {
-            preview: true,
-            preserveFocus: false,
-            viewColumn: editor.viewColumn,
-          });
-          if (editor === vscode.window.activeTextEditor) {
-            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-          }
-        }
-        previousDocument = undefined;
-      }
-      const uri = await storageProvider.writeFile(content, `${responseItem.name}.${extension}`);
+      const fileName = config.responseViewMode === 'reuse' ? 'response' : `${responseItem.name}.${extension}`;
+      const uri = await storageProvider.writeFile(content, fileName);
       let document: vscode.TextDocument;
       if (uri) {
         responseItem.documentUri = uri;
@@ -61,7 +47,8 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider) 
         });
       }
       if (config.responseViewMode === 'reuse') {
-        previousDocument = document;
+        const language = getLanguageId(response.contentType, responseViewContent);
+        vscode.languages.setTextDocumentLanguage(document, language);
       }
       await showTextEditor(document, config.responseViewMode === 'preview');
       return true;
