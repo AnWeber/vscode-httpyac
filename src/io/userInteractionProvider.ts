@@ -23,6 +23,8 @@ export function logToOuputChannelFactory(channel: string): (level: LogLevel, ...
       if (param !== undefined) {
         if (typeof param === 'string') {
           outputChannel.appendLine(param);
+        } else if (Buffer.isBuffer(param)) {
+          outputChannel.appendLine(param.toString('utf-8'));
         } else if (utils.isError(param)) {
           outputChannel.appendLine(`${param.name} - ${param.message}`);
           if (param.stack) {
