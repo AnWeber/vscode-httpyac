@@ -29,6 +29,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   ) {
     super();
     this.envStatusBarItem = vscode.window.createStatusBarItem('vscode_httpyac_env', vscode.StatusBarAlignment.Right);
+    this.envStatusBarItem.name = 'httpyac: Select Environment';
     this.envStatusBarItem.hide();
     this.refreshStatusBarItemWithEditor(vscode.window.activeTextEditor);
     this.environmentChangedEmitter = new vscode.EventEmitter<string[] | undefined>();
@@ -124,10 +125,11 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     if (config.environmentShowStatusBarItem) {
       const env = this.getEnvironmentTitle(httpFile.activeEnvironment);
       this.envStatusBarItem.text = env;
+      this.envStatusBarItem.tooltip = 'Select httpYac Environment';
       this.envStatusBarItem.command = {
         command: commands.toggleEnv,
         arguments: [httpFile.fileName],
-        title: 'reset environments',
+        title: 'Select httpYac Environment',
       };
       this.envStatusBarItem.backgroundColor = this.getDefaultBackgroundColor(config.environmentStatusBarItemDefaultBackground);
       if (config.environmentStatusBarItemErrorEnvs

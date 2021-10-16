@@ -779,7 +779,7 @@
         "httpyac.environmentShowStatusBarItem": {
           "type": "boolean",
           "scope": "window",
-          "description": "show status bar item for environment reset"
+          "description": "show status bar item for environment select"
         },
         "httpyac.environmentStatusBarItemErrorEnvs": {
           "type": "array",
