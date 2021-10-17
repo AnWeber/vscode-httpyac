@@ -3,7 +3,7 @@
   "displayName": "httpYac - Rest Client",
   "license": "MIT",
   "publisher": "anweber",
-  "description": "Quickly and easily send REST, Soap, GraphQL, GRPC and WebSocket requests directly within Visual Studio Code",
+  "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT and WebSocket requests directly within Visual Studio Code",
   "version": "4.3.0",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
@@ -30,6 +30,7 @@
     "gRPC",
     "WebSocket",
 		"EventSource",
+    "MQTT",
     "Intellij Http Client",
     "Postman",
     "Soap",
@@ -61,7 +62,7 @@
           "http",
           "rest"
         ],
-        "firstLine": "^\\s*(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*?$",
+        "firstLine": "^\\s*(MQTT|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*?$",
         "configuration": "./language-configuration.json"
       }
     ],
