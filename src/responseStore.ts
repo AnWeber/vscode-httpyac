@@ -19,6 +19,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     super();
     this.responseHandlers = [
       view.saveFileResponseHandler,
+      view.noResponseViewResponseHandler,
       view.openWithResponseHandlerFactory(storageProvider),
       view.previewResponseHandlerFactory(storageProvider),
     ];

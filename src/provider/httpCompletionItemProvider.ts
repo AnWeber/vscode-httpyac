@@ -295,6 +295,11 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
           description: 'all invalid SSL certificates will be ignored and no error will be thrown.',
           kind: vscode.CompletionItemKind.Property,
           text: new vscode.SnippetString('@noRejectUnauthorized')
+        }, {
+          name: '@noResponseView',
+          description: 'prevent output in editor document.',
+          kind: vscode.CompletionItemKind.Property,
+          text: new vscode.SnippetString('@noResponseView')
         }
       ];
 
