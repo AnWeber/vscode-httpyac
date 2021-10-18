@@ -5,38 +5,51 @@ import { io, LogLevel, utils } from 'httpyac';
 
 const outputChannels: Record<string, OutputChannel> = {};
 
-export function getOutputChannel(channel: string): OutputChannel {
+export function getOutputChannel(channel: string, show = false): OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
     outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);
+    if (show) {
+      outputChannel.show(true);
+    }
     outputChannels[channel] = outputChannel;
   }
   return outputChannel;
 }
 
-export function logToOuputChannelFactory(channel: string): (level: LogLevel, ...params: Array<unknown>) => void {
-  return function logToOuputChannel(level: LogLevel, ...params: Array<unknown>) {
-    const outputChannel = getOutputChannel(channel);
+export async function logStream(channel: string, type: string, message: unknown) : Promise<void> {
+  const outputChannel = getOutputChannel(channel, true);
+  appendToOutputChannel(outputChannel, [message], `${new Date().toLocaleTimeString()} - ${type}: `);
+}
 
+export function logToOuputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {
+  return function logToOuputChannel(level: LogLevel, ...messages: Array<unknown>) {
+    const outputChannel = getOutputChannel(channel);
     outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
-    for (const param of params) {
-      if (param !== undefined) {
-        if (typeof param === 'string') {
-          outputChannel.appendLine(param);
-        } else if (Buffer.isBuffer(param)) {
-          outputChannel.appendLine(param.toString('utf-8'));
-        } else if (utils.isError(param)) {
-          outputChannel.appendLine(`${param.name} - ${param.message}`);
-          if (param.stack) {
-            outputChannel.appendLine(param.stack);
-          }
-        } else {
-          outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
+    appendToOutputChannel(outputChannel, messages);
+  };
+}
+
+function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[], prefix?: string) {
+  for (const param of messages) {
+    if (param !== undefined) {
+      if (prefix) {
+        outputChannel.append(prefix);
+      }
+      if (typeof param === 'string') {
+        outputChannel.appendLine(param);
+      } else if (Buffer.isBuffer(param)) {
+        outputChannel.appendLine(param.toString('utf-8'));
+      } else if (utils.isError(param)) {
+        outputChannel.appendLine(`${param.name} - ${param.message}`);
+        if (param.stack) {
+          outputChannel.appendLine(param.stack);
         }
+      } else {
+        outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
       }
     }
-
-  };
+  }
 }
 
 export function initUserInteractionProvider(): Disposable {

@@ -1,7 +1,7 @@
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 import { getConfigSetting, getEnvironmentConfig, getResourceConfig, httpDocumentSelector, watchConfigSettings } from './config';
-import { getOutputChannel, logToOuputChannelFactory } from './io';
+import { getOutputChannel, logToOuputChannelFactory, logStream } from './io';
 import { DocumentStore as IDocumentStore } from './extensionApi';
 import { DisposeProvider } from './utils';
 
@@ -136,6 +136,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
             responseHeaders: true,
             responseBodyLength: 1024,
           });
+          context.logStream = logStream;
           context.logResponse = async (response, httpRegion) => {
             outputChannelLogResponse(response, httpRegion);
             await logResponse?.(response, httpRegion);
