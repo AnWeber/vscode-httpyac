@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { types } from 'mime-types';
-import { HttpFile, HttpRegion, HttpSymbolKind } from 'httpyac';
+import * as httpyac from 'httpyac';
 import { httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
@@ -168,10 +168,10 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     return [];
   }
 
-  private isInRequestLine(httpRegion: HttpRegion, line: number) {
+  private isInRequestLine(httpRegion: httpyac.HttpRegion, line: number) {
     if (httpRegion.symbol.startLine <= line && line <= httpRegion.symbol.endLine && httpRegion.symbol.children) {
       const preLine = httpRegion.symbol.children.find(obj => obj.startLine === line - 1);
-      if (preLine && (preLine.kind === HttpSymbolKind.requestLine || preLine.kind === HttpSymbolKind.requestHeader)) {
+      if (preLine && (preLine.kind === httpyac.HttpSymbolKind.requestLine || preLine.kind === httpyac.HttpSymbolKind.requestHeader)) {
         return true;
       }
     }
@@ -229,87 +229,39 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
   private getMetaData(textLine: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
     if (textLine.startsWith('#') && !isInRequestLine) {
-      const result = [
-        {
-          name: '@name',
-          description: 'responses of a requests with a name are automatically added as variables and can be reused by other requests',
+      const result: Array<{
+        name: string,
+        description: string,
+        kind: vscode.CompletionItemKind,
+        text: vscode.SnippetString
+      }> = [];
+      for (const obj of httpyac.parser.knownMetaData) {
+        const item = {
+          name: `@${obj.name}`,
+          description: obj.description,
           kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@name ${name}')
-        }, {
-          name: '@ref',
-          description: 'When the request is called, it is ensured that the referenced request is called beforehand',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@ref ${name}')
-        }, {
-          name: '@forceRef',
-          description: 'When the request is called, it is ensured that the referenced request is always called beforehand',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@forceRef ${name}')
-        }, {
-          name: '@disabled',
-          description: 'requests can be disabled',
-          kind: vscode.CompletionItemKind.Property,
-          text: '@disabled ${file}'
-        }, {
-          name: '@language',
-          description: 'language id of the response view',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@language ${name}')
-        }, {
-          name: '@note',
-          description: 'shows a confirmation dialog before sending request',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@note ${message}')
-        }, {
-          name: '@save',
-          description: 'If specified, the response will not be displayed but saved directly.',
-          kind: vscode.CompletionItemKind.Property,
-          text: ' @save ${name}',
-        }, {
-          name: '@openWith',
-          description: 'viewType of custom editor to preview files',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@openWith ${name}')
-        }, {
-          name: '@extension',
-          description: 'extension of file for save or openWith.',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@extension ${extension}')
-        }, {
-          name: '@noLog',
-          description: 'prevent logging of request data in output console',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@noLog')
-        }, {
-          name: '@noCookieJar',
-          description: 'cookieJar support is disabled for this request',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@noCookieJar')
-        }, {
-          name: '@noClientCert',
-          description: 'SSL client certificate is not send for this request',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@noClientCert')
-        }, {
-          name: '@noRejectUnauthorized',
-          description: 'all invalid SSL certificates will be ignored and no error will be thrown.',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@noRejectUnauthorized')
-        }, {
-          name: '@noResponseView',
-          description: 'prevent output in editor document.',
-          kind: vscode.CompletionItemKind.Property,
-          text: new vscode.SnippetString('@noResponseView')
+        };
+        if (obj.completions) {
+          for (const completion of obj.completions) {
+            result.push({
+              ...item,
+              name: `@${obj.name} ${completion}`,
+              text: new vscode.SnippetString(`@${obj.name} ${completion}`)
+            });
+          }
+        } else {
+          result.push({
+            ...item,
+            text: new vscode.SnippetString(`${item.name} \${name}`)
+          });
         }
-      ];
+      }
 
       return result
         .filter(obj => obj.name.toLowerCase().indexOf(textLine.replace(/#/u, '').trim()) >= 0).map(obj => {
           if (textLine.endsWith('@')) {
             if (obj.text && typeof obj.text !== 'string') {
               obj.text = new vscode.SnippetString(obj.text.value.slice(1));
-            } else {
-              obj.text = obj.name.slice(1);
             }
           }
           return obj;
@@ -318,11 +270,11 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     return [];
   }
 
-  private async getRefName(line: string, httpFile: HttpFile | undefined): Promise<Array<HttpCompletionItem>> {
+  private async getRefName(line: string, httpFile: httpyac.HttpFile | undefined): Promise<Array<HttpCompletionItem>> {
     if (httpFile && line.startsWith('#') && line.toLowerCase().indexOf('ref') >= 0) {
       const result: Array<HttpCompletionItem> = [];
 
-      const toHttpCompletionItem = (httpRegion: HttpRegion) => ({
+      const toHttpCompletionItem = (httpRegion: httpyac.HttpRegion) => ({
         name: httpRegion.metaData.name || '',
         description: 'httpRegion name',
         kind: vscode.CompletionItemKind.Reference
