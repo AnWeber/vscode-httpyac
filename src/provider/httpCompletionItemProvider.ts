@@ -26,13 +26,16 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character)).trim();
     const httpFile = await this.documentStore.getHttpFile(document);
 
-    const isInRequestLine = !!(httpFile && httpFile.httpRegions.some(httpRegion => this.isInRequestLine(httpRegion, position.line)));
+    const httpRegion = httpFile && httpFile.httpRegions.find(obj => obj.symbol.startLine <= position.line && position.line <= obj.symbol.endLine);
+    const isInRequestLine = !!httpRegion && this.isInRequestLine(httpRegion, position.line);
 
     const result: Array<HttpCompletionItem> = [];
 
     result.push(...this.getRequstMethodCompletionItems(textLine, isInRequestLine));
-    result.push(...this.getRequestHeaders(textLine, isInRequestLine));
-    result.push(...this.getMimetypes(textLine, isInRequestLine));
+    if (httpRegion?.request && httpyac.utils.isHttpRequest(httpRegion.request)) {
+      result.push(...this.getRequestHeaders(textLine, isInRequestLine));
+      result.push(...this.getMimetypes(textLine, isInRequestLine));
+    }
     result.push(...this.getAuthorization(textLine, isInRequestLine));
     result.push(...this.getMetaData(textLine, isInRequestLine));
     result.push(...(await this.getRefName(textLine, httpFile)));
@@ -169,7 +172,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
   }
 
   private isInRequestLine(httpRegion: httpyac.HttpRegion, line: number) {
-    if (httpRegion.symbol.startLine <= line && line <= httpRegion.symbol.endLine && httpRegion.symbol.children) {
+    if (httpRegion.symbol.children) {
       const preLine = httpRegion.symbol.children.find(obj => obj.startLine === line - 1);
       if (preLine && (preLine.kind === httpyac.HttpSymbolKind.requestLine || preLine.kind === httpyac.HttpSymbolKind.requestHeader)) {
         return true;
