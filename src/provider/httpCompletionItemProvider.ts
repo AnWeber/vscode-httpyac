@@ -125,9 +125,9 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
   private getRequestHeaders(textLine: string, isInRequestLine: boolean, httpRegion?: httpyac.HttpRegion): Array<HttpCompletionItem> {
     if (isInRequestLine && httpRegion?.request) {
-      let result: Array<HttpCompletionItem> | undefined;
+      const result: Array<HttpCompletionItem> = [];
       if (httpyac.utils.isHttpRequest(httpRegion.request)) {
-        result = [
+        result.push(...[
           { name: 'A-IM', description: 'Acceptable instance-manipulations for the request.', kind: vscode.CompletionItemKind.Field },
           { name: 'Accept', description: 'Media type(s) that is/are acceptable for the response. See Content negotiation.', kind: vscode.CompletionItemKind.Field },
           { name: 'Accept-Charset', description: 'Character sets that are acceptable.', kind: vscode.CompletionItemKind.Field },
@@ -184,9 +184,9 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
           { name: 'X-Request-ID', description: 'Correlates HTTP requests between a client and server.', kind: vscode.CompletionItemKind.Field },
           { name: 'X-Correlation-ID', description: 'Correlates HTTP requests between a client and server.', kind: vscode.CompletionItemKind.Field },
           { name: 'Save-Data', description: 'The Save-Data client hint request header available in Chrome, Opera, and Yandex browsers lets developers deliver lighter, faster applications to users who opt-in to data saving mode in their browser.', kind: vscode.CompletionItemKind.Field },
-        ];
+        ]);
       } else if (httpyac.utils.isMQTTRequest(httpRegion.request)) {
-        result = [
+        result.push(...[
           { name: 'username', description: 'the username required by your broker', kind: vscode.CompletionItemKind.Field },
           { name: 'password', description: 'the password required by your broker', kind: vscode.CompletionItemKind.Field },
           { name: 'clean', description: 'true, set to false to receive QoS 1 and 2 messages while offline', kind: vscode.CompletionItemKind.Field },
@@ -196,8 +196,15 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
           { name: 'subscribe', description: 'topics to subscribe to', kind: vscode.CompletionItemKind.Field },
           { name: 'publish', description: 'topics to publish to', kind: vscode.CompletionItemKind.Field },
           { name: 'topic', description: 'topic to subscribe and publish to', kind: vscode.CompletionItemKind.Field },
-
-        ];
+        ]);
+      } else if (httpyac.utils.isEventSourceRequest(httpRegion.request)) {
+        result.push(...[
+          { name: 'Event', description: 'Server Sent Events to add listener', kind: vscode.CompletionItemKind.Field },
+        ]);
+      } else if (httpyac.utils.isGrpcRequest(httpRegion.request)) {
+        result.push(...[
+          { name: 'ChannelCredentials', description: 'Channel credentials, which are attached to a Channel, such as SSL credentials.', kind: vscode.CompletionItemKind.Field },
+        ]);
       }
       if (result) {
         return result
