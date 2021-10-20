@@ -31,7 +31,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
     const result: Array<HttpCompletionItem> = [];
 
-    result.push(...this.getRequstMethodCompletionItems(textLine, httpRegion, isInRequestLine));
+    result.push(...this.getRequstMethodCompletionItems(textLine));
 
     result.push(...this.getRequestHeaders(textLine, isInRequestLine, httpRegion));
 
@@ -49,59 +49,78 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     });
   }
 
-  private getRequstMethodCompletionItems(textLine: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
-    if (!isInRequestLine) {
-      const result = [
-        {
-          name: 'GET',
-          description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'HEAD',
-          description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'POST',
-          description: 'The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'PUT',
-          description: 'The PUT method replaces all current representations of the target resource with the request payload.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'DELETE',
-          description: 'The DELETE method deletes the specified resource.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'CONNECT',
-          description: 'The CONNECT method establishes a tunnel to the server identified by the target resource.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'OPTIONS',
-          description: 'The OPTIONS method is used to describe the communication options for the target resource.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'TRACE',
-          description: 'The TRACE method performs a message loop-back test along the path to the target resource.',
-          kind: vscode.CompletionItemKind.Keyword,
-        },
-        {
-          name: 'PATCH',
-          description: 'The PATCH method is used to apply partial modifications to a resource.',
-          kind: vscode.CompletionItemKind.Keyword,
-        }
-      ];
+  private getRequstMethodCompletionItems(textLine: string): Array<HttpCompletionItem> {
 
-      return result.filter(obj => textLine.length === 0 || obj.name.indexOf(textLine) >= 0);
-    }
-    return [];
+    const result = [
+      {
+        name: 'GET',
+        description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'HEAD',
+        description: 'The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'POST',
+        description: 'The POST method is used to submit an entity to the specified resource, often causing a change in state or side effects on the server.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'PUT',
+        description: 'The PUT method replaces all current representations of the target resource with the request payload.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'DELETE',
+        description: 'The DELETE method deletes the specified resource.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'CONNECT',
+        description: 'The CONNECT method establishes a tunnel to the server identified by the target resource.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'OPTIONS',
+        description: 'The OPTIONS method is used to describe the communication options for the target resource.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'TRACE',
+        description: 'The TRACE method performs a message loop-back test along the path to the target resource.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'PATCH',
+        description: 'The PATCH method is used to apply partial modifications to a resource.',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'MQTT',
+        description: 'MQTT request',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'WSS',
+        description: 'WSS request',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'SSE',
+        description: 'Server Sent Event',
+        kind: vscode.CompletionItemKind.Keyword,
+      },
+      {
+        name: 'GRPC',
+        description: 'GRPC request',
+        kind: vscode.CompletionItemKind.Keyword,
+      }
+    ];
+
+    return result.filter(obj => textLine.length === 0 || obj.name.toLowerCase().startsWith(textLine));
+
   }
 
   private getRequestHeaders(textLine: string, isInRequestLine: boolean, httpRegion?: httpyac.HttpRegion): Array<HttpCompletionItem> {
@@ -182,7 +201,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
       }
       if (result) {
         return result
-          .filter(obj => textLine.length === 0 || obj.name.startsWith(textLine.trim().toLowerCase()));
+          .filter(obj => textLine.length === 0 || obj.name.toLowerCase().startsWith(textLine.trim().toLowerCase()));
       }
 
     }
@@ -249,44 +268,41 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
   }
 
   private getMetaData(textLine: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
-    if (textLine.startsWith('#') && !isInRequestLine) {
+    if (textLine.trim().startsWith('#') && !isInRequestLine) {
       const result: Array<{
         name: string,
         description: string,
         kind: vscode.CompletionItemKind,
-        text: vscode.SnippetString
+        text?: string
       }> = [];
+      const line = textLine.trim().slice(1).trim();
       for (const obj of httpyac.parser.knownMetaData) {
         const item = {
           name: `@${obj.name}`,
           description: obj.description,
-          kind: vscode.CompletionItemKind.Property,
+          kind: vscode.CompletionItemKind.Field,
+          text: `@${obj.name}`
         };
-        if (obj.completions) {
-          for (const completion of obj.completions) {
+
+        if (line.length === 0 || item.name.startsWith(line)) {
+
+          if (obj.completions) {
+            for (const completion of obj.completions) {
+              result.push({
+                ...item,
+                name: `@${obj.name} ${completion}`,
+                text: `@${obj.name} ${completion}`.slice(line.length),
+              });
+            }
+          } else {
             result.push({
               ...item,
-              name: `@${obj.name} ${completion}`,
-              text: new vscode.SnippetString(`@${obj.name} ${completion}`)
+              text: item.name.slice(line.length),
             });
           }
-        } else {
-          result.push({
-            ...item,
-            text: new vscode.SnippetString(`${item.name} \${name}`)
-          });
         }
       }
-
-      return result
-        .filter(obj => obj.name.toLowerCase().indexOf(textLine.replace(/#/u, '').trim()) >= 0).map(obj => {
-          if (textLine.endsWith('@')) {
-            if (obj.text && typeof obj.text !== 'string') {
-              obj.text = new vscode.SnippetString(obj.text.value.slice(1));
-            }
-          }
-          return obj;
-        });
+      return result;
     }
     return [];
   }
