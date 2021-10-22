@@ -1174,17 +1174,17 @@
     "*.ts": "eslint --cache --fix"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.175",
+    "@types/lodash": "^4.14.176",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^16.11.0",
+    "@types/node": "^16.11.4",
     "@types/uuid": "^8.3.1",
     "@types/vscode": "1.61.0",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "esbuild": "^0.13.6",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "esbuild": "^0.13.8",
     "eslint": "^8.0.1",
     "eslint-plugin-node": "^11.1.0",
-    "husky": "^7.0.2",
+    "husky": "^7.0.4",
     "lint-staged": "^11.2.3",
     "lockfile-lint": "^4.6.2",
     "typescript": "^4.4.4"
