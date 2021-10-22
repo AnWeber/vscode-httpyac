@@ -82,7 +82,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     if (httpyac.store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
       result.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
         command: commands.logout,
-        title: `oauth2 session (${httpyac.store.userSessionStore.userSessions.length})`,
+        title: `session (${httpyac.store.userSessionStore.userSessions.length})`,
       }));
     }
     if (httpFile && config.codelens?.removeCookies) {
@@ -231,7 +231,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       label: userSession.title,
       data: userSession
     })), {
-      placeHolder: 'select oauth2 sessions to logout',
+      placeHolder: 'select sessions to remove',
       canPickMany: true,
       ignoreFocusOut: true,
       onDidSelectItem: (item: vscode.QuickPickItem & {data: httpyac.UserSession}) => {

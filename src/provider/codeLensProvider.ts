@@ -66,13 +66,20 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
 
         if (!!httpRegion.request && !httpRegion.metaData.disabled) {
           if (config?.codelens?.send) {
+            let title = 'send';
+            if (httpyac.utils.isWebsocketRequest(httpRegion.request)
+              || httpyac.utils.isEventSourceRequest(httpRegion.request)
+              || httpyac.utils.isMQTTRequest(httpRegion.request)) {
+              title = 'connect';
+            }
+
             result.push(new vscode.CodeLens(range, {
               command: commands.send,
               arguments: args,
-              title: config?.useMethodInSendCodeLens ? `send (${httpRegion.request.method})` : 'send'
+              title: config?.useMethodInSendCodeLens ? `${title} (${httpRegion.request.method})` : title
             }));
           }
-          if (config?.codelens?.sendRepeat) {
+          if (config?.codelens?.sendRepeat && httpyac.utils.isHttpRequest(httpRegion.request)) {
             result.push(new vscode.CodeLens(range, {
               command: commands.sendRepeat,
               arguments: args,
