@@ -154,23 +154,16 @@ export class RequestCommandsController extends DisposeProvider {
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
-        await this.openVariablesInEditor(httpFile);
+        const variables = await httpyac.getVariables({
+          httpFile,
+          config: await getEnvironmentConfig(httpFile.fileName)
+        });
+        await this.openVariablesInEditor(variables);
       }
     }
   }
 
-  private async openVariablesInEditor(httpFile: httpyac.HttpFile, status?: unknown) {
-    let variables = await httpyac.getVariables({
-      httpFile,
-      config: await getEnvironmentConfig(httpFile.fileName)
-    });
-    if (status) {
-      variables = {
-        '_status': status,
-        ...variables
-      };
-    }
-
+  private async openVariablesInEditor(variables: httpyac.Variables) {
     const uri = await this.storageProvider.writeFile(Buffer.from(JSON.stringify(variables, null, 2)), 'variables.json');
     if (uri) {
       await utils.showTextEditor(uri);
@@ -181,24 +174,29 @@ export class RequestCommandsController extends DisposeProvider {
   private async validateVariables(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
     const result = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (result) {
-      let status: unknown;
       const abortInterceptor = {
         afterLoop: async () => false
+      };
+      const variables: Record<string, unknown> = {
+
       };
       try {
         result.httpFile.hooks.onRequest.addInterceptor(abortInterceptor);
         await this.sendRequest(result);
-        status = {
+        variables.status = {
           message: 'variables are valid',
         };
       } catch (err) {
-        status = {
+        variables.status = {
           message: 'variables are invalid',
           err
         };
       } finally {
+        if (httpyac.utils.isProcessorContext(result)) {
+          Object.assign(variables, result.variables);
+        }
         result.httpFile.hooks.onRequest.removeInterceptor(abortInterceptor);
-        await this.openVariablesInEditor(result.httpFile, status);
+        await this.openVariablesInEditor(variables);
       }
     }
   }
