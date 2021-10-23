@@ -23,6 +23,9 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
 
     this.subscriptions = [
+      {
+        dispose: httpyac.store.userSessionStore.onSessionChanged(() => this.documentStoreChangedEmitter.fire())
+      },
       watchConfigSettings(() => {
         this.httpFileStore.clear();
       }),
