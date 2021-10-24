@@ -82,10 +82,12 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
 
   if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0) {
     result.push(`${response.protocol} ${response.statusCode} ${response.statusMessage}`);
-    result.push(...Object.entries(response.headers)
-      .filter(([key]) => !key.startsWith(':'))
-      .map(([key, value]) => `${key}: ${value}`)
-      .sort());
+    if (response.headers) {
+      result.push(...Object.entries(response.headers)
+        .filter(([key]) => !key.startsWith(':'))
+        .map(([key, value]) => `${key}: ${value}`)
+        .sort());
+    }
     result.push('');
   }
 
