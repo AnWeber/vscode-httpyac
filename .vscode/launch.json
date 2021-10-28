@@ -2,7 +2,17 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "vscode-httpyac: launch",
+			"name": "launch",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			]
+		},{
+			"name": "launch with httpyac",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
