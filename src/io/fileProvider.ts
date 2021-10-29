@@ -3,9 +3,9 @@ import { FileEnconding, PathLike, io } from 'httpyac';
 
 
 export function initFileProvider(): void {
-  io.fileProvider.isAbsolute = (fileName: PathLike) => {
+  io.fileProvider.isAbsolute = async (fileName: PathLike) => {
     const uri = toUri(fileName);
-    return !!uri;
+    return uri && await io.fileProvider.exists(uri);
   };
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
@@ -58,6 +58,13 @@ export function initFileProvider(): void {
     if (uri) {
       const file = await workspace.fs.readFile(uri);
       return Buffer.from(file);
+    }
+    throw new Error('No valid uri');
+  };
+  io.fileProvider.writeBuffer = async (fileName: PathLike, buffer: Buffer) => {
+    const uri = toUri(fileName);
+    if (uri) {
+      await workspace.fs.writeFile(uri, buffer);
     }
     throw new Error('No valid uri');
   };
