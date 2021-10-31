@@ -129,6 +129,9 @@ export class RequestCommandsController extends DisposeProvider {
           report: data => progress.report(data),
         };
         context.logResponse = async (response, httpRegion) => {
+          context.progress?.report?.({
+            message: 'update view',
+          });
           await this.responseStore.add(response, httpRegion);
         };
         await this.documentStore.send(context);

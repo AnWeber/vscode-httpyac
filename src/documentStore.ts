@@ -128,7 +128,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         }
         const resourceConfig = getResourceConfig(context.httpFile);
         if (resourceConfig.logRequest) {
-          const logResponse = context.logResponse;
           const outputChannelLogResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
             const requestChannel = getOutputChannel('Request');
             requestChannel.appendLine(arg);
@@ -139,7 +138,12 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
             responseHeaders: true,
             responseBodyLength: 1024,
           });
-          context.logStream = logStream;
+          const logStreamCache = context.logStream;
+          context.logStream = async (channel, type, message) => {
+            await logStream(channel, type, message);
+            logStreamCache?.(channel, type, message);
+          };
+          const logResponse = context.logResponse;
           context.logResponse = async (response, httpRegion) => {
             outputChannelLogResponse(response, httpRegion);
             await logResponse?.(response, httpRegion);
