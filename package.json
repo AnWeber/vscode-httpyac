@@ -1192,7 +1192,7 @@
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.5.0",
+    "httpyac": "^4.5.1",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.33",
 		"uuid": "^8.3.2"
