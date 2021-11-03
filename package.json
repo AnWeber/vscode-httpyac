@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT and WebSocket requests directly within Visual Studio Code",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -468,6 +468,12 @@
           "scope": "resource",
           "default": "env",
           "description": "relative or absolute path to folder with env files"
+        },
+        "httpyac.useRegionScopedVariables": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "scope variables to region (needs @ref to import variables from other regions)"
         },
         "httpyac.responseViewHeader": {
           "type": "array",
@@ -1192,7 +1198,7 @@
   },
   "dependencies": {
     "httpsnippet": "^2.0.0",
-    "httpyac": "^4.5.0",
+    "httpyac": "^4.5.2",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.33",
 		"uuid": "^8.3.2"

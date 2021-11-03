@@ -1,3 +1,8 @@
+## 4.5.1 (2021-11-03)
+
+#### Features
+* config setting to use Region scoped variables (default: false)
+
 ## 4.5.0 (2021-10-31)
 
 #### Features

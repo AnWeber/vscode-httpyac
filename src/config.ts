@@ -39,6 +39,7 @@ export interface ResourceConfig {
   logLevel?: string,
   logOutputChannelOptions?:httpyac.utils.RequestLoggerFactoryOptions,
   logRequest?: boolean,
+  useRegionScopedVariables?: boolean,
 }
 
 
@@ -137,6 +138,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
     proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
     defaultHeaders: config.requestDefaultHeaders,
     envDirName: config.envDirName,
+    useRegionScopedVariables: config.useRegionScopedVariables,
   };
 
   const uri = toUri(fileName);
