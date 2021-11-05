@@ -1,4 +1,4 @@
-import { Disposable, OutputChannel, window } from 'vscode';
+import { Disposable, OutputChannel, window, env } from 'vscode';
 import { APP_NAME } from '../config';
 import { io, LogLevel, utils } from 'httpyac';
 
@@ -54,13 +54,12 @@ function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[]
 
 export function initUserInteractionProvider(): Disposable {
   io.log.options.logMethod = logToOuputChannelFactory('Log');
-
-  io.userInteractionProvider.showErrorMessage = async (message: string) => {
-    await window.showErrorMessage(message);
-  };
-  io.userInteractionProvider.showWarnMessage = async (message: string) => {
-    await window.showWarningMessage(message);
-  };
+  io.userInteractionProvider.showInformationMessage
+    = async (message: string, ...buttons: Array<string>) => await window.showInformationMessage(message, ...buttons);
+  io.userInteractionProvider.showErrorMessage
+    = async (message: string, ...buttons: Array<string>) => await window.showErrorMessage(message, ...buttons);
+  io.userInteractionProvider.showWarnMessage
+    = async (message: string, ...buttons: Array<string>) => await window.showWarningMessage(message, ...buttons);
   io.userInteractionProvider.showNote = async (note: string) => {
     const buttonTitle = 'Execute';
     const result = await window.showWarningMessage(note, { modal: true }, buttonTitle);
@@ -76,6 +75,9 @@ export function initUserInteractionProvider(): Disposable {
     placeHolder: message,
     ignoreFocusOut: true
   });
+
+  io.userInteractionProvider.setClipboard = async message => await env.clipboard.writeText(message);
+  io.userInteractionProvider.getClipboard = async () => await env.clipboard.readText();
 
   return {
     dispose: function dispose() {
