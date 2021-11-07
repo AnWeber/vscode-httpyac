@@ -1,3 +1,13 @@
+## 4.6.0 (2021-11-07)
+
+#### Features
+* added [OAuth 2.0 Device Authorization Grant}(https://datatracker.ietf.org/doc/html/rfc8628) (AnWeber/httpyac#97)
+* extend GRPC Not Found Service Error with avaiable services
+
+#### Fix
+* escape of `{{...}}` works again (AnWeber/httpyac#99)
+* user cancelation stops execution hook (AnWeber/httpyac#98)
+
 ## 4.5.1 (2021-11-03)
 
 #### Features
