@@ -137,7 +137,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
     requestBodyInjectVariablesExtensions: config.requestBodyInjectVariablesExtensions,
     proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
     defaultHeaders: config.requestDefaultHeaders,
-    envDirName: config.envDirName,
+    envDirName: config.envDirName || undefined,
     useRegionScopedVariables: config.useRegionScopedVariables,
   };
 
