@@ -28,16 +28,15 @@ export async function getHttpRegionFromLine(
 }
 
 function getLine(line: LineArgument, editor: vscode.TextEditor): number {
-  if (line) {
-    if (Number.isInteger(line)) {
-      return line as number;
-    }
-    if (line instanceof vscode.Position) {
-      return line.line;
-    }
-    if (line instanceof vscode.Range) {
-      return line.start.line;
-    }
+
+  if (Number.isInteger(line)) {
+    return line as number;
+  }
+  if (line instanceof vscode.Position) {
+    return line.line;
+  }
+  if (line instanceof vscode.Range) {
+    return line.start.line;
   }
   if (!!editor.selections && editor.selections.length > 0) {
     return editor.selection.active.line;
