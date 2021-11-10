@@ -53,6 +53,7 @@ export interface AppConfig {
   environmentPickMany?:boolean,
   responseViewHeader?:Array<string>,
   responseViewContent?: ResponseViewContent,
+  responseViewExtensionRecognition?: 'mimetype' | 'extension',
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none',
   responseViewPrettyPrint?:boolean,
   responseViewPreserveFocus?:boolean,

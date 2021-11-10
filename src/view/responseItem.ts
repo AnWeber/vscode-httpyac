@@ -3,6 +3,7 @@ import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 import { extension } from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
+import { getConfigSetting } from '../config';
 
 export class ResponseItem implements IResponseItem {
   readonly id: string;
@@ -75,10 +76,38 @@ function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRe
   return undefined;
 }
 
-function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) : string {
+function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
+  const extensionRecognitions: Array<ExtensionRecognition> = [
+    getExtensionByMetaData,
+  ];
+
+  const config = getConfigSetting();
+  if (config.responseViewExtensionRecognition === 'mimetype') {
+    extensionRecognitions.push(getExtensionByMimeTypes, getExtensionByUrl);
+  } else {
+    extensionRecognitions.push(getExtensionByUrl, getExtensionByMimeTypes);
+  }
+  extensionRecognitions.push(getExtensionByRegexMimetype);
+
+  for (const extensionRecognition of extensionRecognitions) {
+    const result = extensionRecognition(response, httpRegion);
+    if (result) {
+      return result;
+    }
+  }
+  return 'json';
+}
+
+type ExtensionRecognition = (response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) => string | false;
+
+function getExtensionByMetaData(_response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
   if (httpRegion?.metaData?.extension) {
     return httpRegion.metaData.extension;
   }
+  return false;
+}
+
+function getExtensionByUrl(_response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
   if (httpRegion?.request?.url) {
     const indexQuery = httpRegion.request.url.indexOf('?');
     let url = httpRegion.request.url;
@@ -90,5 +119,41 @@ function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpR
       return url.slice(dotIndex + 1);
     }
   }
-  return extension(response?.contentType?.contentType || 'application/octet-stream') || 'json';
+  return false;
+}
+
+function getExtensionByMimeTypes(response: httpyac.HttpResponse) {
+  if (response?.contentType?.contentType) {
+    return extension(response?.contentType?.contentType);
+  }
+  return false;
+}
+
+
+function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string {
+  if (response?.contentType) {
+    const contentType = response?.contentType;
+    if (httpyac.utils.isMimeTypeJSON(contentType)) {
+      return 'json';
+    }
+    if (httpyac.utils.isMimeTypeJavascript(contentType)) {
+      return 'js';
+    }
+    if (httpyac.utils.isMimeTypeXml(contentType)) {
+      return 'html';
+    }
+    if (httpyac.utils.isMimeTypeHtml(contentType)) {
+      return 'xml';
+    }
+    if (httpyac.utils.isMimeTypeCSS(contentType)) {
+      return 'css';
+    }
+    if (httpyac.utils.isMimeTypeMarkdown(contentType)) {
+      return 'md';
+    }
+    if (httpyac.utils.isMimeTypePdf(contentType)) {
+      return 'pdf';
+    }
+  }
+  return 'txt';
 }
