@@ -1,3 +1,14 @@
+## 4.7.0 (2021-11-10)
+
+#### Features
+* add new event `@responseLogging` for scripts
+* better extension recognition (#87)
+
+#### Fix
+* refreshTokenFlow does not require refreshExpiresIn
+* envDirName is not overriden in cli command (AnWeber/httpyac#103)
+* wrong request was executed, when written in first line of document (#85)
+
 ## 4.6.0 (2021-11-07)
 
 #### Features
