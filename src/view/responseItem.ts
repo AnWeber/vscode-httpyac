@@ -83,11 +83,24 @@ function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpR
 
   const config = getConfigSetting();
   if (config.responseViewExtensionRecognition === 'mimetype') {
-    extensionRecognitions.push(getExtensionByMimeTypes, getExtensionByUrl);
+    extensionRecognitions.push(
+      getExtensionByMimeTypes,
+      getExtensionByUrl,
+      getExtensionByRegexMimetype
+    );
+  } else if (config.responseViewExtensionRecognition === 'regex') {
+    extensionRecognitions.push(
+      getExtensionByRegexMimetype,
+      getExtensionByUrl,
+      getExtensionByMimeTypes
+    );
   } else {
-    extensionRecognitions.push(getExtensionByUrl, getExtensionByMimeTypes);
+    extensionRecognitions.push(
+      getExtensionByUrl,
+      getExtensionByMimeTypes,
+      getExtensionByRegexMimetype
+    );
   }
-  extensionRecognitions.push(getExtensionByRegexMimetype);
 
   for (const extensionRecognition of extensionRecognitions) {
     const result = extensionRecognition(response, httpRegion);
@@ -95,7 +108,7 @@ function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpR
       return result;
     }
   }
-  return 'json';
+  return 'txt';
 }
 
 type ExtensionRecognition = (response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) => string | false;
@@ -130,7 +143,7 @@ function getExtensionByMimeTypes(response: httpyac.HttpResponse) {
 }
 
 
-function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string {
+function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string | false {
   if (response?.contentType) {
     const contentType = response?.contentType;
     if (httpyac.utils.isMimeTypeJSON(contentType)) {
@@ -140,10 +153,10 @@ function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string {
       return 'js';
     }
     if (httpyac.utils.isMimeTypeXml(contentType)) {
-      return 'html';
+      return 'xml';
     }
     if (httpyac.utils.isMimeTypeHtml(contentType)) {
-      return 'xml';
+      return 'html';
     }
     if (httpyac.utils.isMimeTypeCSS(contentType)) {
       return 'css';
@@ -154,6 +167,9 @@ function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string {
     if (httpyac.utils.isMimeTypePdf(contentType)) {
       return 'pdf';
     }
+    if (contentType?.mimeType === 'text/plain') {
+      return 'txt';
+    }
   }
-  return 'txt';
+  return false;
 }

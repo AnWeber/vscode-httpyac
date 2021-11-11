@@ -1,3 +1,8 @@
+## 4.7.1 (2021-11-11)
+
+#### Fix
+* mimeType xml is saved as html (#87)
+
 ## 4.7.0 (2021-11-10)
 
 #### Features

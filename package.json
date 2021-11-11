@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT and WebSocket requests directly within Visual Studio Code",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -497,10 +497,11 @@
           "description": "response view will not take focus after receiving response"
         },
         "httpyac.responseViewExtensionRecognition": {
-          "type": "string",
+          "type": "array",
           "enum": [
             "mimetype",
-            "extension"
+            "extension",
+            "regex"
           ],
           "markdownEnumDescriptions": [
             "prefer response mimetype",
