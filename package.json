@@ -497,7 +497,7 @@
           "description": "response view will not take focus after receiving response"
         },
         "httpyac.responseViewExtensionRecognition": {
-          "type": "array",
+          "type": "string",
           "enum": [
             "mimetype",
             "extension",
