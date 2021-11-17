@@ -1,3 +1,11 @@
+## 4.7.2 (2021-11-17)
+
+#### Fix
+* .env file in same folder not imported  (AnWeber/httpyac#112)
+* blank header is now supported (AnWeber/httpyac#107)
+* using `# @no-log` breaks named variable (AnWeber/httpyac#106)
+* fix error in VSCode Settings Configuration with setting `responseViewExtensionRecognition`
+
 ## 4.7.1 (2021-11-11)
 
 #### Fix
