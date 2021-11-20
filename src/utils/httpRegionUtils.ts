@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
-import * as httpyac from 'httpyac';
 import { DocumentStore } from '../documentStore';
+import * as httpyac from 'httpyac';
+import * as vscode from 'vscode';
 
 export type DocumentArgument = vscode.TextDocument | vscode.TextEditor | vscode.Uri | undefined;
 export type LineArgument = number | vscode.Position | vscode.Range | undefined;
@@ -15,11 +15,13 @@ export async function getHttpRegionFromLine(
     const httpFile = await documentStore.getHttpFile(editor.document);
     if (httpFile) {
       const currentLine = getLine(line, editor);
-      const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine);
+      const httpRegion = httpFile.httpRegions.find(
+        obj => obj.symbol.startLine <= currentLine && currentLine <= obj.symbol.endLine
+      );
       if (httpRegion) {
         return {
           httpRegion,
-          httpFile
+          httpFile,
         };
       }
     }
@@ -28,7 +30,6 @@ export async function getHttpRegionFromLine(
 }
 
 function getLine(line: LineArgument, editor: vscode.TextEditor): number {
-
   if (Number.isInteger(line)) {
     return line as number;
   }
@@ -43,7 +44,6 @@ function getLine(line: LineArgument, editor: vscode.TextEditor): number {
   }
   return 0;
 }
-
 
 export function getTextEditor(documentIdentifier: DocumentArgument): vscode.TextEditor | undefined {
   let editor: vscode.TextEditor | undefined;

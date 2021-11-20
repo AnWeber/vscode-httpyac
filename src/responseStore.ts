@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
-import * as httpyac from 'httpyac';
-import { ResponseHandler, ResponseItem, ResponseStore as IResponseStore } from './extensionApi';
-import * as view from './view';
-import { DisposeProvider } from './utils';
 import { getConfigSetting } from './config';
+import { ResponseHandler, ResponseItem, ResponseStore as IResponseStore } from './extensionApi';
 import { StorageProvider } from './io';
+import { DisposeProvider } from './utils';
+import * as view from './view';
+import * as httpyac from 'httpyac';
+import * as vscode from 'vscode';
 
 export class ResponseStore extends DisposeProvider implements IResponseStore {
   readonly responseCache: Array<view.ResponseItem> = [];
@@ -13,9 +13,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
 
   readonly responseHandlers: Array<ResponseHandler>;
 
-  constructor(
-    private readonly storageProvider: StorageProvider
-  ) {
+  constructor(private readonly storageProvider: StorageProvider) {
     super();
     this.responseHandlers = [
       view.saveFileResponseHandler,
@@ -25,7 +23,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     ];
     this.subscriptions = [
       vscode.window.onDidChangeActiveTextEditor(async editor => {
-        const indexOfDocument = editor?.document && this.prettyPrintDocuments.indexOf(editor.document.uri) || -1;
+        const indexOfDocument = (editor?.document && this.prettyPrintDocuments.indexOf(editor.document.uri)) || -1;
         if (editor && indexOfDocument >= 0) {
           await this.prettyPrint(editor);
           this.prettyPrintDocuments.splice(indexOfDocument, 1);
@@ -34,7 +32,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     ];
     this.refreshHistory = new vscode.EventEmitter<void>();
   }
-
 
   get historyChanged(): vscode.Event<void> {
     return this.refreshHistory.event;
@@ -46,7 +43,9 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   }
 
   findResponseByHttpRegion(httpRegion: httpyac.HttpRegion): view.ResponseItem | undefined {
-    return this.responseCache.find(obj => obj.name === httpRegion.symbol.name && obj.line === httpRegion.symbol.startLine);
+    return this.responseCache.find(
+      obj => obj.name === httpRegion.symbol.name && obj.line === httpRegion.symbol.startLine
+    );
   }
 
   public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void> {
@@ -54,7 +53,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     await this.show(responseItem);
     this.addToCache(responseItem);
   }
-
 
   private shrinkResponseItem(response: httpyac.HttpResponse) {
     delete response.request?.body;
@@ -71,7 +69,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     this.refreshHistory.fire();
     vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
   }
-
 
   async remove(responseItem: ResponseItem): Promise<boolean> {
     const index = this.responseCache.findIndex(obj => obj.id === responseItem.id);
@@ -100,11 +97,12 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', false);
   }
 
-
   public async shrink(responseItem: ResponseItem): Promise<void> {
     const response = responseItem.response;
     if (response.rawBody) {
-      const responseUri = responseItem.responseUri || await this.storageProvider.writeFile(response.rawBody, `${responseItem.id}.${responseItem.extension}`);
+      const responseUri =
+        responseItem.responseUri ||
+        (await this.storageProvider.writeFile(response.rawBody, `${responseItem.id}.${responseItem.extension}`));
       if (responseUri) {
         this.shrinkResponseItem(response);
         responseItem.responseUri = responseUri;

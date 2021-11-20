@@ -1,10 +1,15 @@
+import {
+  getConfigSetting,
+  getEnvironmentConfig,
+  getResourceConfig,
+  httpDocumentSelector,
+  watchConfigSettings,
+} from './config';
+import { DocumentStore as IDocumentStore } from './extensionApi';
+import { getOutputChannel, logToOuputChannelFactory, logStream } from './io';
+import { DisposeProvider } from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
-import { getConfigSetting, getEnvironmentConfig, getResourceConfig, httpDocumentSelector, watchConfigSettings } from './config';
-import { getOutputChannel, logToOuputChannelFactory, logStream } from './io';
-import { DocumentStore as IDocumentStore } from './extensionApi';
-import { DisposeProvider } from './utils';
-
 
 export class DocumentStore extends DisposeProvider implements IDocumentStore {
   activeEnvironment: Array<string> | undefined;
@@ -24,7 +29,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
 
     this.subscriptions = [
       {
-        dispose: httpyac.store.userSessionStore.onSessionChanged(() => this.documentStoreChangedEmitter.fire())
+        dispose: httpyac.store.userSessionStore.onSessionChanged(() => this.documentStoreChangedEmitter.fire()),
       },
       watchConfigSettings(() => {
         this.httpFileStore.clear();
@@ -43,19 +48,40 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         if (event.contentChanges.length > 0) {
           if (vscode.languages.match(httpDocumentSelector, event.document)) {
             await this.getHttpFile(event.document);
-          } else if (vscode.languages.match([{
-            language: 'dotenv', scheme: 'file',
-          }], event.document)) {
+          } else if (
+            vscode.languages.match(
+              [
+                {
+                  language: 'dotenv',
+                  scheme: 'file',
+                },
+              ],
+              event.document
+            )
+          ) {
             this.httpFileStore.clear();
-          } else if (vscode.languages.match([
-            {
-              language: 'javascript', scheme: 'file', pattern: '**/*httpyac*'
-            }, {
-              language: 'json', scheme: 'file', pattern: '**/*httpyac*'
-            }, {
-              language: 'json', scheme: 'file', pattern: '**/http-client*'
-            }
-          ], event.document)) {
+          } else if (
+            vscode.languages.match(
+              [
+                {
+                  language: 'javascript',
+                  scheme: 'file',
+                  pattern: '**/*httpyac*',
+                },
+                {
+                  language: 'json',
+                  scheme: 'file',
+                  pattern: '**/*httpyac*',
+                },
+                {
+                  language: 'json',
+                  scheme: 'file',
+                  pattern: '**/http-client*',
+                },
+              ],
+              event.document
+            )
+          ) {
             this.httpFileStore.clear();
           }
         }
@@ -68,7 +94,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     ];
   }
 
-  get documentStoreChanged() : vscode.Event<void> {
+  get documentStoreChanged(): vscode.Event<void> {
     return this.documentStoreChangedEmitter.event;
   }
 
@@ -79,39 +105,35 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     return httpFile;
   }
 
-  async getOrCreate(path: httpyac.PathLike, getText: () => Promise<string>, version: number) : Promise<httpyac.HttpFile> {
+  async getOrCreate(
+    path: httpyac.PathLike,
+    getText: () => Promise<string>,
+    version: number
+  ): Promise<httpyac.HttpFile> {
     const config = await getEnvironmentConfig(path);
-    return await this.httpFileStore.getOrCreate(
-      path,
-      getText,
-      version, {
-        config,
-        activeEnvironment: this.activeEnvironment,
-      }
-    );
+    return await this.httpFileStore.getOrCreate(path, getText, version, {
+      config,
+      activeEnvironment: this.activeEnvironment,
+    });
   }
 
-  async parse(uri: vscode.Uri | undefined, text: string) : Promise<httpyac.HttpFile> {
+  async parse(uri: vscode.Uri | undefined, text: string): Promise<httpyac.HttpFile> {
     let config: httpyac.EnvironmentConfig = {};
     const path: httpyac.PathLike = uri || 'unknown';
     if (uri) {
       config = await getEnvironmentConfig(uri);
     }
-    return await this.httpFileStore.parse(
-      path,
-      text,
-      {
-        config,
-        activeEnvironment: this.activeEnvironment
-      }
-    );
+    return await this.httpFileStore.parse(path, text, {
+      config,
+      activeEnvironment: this.activeEnvironment,
+    });
   }
 
   getAll(): Array<httpyac.HttpFile> {
     return this.httpFileStore.getAll();
   }
 
-  remove(document: vscode.TextDocument) : void {
+  remove(document: vscode.TextDocument): void {
     const path = this.getDocumentPathLike(document);
     this.httpFileStore.remove(path);
   }
@@ -128,16 +150,19 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         }
         const resourceConfig = getResourceConfig(context.httpFile);
         if (resourceConfig.logRequest) {
-          const outputChannelLogResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
-            const requestChannel = getOutputChannel('Request');
-            requestChannel.appendLine(arg);
-          }, resourceConfig.logOutputChannelOptions || {
-            requestOutput: true,
-            requestHeaders: true,
-            requestBodyLength: 1024,
-            responseHeaders: true,
-            responseBodyLength: 1024,
-          });
+          const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
+            (arg: string) => {
+              const requestChannel = getOutputChannel('Request');
+              requestChannel.appendLine(arg);
+            },
+            resourceConfig.logOutputChannelOptions || {
+              requestOutput: true,
+              requestHeaders: true,
+              requestBodyLength: 1024,
+              responseHeaders: true,
+              responseBodyLength: 1024,
+            }
+          );
           const logStreamCache = context.logStream;
           context.logStream = async (channel, type, message) => {
             await logStream(channel, type, message);

@@ -1,11 +1,11 @@
-import * as httpyac from 'httpyac';
-import * as vscode from 'vscode';
 import { getConfigSetting, ResponseViewContent } from '../config';
 import { ResponseItem, ResponseHandler } from '../extensionApi';
 import { StorageProvider } from '../io';
 import { showTextEditor } from '../utils/textEditorUtils';
+import * as httpyac from 'httpyac';
+import * as vscode from 'vscode';
 
-export function previewResponseHandlerFactory(storageProvider: StorageProvider) : ResponseHandler {
+export function previewResponseHandlerFactory(storageProvider: StorageProvider): ResponseHandler {
   return async function previewResponseHandler(responseItem: ResponseItem): Promise<boolean> {
     const config = getConfigSetting();
 
@@ -23,8 +23,7 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider) 
         if (config.responseViewContent && config.responseViewContent !== 'body') {
           content = getContent(response, config.responseViewContent);
           extension = 'http';
-        } else if (response.prettyPrintBody
-          && config.responseViewPrettyPrint) {
+        } else if (response.prettyPrintBody && config.responseViewPrettyPrint) {
           content = response.prettyPrintBody;
         }
       }
@@ -43,7 +42,7 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider) 
         const language = getLanguageId(response.contentType, responseViewContent);
         document = await vscode.workspace.openTextDocument({
           language,
-          content
+          content,
         });
       }
       if (config.responseViewMode === 'reuse') {
@@ -57,17 +56,18 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider) 
   };
 }
 
-
-export function getContent(response: httpyac.HttpResponse, viewContent?: ResponseViewContent | undefined) : string {
+export function getContent(response: httpyac.HttpResponse, viewContent?: ResponseViewContent | undefined): string {
   const result = [];
 
   if (viewContent === 'exchange' && response.request) {
     result.push(`${response.request.method} ${response.request.url}`);
     if (response.request.headers) {
-      result.push(...Object.entries(response.request.headers)
-        .filter(([key]) => !key.startsWith(':'))
-        .map(([key, value]) => `${key}: ${value}`)
-        .sort());
+      result.push(
+        ...Object.entries(response.request.headers)
+          .filter(([key]) => !key.startsWith(':'))
+          .map(([key, value]) => `${key}: ${value}`)
+          .sort()
+      );
     }
     if (response.request.body) {
       result.push('');
@@ -83,10 +83,12 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
   if (viewContent && ['headers', 'full', 'exchange'].indexOf(viewContent) >= 0) {
     result.push(`${response.protocol} ${response.statusCode} ${response.statusMessage}`);
     if (response.headers) {
-      result.push(...Object.entries(response.headers)
-        .filter(([key]) => !key.startsWith(':'))
-        .map(([key, value]) => `${key}: ${value}`)
-        .sort());
+      result.push(
+        ...Object.entries(response.headers)
+          .filter(([key]) => !key.startsWith(':'))
+          .map(([key, value]) => `${key}: ${value}`)
+          .sort()
+      );
     }
     result.push('');
   }
@@ -94,8 +96,7 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
   if (!viewContent || viewContent !== 'headers') {
     if (response?.body) {
       if (httpyac.utils.isString(response.body)) {
-        if (response.prettyPrintBody
-          && getConfigSetting().responseViewPrettyPrint) {
+        if (response.prettyPrintBody && getConfigSetting().responseViewPrettyPrint) {
           result.push(response.prettyPrintBody);
         } else {
           result.push(response.body);
@@ -108,14 +109,20 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
   return httpyac.utils.toMultiLineString(result);
 }
 
-export function getResponseViewContext(viewContent: ResponseViewContent | undefined, hasBody: boolean) : ResponseViewContent | undefined {
+export function getResponseViewContext(
+  viewContent: ResponseViewContent | undefined,
+  hasBody: boolean
+): ResponseViewContent | undefined {
   if (!hasBody && viewContent === 'body') {
     return 'exchange';
   }
   return viewContent;
 }
 
-export function getLanguageId(contentType: httpyac.ContentType | undefined, viewContent?: ResponseViewContent | undefined) : string {
+export function getLanguageId(
+  contentType: httpyac.ContentType | undefined,
+  viewContent?: ResponseViewContent | undefined
+): string {
   if (viewContent && viewContent !== 'body') {
     return 'http';
   }

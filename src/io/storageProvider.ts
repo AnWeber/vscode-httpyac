@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
-import * as httpyac from 'httpyac';
-import { DisposeProvider } from '../utils';
 import { commands } from '../config';
+import { DisposeProvider } from '../utils';
+import * as httpyac from 'httpyac';
+import * as vscode from 'vscode';
 
 export class StorageProvider extends DisposeProvider {
   private storageUri: vscode.Uri;
@@ -19,14 +19,14 @@ export class StorageProvider extends DisposeProvider {
       {
         dispose: async () => {
           await this.clear();
-        }
-      }
+        },
+      },
     ];
     this.storageUri = storageUri;
     this.storageEnabled = vscode.workspace.fs.isWritableFileSystem(this.storageUri.scheme) !== false;
   }
 
-  private async initialize() : Promise<boolean> {
+  private async initialize(): Promise<boolean> {
     if (!this.init && this.storageEnabled) {
       try {
         const storage = vscode.Uri.joinPath(this.storageUri, '_httpyac_');
@@ -42,14 +42,17 @@ export class StorageProvider extends DisposeProvider {
   }
 
   async writeFile(content: string | Buffer, fileName: string): Promise<vscode.Uri | undefined> {
-    if (this.storageUri && await this.initialize()) {
+    if (this.storageUri && (await this.initialize())) {
       try {
         const file = httpyac.utils.shortenFileName(httpyac.utils.replaceInvalidChars(fileName));
         const documentUri = vscode.Uri.joinPath(this.storageUri, file);
         if (this.cachedUris.every(obj => obj.toString() !== documentUri.toString())) {
           this.cachedUris.push(documentUri);
         }
-        await vscode.workspace.fs.writeFile(documentUri, httpyac.utils.isString(content) ? Buffer.from(content) : content);
+        await vscode.workspace.fs.writeFile(
+          documentUri,
+          httpyac.utils.isString(content) ? Buffer.from(content) : content
+        );
         return documentUri;
       } catch (err) {
         httpyac.io.log.error(`write of ${fileName} failed`, err);

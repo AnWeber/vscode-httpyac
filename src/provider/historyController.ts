@@ -20,15 +20,10 @@ class ResponseTreeItem extends vscode.TreeItem {
   }
 }
 
-
 export class HistoryController extends DisposeProvider implements vscode.TreeDataProvider<ResponseItem> {
-
   readonly onDidChangeTreeData: vscode.Event<void>;
 
-  constructor(
-    readonly documentStore: DocumentStore,
-    readonly responseStore: ResponseStore
-  ) {
+  constructor(readonly documentStore: DocumentStore, readonly responseStore: ResponseStore) {
     super();
 
     this.onDidChangeTreeData = responseStore.historyChanged;
@@ -46,28 +41,30 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
     return new ResponseTreeItem(element);
   }
 
-  async getChildren(): Promise<(ResponseItem)[]> {
+  async getChildren(): Promise<ResponseItem[]> {
     return this.responseStore.responseCache;
   }
 
-
   @errorHandler()
   private async showHistory() {
-    const pickedObj = await vscode.window.showQuickPick(this.responseStore.responseCache.map(responseItem => ({
-      label: `${responseItem.name}`,
-      description: `${responseItem.response.statusCode} - ${getTimeAgo(responseItem.created)}`,
-      value: responseItem,
-    })), {
-      placeHolder: 'select history entry',
-      ignoreFocusOut: true
-    });
+    const pickedObj = await vscode.window.showQuickPick(
+      this.responseStore.responseCache.map(responseItem => ({
+        label: `${responseItem.name}`,
+        description: `${responseItem.response.statusCode} - ${getTimeAgo(responseItem.created)}`,
+        value: responseItem,
+      })),
+      {
+        placeHolder: 'select history entry',
+        ignoreFocusOut: true,
+      }
+    );
     if (pickedObj) {
       await this.responseStore.show(pickedObj.value);
     }
   }
 
   @errorHandler()
-  private async clearHistory() : Promise<void> {
+  private async clearHistory(): Promise<void> {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);

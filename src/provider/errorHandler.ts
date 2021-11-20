@@ -1,6 +1,7 @@
+/* eslint-disable no-invalid-this */
+import { getConfigSetting } from '../config';
 import { io, utils } from 'httpyac';
 import { window } from 'vscode';
-import { getConfigSetting } from '../config';
 
 export function errorHandler(this: unknown): MethodDecorator {
   return (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
@@ -11,8 +12,12 @@ export function errorHandler(this: unknown): MethodDecorator {
   };
 }
 
-export function errorHandlerWrapper(target: unknown, propertyKey: string | symbol, method: (...args: unknown[]) => unknown) {
-  return function(this: unknown, ...args: unknown[]): unknown {
+export function errorHandlerWrapper(
+  target: unknown,
+  propertyKey: string | symbol,
+  method: (...args: unknown[]) => unknown
+) {
+  return function (this: unknown, ...args: unknown[]): unknown {
     try {
       const result = method.apply(this, args);
       if (utils.isPromise(result)) {
@@ -45,18 +50,15 @@ async function handleError(_target: unknown, _propertyKey: string | symbol, err:
   }
 }
 
-export function getErrorQuickFix(err: Error) : string | undefined {
+export function getErrorQuickFix(err: Error): string | undefined {
   if (err.name === 'RequestError') {
-    if ([
-      'self signed certificate',
-      'unable to verify the first certificate',
-    ].indexOf(err.message) >= 0) {
-      io.log.info('Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)');
+    if (['self signed certificate', 'unable to verify the first certificate'].indexOf(err.message) >= 0) {
+      io.log.info(
+        'Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)'
+      );
       return 'Disable SSL Verification could fix the problem (# @noRejectUnauthorized or use settings httpyac.requestGotOptions)';
     }
-    if ([
-      'Protocol "https:" not supported. Expected "http:"'
-    ].indexOf(err.message) >= 0) {
+    if (['Protocol "https:" not supported. Expected "http:"'].indexOf(err.message) >= 0) {
       io.log.info('HTTP2 requests are not supported with settings http.proxySupport!=off');
       return 'HTTP2 request are not supported with settings http.proxySupport!=off';
     }

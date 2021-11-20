@@ -1,17 +1,18 @@
-import { workspace, window, languages, Uri, FileType } from 'vscode';
 import { FileEnconding, PathLike, io } from 'httpyac';
-
+import { workspace, window, languages, Uri, FileType } from 'vscode';
 
 export function initFileProvider(): void {
   io.fileProvider.isAbsolute = async (fileName: PathLike) => {
     const uri = toUri(fileName);
-    return uri && await io.fileProvider.exists(uri);
+    return uri && (await io.fileProvider.exists(uri));
   };
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
       if (uri.scheme === 'untitled') {
-        const editor = window.visibleTextEditors.find(obj => languages.match({ language: 'http', scheme: 'file' }, obj.document));
+        const editor = window.visibleTextEditors.find(obj =>
+          languages.match({ language: 'http', scheme: 'file' }, obj.document)
+        );
         if (editor) {
           return Uri.joinPath(editor.document.uri, '..');
         }
@@ -37,7 +38,7 @@ export function initFileProvider(): void {
     try {
       const uri = toUri(fileName);
       if (uri) {
-        const stats = (await workspace.fs.stat(uri));
+        const stats = await workspace.fs.stat(uri);
         return !!stats;
       }
       return false;
@@ -92,8 +93,8 @@ export function initFileProvider(): void {
   };
 }
 
-interface VirtualDocument{
-  uri: Uri,
+interface VirtualDocument {
+  uri: Uri;
   fileUri: Uri;
   toString(): string;
 }

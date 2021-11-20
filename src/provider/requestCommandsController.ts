@@ -9,9 +9,7 @@ import { DisposeProvider } from '../utils';
 import { ResponseStore } from '../responseStore';
 import { ResponseItem } from '../view';
 
-
 export class RequestCommandsController extends DisposeProvider {
-
   onDidChangeCodeLenses: vscode.Event<void>;
 
   constructor(
@@ -39,109 +37,116 @@ export class RequestCommandsController extends DisposeProvider {
   private httpRegionSendContext: httpyac.HttpRegionSendContext | undefined;
 
   @errorHandler()
-  private async send(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+  private async send(document?: utils.DocumentArgument, line?: utils.LineArgument): Promise<void> {
     this.httpRegionSendContext = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
-  private async sendRepeat(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+  private async sendRepeat(document?: utils.DocumentArgument, line?: utils.LineArgument): Promise<void> {
     this.httpRegionSendContext = await utils.getHttpRegionFromLine(document, line, this.documentStore);
-    const repeatOrder = await vscode.window.showQuickPick([
-      { label: 'parallel', value: httpyac.RepeatOrder.parallel },
-      { label: 'sequential', value: httpyac.RepeatOrder.sequential }
-    ], {
-      ignoreFocusOut: true,
-    });
+    const repeatOrder = await vscode.window.showQuickPick(
+      [
+        { label: 'parallel', value: httpyac.RepeatOrder.parallel },
+        { label: 'sequential', value: httpyac.RepeatOrder.sequential },
+      ],
+      {
+        ignoreFocusOut: true,
+      }
+    );
     const count = await vscode.window.showInputBox({
       placeHolder: 'repeat count',
-      ignoreFocusOut: true
+      ignoreFocusOut: true,
     });
 
     if (repeatOrder && count && +count > 0 && this.httpRegionSendContext) {
       this.httpRegionSendContext.repeat = {
         count: +count,
-        type: repeatOrder?.value
+        type: repeatOrder?.value,
       };
       await this.sendRequest(this.httpRegionSendContext);
     }
   }
 
   @errorHandler()
-  private async resend() : Promise<void> {
+  private async resend(): Promise<void> {
     await this.sendRequest(this.httpRegionSendContext);
   }
 
   @errorHandler()
-  private async sendAll() : Promise<void> {
+  private async sendAll(): Promise<void> {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
       await this.sendRequest({
         httpFile,
       });
-
     }
   }
 
   @errorHandler()
-  private async sendSelected() : Promise<void> {
+  private async sendSelected(): Promise<void> {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
 
       const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
 
-      const pickedObjs = await vscode.window.showQuickPick(httpRegions.map(httpRegion => ({
-        label: httpRegion.symbol.name,
-        data: httpRegion
-      })), {
-        placeHolder: 'select requests',
-        canPickMany: true,
-        ignoreFocusOut: true
-      });
+      const pickedObjs = await vscode.window.showQuickPick(
+        httpRegions.map(httpRegion => ({
+          label: httpRegion.symbol.name,
+          data: httpRegion,
+        })),
+        {
+          placeHolder: 'select requests',
+          canPickMany: true,
+          ignoreFocusOut: true,
+        }
+      );
 
       if (pickedObjs) {
         await this.sendRequest({
           httpFile,
-          httpRegionPredicate: httpRegion => pickedObjs.some(obj => obj.data === httpRegion)
+          httpRegionPredicate: httpRegion => pickedObjs.some(obj => obj.data === httpRegion),
         });
       }
-
     }
   }
 
   private async sendRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined) {
-
     if (context) {
-      await vscode.window.withProgress({
-        location: getConfigSetting().progressDefaultLocation === 'window' ? vscode.ProgressLocation.Window : vscode.ProgressLocation.Notification,
-        cancellable: true,
-        title: 'send',
-      }, async (progress, token) => {
-
-        context.progress = {
-          isCanceled: () => token.isCancellationRequested,
-          register: (event: () => void) => {
-            const dispose = token.onCancellationRequested(event);
-            return () => dispose.dispose();
-          },
-          report: data => progress.report(data),
-        };
-        context.logResponse = async (response, httpRegion) => {
-          context.progress?.report?.({
-            message: 'update view',
-          });
-          await this.responseStore.add(response, httpRegion);
-        };
-        await this.documentStore.send(context);
-      });
+      await vscode.window.withProgress(
+        {
+          location:
+            getConfigSetting().progressDefaultLocation === 'window'
+              ? vscode.ProgressLocation.Window
+              : vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: 'send',
+        },
+        async (progress, token) => {
+          context.progress = {
+            isCanceled: () => token.isCancellationRequested,
+            register: (event: () => void) => {
+              const dispose = token.onCancellationRequested(event);
+              return () => dispose.dispose();
+            },
+            report: data => progress.report(data),
+          };
+          context.logResponse = async (response, httpRegion) => {
+            context.progress?.report?.({
+              message: 'update view',
+            });
+            await this.responseStore.add(response, httpRegion);
+          };
+          await this.documentStore.send(context);
+        }
+      );
     }
   }
 
-
   @errorHandler()
-  private async show(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+  private async show(document?: utils.DocumentArgument, line?: utils.LineArgument): Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (context?.httpRegion) {
       const responseItem = this.responseStore.findResponseByHttpRegion(context.httpRegion);
@@ -152,14 +157,14 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async showVariables() : Promise<void> {
+  private async showVariables(): Promise<void> {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
         const variables = await httpyac.getVariables({
           httpFile,
-          config: await getEnvironmentConfig(httpFile.fileName)
+          config: await getEnvironmentConfig(httpFile.fileName),
         });
         await this.openVariablesInEditor(variables);
       }
@@ -174,15 +179,13 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async validateVariables(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+  private async validateVariables(document?: utils.DocumentArgument, line?: utils.LineArgument): Promise<void> {
     const result = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (result) {
       const abortInterceptor = {
-        afterLoop: async () => false
+        afterLoop: async () => false,
       };
-      const variables: Record<string, unknown> = {
-
-      };
+      const variables: Record<string, unknown> = {};
       try {
         result.httpFile.hooks.onRequest.addInterceptor(abortInterceptor);
         await this.sendRequest(result);
@@ -192,7 +195,7 @@ export class RequestCommandsController extends DisposeProvider {
       } catch (err) {
         variables.status = {
           message: 'variables are invalid',
-          err
+          err,
         };
       } finally {
         if (httpyac.utils.isProcessorContext(result)) {
@@ -205,7 +208,10 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async viewHeader(document: utils.DocumentArgument | ResponseItem | undefined, line: utils.LineArgument) : Promise<void> {
+  private async viewHeader(
+    document: utils.DocumentArgument | ResponseItem | undefined,
+    line: utils.LineArgument
+  ): Promise<void> {
     if (document) {
       let responseItem: ResponseItem | undefined;
       if (document instanceof ResponseItem) {
@@ -239,7 +245,7 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async save(document?: utils.DocumentArgument, line?: utils.LineArgument) : Promise<void> {
+  private async save(document?: utils.DocumentArgument, line?: utils.LineArgument): Promise<void> {
     const context = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (context?.httpRegion) {
       const responseItem = this.responseStore.findResponseByHttpRegion(context.httpRegion);
@@ -251,7 +257,7 @@ export class RequestCommandsController extends DisposeProvider {
           filters[ext] = [ext];
         }
         const uri = await vscode.window.showSaveDialog({
-          filters
+          filters,
         });
         if (uri && responseItem.response.rawBody) {
           await vscode.workspace.fs.writeFile(uri, new Uint8Array(responseItem.response.rawBody));

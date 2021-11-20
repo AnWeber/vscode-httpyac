@@ -1,9 +1,9 @@
+import { getConfigSetting } from '../config';
 import { ResponseItem as IResponseItem } from '../extensionApi';
 import * as httpyac from 'httpyac';
-import * as vscode from 'vscode';
 import { extension } from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
-import { getConfigSetting } from '../config';
+import * as vscode from 'vscode';
 
 export class ResponseItem implements IResponseItem {
   readonly id: string;
@@ -15,7 +15,6 @@ export class ResponseItem implements IResponseItem {
   readonly testResults?: Array<httpyac.TestResult>;
   readonly metaData: Record<string, unknown>;
   readonly response: httpyac.HttpResponse;
-
 
   documentUri?: vscode.Uri;
   responseUri?: vscode.Uri;
@@ -35,7 +34,6 @@ export class ResponseItem implements IResponseItem {
     this.response = response;
     this.isCachedResponse = false;
   }
-
 
   private getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
     if (httpRegion) {
@@ -60,46 +58,29 @@ export class ResponseItem implements IResponseItem {
   }
 }
 
-
 function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string | undefined {
-
   if (httpRegion?.metaData?.openWith) {
     return httpRegion.metaData.openWith;
   }
   if (httpyac.utils.isMimeTypeImage(response.contentType)) {
     return 'imagePreview.previewEditor';
   }
-  if (httpyac.utils.isMimeTypePdf(response.contentType)
-    && vscode.extensions.getExtension('tomoki1207.pdf')) {
+  if (httpyac.utils.isMimeTypePdf(response.contentType) && vscode.extensions.getExtension('tomoki1207.pdf')) {
     return 'pdf.preview';
   }
   return undefined;
 }
 
 function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
-  const extensionRecognitions: Array<ExtensionRecognition> = [
-    getExtensionByMetaData,
-  ];
+  const extensionRecognitions: Array<ExtensionRecognition> = [getExtensionByMetaData];
 
   const config = getConfigSetting();
   if (config.responseViewExtensionRecognition === 'mimetype') {
-    extensionRecognitions.push(
-      getExtensionByMimeTypes,
-      getExtensionByUrl,
-      getExtensionByRegexMimetype
-    );
+    extensionRecognitions.push(getExtensionByMimeTypes, getExtensionByUrl, getExtensionByRegexMimetype);
   } else if (config.responseViewExtensionRecognition === 'regex') {
-    extensionRecognitions.push(
-      getExtensionByRegexMimetype,
-      getExtensionByUrl,
-      getExtensionByMimeTypes
-    );
+    extensionRecognitions.push(getExtensionByRegexMimetype, getExtensionByUrl, getExtensionByMimeTypes);
   } else {
-    extensionRecognitions.push(
-      getExtensionByUrl,
-      getExtensionByMimeTypes,
-      getExtensionByRegexMimetype
-    );
+    extensionRecognitions.push(getExtensionByUrl, getExtensionByMimeTypes, getExtensionByRegexMimetype);
   }
 
   for (const extensionRecognition of extensionRecognitions) {
@@ -142,8 +123,7 @@ function getExtensionByMimeTypes(response: httpyac.HttpResponse) {
   return false;
 }
 
-
-function getExtensionByRegexMimetype(response: httpyac.HttpResponse) : string | false {
+function getExtensionByRegexMimetype(response: httpyac.HttpResponse): string | false {
   if (response?.contentType) {
     const contentType = response?.contentType;
     if (httpyac.utils.isMimeTypeJSON(contentType)) {

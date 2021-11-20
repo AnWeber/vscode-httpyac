@@ -1,4 +1,4 @@
-export function getTimeAgo(date: Date) : string {
+export function getTimeAgo(date: Date): string {
   const diff = Date.now() - date.getTime();
 
   const absDiff = Math.abs(diff);
@@ -22,5 +22,4 @@ export function getTimeAgo(date: Date) : string {
   }
 
   return date.toLocaleTimeString();
-
 }

@@ -12,6 +12,6 @@ declare module 'httpsnippet' {
       key: string;
       link?: string;
       description: string;
-    }>
+    }>;
   }>;
 }

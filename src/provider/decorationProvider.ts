@@ -1,18 +1,15 @@
-import { HttpFile } from 'httpyac';
-import * as vscode from 'vscode';
 import { watchConfigSettings, getConfigSetting, httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider, isNotebook } from '../utils';
+import { HttpFile } from 'httpyac';
+import * as vscode from 'vscode';
 
 export class DecorationProvider extends DisposeProvider {
-
   private decorationInactive: vscode.TextEditorDecorationType | undefined;
   private decorationActiveBefore: vscode.TextEditorDecorationType | undefined;
   private decorationActive: vscode.TextEditorDecorationType | undefined;
 
-  constructor(
-    private readonly documentStore: DocumentStore
-  ) {
+  constructor(private readonly documentStore: DocumentStore) {
     super();
     this.subscriptions = [
       documentStore.documentStoreChanged(() => this.setEditorDecoration(vscode.window.activeTextEditor)),
@@ -34,12 +31,8 @@ export class DecorationProvider extends DisposeProvider {
         }
         if (config.decorationActiveRegion) {
           const active = this.initThemeColors(config.decorationActiveRegion);
-          this.decorationActive = vscode.window.createTextEditorDecorationType(
-            active
-          );
-          this.decorationActiveBefore = vscode.window.createTextEditorDecorationType(
-            active
-          );
+          this.decorationActive = vscode.window.createTextEditorDecorationType(active);
+          this.decorationActiveBefore = vscode.window.createTextEditorDecorationType(active);
         }
       }),
     ];
@@ -81,11 +74,17 @@ export class DecorationProvider extends DisposeProvider {
 
       httpFile.httpRegions.forEach((httpRegion, index) => {
         if (httpRegion.symbol.children) {
-          const currentRange = new vscode.Range(httpRegion.symbol.endLine, 0, httpRegion.symbol.endLine, httpRegion.symbol.endOffset);
+          const currentRange = new vscode.Range(
+            httpRegion.symbol.endLine,
+            0,
+            httpRegion.symbol.endLine,
+            httpRegion.symbol.endOffset
+          );
 
-          if (httpRegion.symbol.startLine <= editor.selection.active.line
-            && httpRegion.symbol.endLine >= editor.selection.active.line) {
-
+          if (
+            httpRegion.symbol.startLine <= editor.selection.active.line &&
+            httpRegion.symbol.endLine >= editor.selection.active.line
+          ) {
             activeBorderLineStart = borderLineRanges.pop();
 
             activeBorderLineEnd = currentRange;

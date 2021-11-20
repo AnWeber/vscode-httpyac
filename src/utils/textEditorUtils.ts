@@ -1,8 +1,10 @@
-import * as vscode from 'vscode';
 import { getConfigSetting } from '../config';
+import * as vscode from 'vscode';
 
-
-export async function showTextEditor(uri: vscode.Uri | vscode.TextDocument, preview = true) : Promise<vscode.TextEditor> {
+export async function showTextEditor(
+  uri: vscode.Uri | vscode.TextDocument,
+  preview = true
+): Promise<vscode.TextEditor> {
   const config = getConfigSetting();
   let viewColumn = vscode.ViewColumn.Beside;
   if (config.responseViewColumn === 'current') {

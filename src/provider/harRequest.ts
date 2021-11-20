@@ -1,5 +1,4 @@
 export interface Request {
-
   /** Request method (`GET`, `POST`, ...). */
   method: string;
 
@@ -55,40 +54,38 @@ export interface Header {
   comment?: string;
 }
 export interface Cookie {
+  /** The name of the cookie. */
+  name: string;
 
-    /** The name of the cookie. */
-    name: string;
+  /** The cookie value. */
+  value: string;
 
-    /** The cookie value. */
-    value: string;
+  /** The path pertaining to the cookie. */
+  path?: string;
 
-    /** The path pertaining to the cookie. */
-    path?: string;
+  /** The host of the cookie. */
+  domain?: string;
 
-    /** The host of the cookie. */
-    domain?: string;
+  /**
+   * Cookie expiration time.
+   * (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`,
+   * e.g. `2009-07-24T19:20:30.123+02:00`).
+   */
+  expires?: string;
 
-    /**
-     * Cookie expiration time.
-     * (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`,
-     * e.g. `2009-07-24T19:20:30.123+02:00`).
-     */
-    expires?: string;
+  /** Set to true if the cookie is HTTP only, false otherwise. */
+  httpOnly?: boolean;
 
-    /** Set to true if the cookie is HTTP only, false otherwise. */
-    httpOnly?: boolean;
+  /** True if the cookie was transmitted over ssl, false otherwise. */
+  secure?: boolean;
 
-    /** True if the cookie was transmitted over ssl, false otherwise. */
-    secure?: boolean;
-
-    /**  A comment provided by the user or the application */
-    comment?: string;
+  /**  A comment provided by the user or the application */
+  comment?: string;
 }
 
 export type PostData = PostDataCommon & (PostDataParams | PostDataText);
 
 export interface PostDataCommon {
-
   /** Mime type of posted data. */
   mimeType: string;
 
@@ -97,7 +94,6 @@ export interface PostDataCommon {
 }
 
 export interface PostDataParams {
-
   /**
    * List of posted parameters (in case of URL encoded parameters).
    */
@@ -110,7 +106,6 @@ export interface PostDataParams {
 }
 
 export interface PostDataText {
-
   /**
    * Plain text posted data
    */
@@ -123,7 +118,6 @@ export interface PostDataText {
 }
 
 export interface Param {
-
   /** name of a posted parameter. */
   name: string;
 
