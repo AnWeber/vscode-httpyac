@@ -1,3 +1,10 @@
+## 4.7.3 (2021-11-23)
+
+#### Fix
+
+- remove special handling of Authorization Header on grpc Requests (AnWeber/httpyac#125)
+- GraphQL queries withouth variables are executed (AnWeber/httpyac##124)
+
 ## 4.7.2 (2021-11-17)
 
 #### Fix
