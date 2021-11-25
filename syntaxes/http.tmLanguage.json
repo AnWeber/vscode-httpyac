@@ -1,9 +1,6 @@
 {
   "scopeName": "source.http",
-  "fileTypes": [
-    "http",
-    "rest"
-  ],
+  "fileTypes": ["http", "rest"],
   "keyEquivalent": "^~H",
   "name": "http",
   "patterns": [
@@ -52,11 +49,14 @@
     {
       "begin": "\\s*(?=(\\[|{[^{]))",
       "name": "http.request.body.json",
-      "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "end": "^\\s*(\\#{3,})\\s*(.*?)?\\s*$",
       "contentName": "source.json",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
+        },
+        "1": {
+          "name": "entity.name.type.http"
         }
       },
       "patterns": [
@@ -68,11 +68,14 @@
     {
       "begin": "^\\s*(?=<\\S)",
       "name": "http.request.body.xml",
-      "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "end": "^\\s*(\\#{3,})\\s*(.*?)?\\s*$",
       "contentName": "source.html",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
+        },
+        "1": {
+          "name": "entity.name.type.http"
         }
       },
       "patterns": [
@@ -84,11 +87,14 @@
     {
       "begin": "\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
-      "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "end": "^\\s*(\\#{3,})\\s*(.*?)?\\s*$",
       "contentName": "source.graphql",
       "endCaptures": {
         "0": {
           "name": "comment.line.sharp.http"
+        },
+        "1": {
+          "name": "entity.name.type.http"
         }
       },
       "patterns": [
@@ -222,8 +228,16 @@
           }
         },
         {
-          "match": "^\\s*\\#+.*$",
-          "name": "comment.line.sharp.http"
+          "match": "^\\s*(\\#+)\\s*(.*)$",
+          "name": "comment.line.sharp.http",
+          "captures": {
+            "1": {
+              "name": "comment.line.sharp.http"
+            },
+            "2": {
+              "name": "entity.name.type.http"
+            }
+          }
         },
         {
           "match": "^\\s*\\/{2}.*$",
@@ -281,7 +295,7 @@
             }
           },
           "name": "http.version",
-          "match": "(HTTP)\/(\\d+.\\d+)"
+          "match": "(HTTP)/(\\d+.\\d+)"
         }
       ]
     }
