@@ -64,12 +64,13 @@ export function initUserInteractionProvider(): Disposable {
     const result = await window.showWarningMessage(note, { modal: true }, buttonTitle);
     return result === buttonTitle;
   };
-  io.userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string) =>
+  io.userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string, maskedInput?: boolean) =>
     await window.showInputBox({
       placeHolder: message,
       value: defaultValue,
       prompt: message,
       ignoreFocusOut: true,
+      password: maskedInput,
     });
   io.userInteractionProvider.showListPrompt = async (message: string, values: string[]) =>
     await window.showQuickPick(values, {
