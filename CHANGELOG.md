@@ -1,3 +1,20 @@
+## 4.7.4 (2021-11-30)
+
+#### Feature
+
+- add config setting for OAuth2 redirectUri (AnWeber/httpyac#118)
+- add password variable replacer (AnWeber/httpyac#139)
+- besides `$shared` there is now also the possibility to use `$default` in `config.environment`. These variables are only used if no environment is selected (AnWeber/httpyac#142)
+
+#### Fix
+
+- added two line endings instead of one in response body (httpyac/httpyac.github.io#13)
+- add support for `.` in header name (AnWeber/httpyac#128)
+- parsing error with `=` fixed cli command `--var`
+- interpret all status codes <400 as valid OAuth2 return codes (AnWeber/httpyac#131)
+- global hooks are now always used for all HttpRegions and also work correctly in httpbook (AnWeber/httpbook#39)
+- fix highlighting for script with event name and name after meta data separator
+
 ## 4.7.3 (2021-11-23)
 
 #### Fix
