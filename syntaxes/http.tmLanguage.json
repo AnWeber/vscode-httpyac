@@ -156,13 +156,16 @@
           "name": "entity.name.tag.http"
         },
         "2": {
-          "name": "keyword.other.http"
+          "name": "entity.name.http"
         },
         "3": {
+          "name": "keyword.control.http"
+        },
+        "4": {
           "name": "string.other.http"
         }
       },
-      "match": "^(gql|proto)\\s*(<)\\s+(.*)\\s*$",
+      "match": "^(gql|proto)\\s+(.*)\\s*(<)\\s+(.*)\\s*$",
       "name": "http.import"
     },
     {
@@ -185,15 +188,108 @@
     "metadata": {
       "patterns": [
         {
-          "match": "^\\s*#+\\s+(@([^\\s]*))\\s+(.*)?$",
+          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(for)\\s+(.*)\\s+(of)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "punctuation.definition.block.tag.metadata"
+              "name": "keyword.control.http"
             },
             "3": {
+              "name": "entity.name.type.http"
+            },
+            "4": {
+              "name": "keyword.control.http"
+            },
+            "5": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.sharp.forof.http"
+        },
+        {
+          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(for)\\s+.*\\s*?$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
+              "name": "keyword.control.http"
+            },
+            "3": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.sharp.for.http"
+        },
+        {
+          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(while)\\s+(.*)\\s*?$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
+              "name": "keyword.control.http"
+            },
+            "3": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.sharp.while.http"
+        },
+        {
+          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(slot(:)?\\s*(?<slot>[^\\s]+))?\\s*(minIdleTime(:)?\\s*(?<minIdleTime>\\d*))?\\s*(max(:)?\\s*(?<max>\\d*))?\\s*(expire(:)?\\s*(?<expire>\\d*))?\\s*?$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
+              "name": "keyword.control.http"
+            },
+            "3": {
+              "name": "keyword.control.http"
+            },
+            "4": {
+              "name": "entity.name.type.http"
+            },
+            "5": {
+              "name": "keyword.control.http"
+            },
+            "6": {
+              "name": "keyword.control.http"
+            },
+            "7": {
+              "name": "entity.name.type.http"
+            },
+            "8": {
+              "name": "keyword.control.http"
+            },
+            "9": {
+              "name": "keyword.control.http"
+            },
+            "10": {
+              "name": "entity.name.type.http"
+            },
+            "11": {
+              "name": "keyword.control.http"
+            },
+            "12": {
+              "name": "keyword.control.http"
+            },
+            "13": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.sharp.ratelimit.http"
+        },
+        {
+          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+(.*)?$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
               "name": "entity.name.type.http"
             }
           },
