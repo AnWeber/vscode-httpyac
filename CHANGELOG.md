@@ -1,3 +1,13 @@
+## 4.7.5 (2021-12-05)
+
+#### Feature
+
+- better syntax highlighting for meta data and headers
+
+#### Fix
+
+- oauth2 variables are expanded
+
 ## 4.7.4 (2021-11-30)
 
 #### Feature
