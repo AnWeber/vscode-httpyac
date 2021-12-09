@@ -1,3 +1,16 @@
+## 4.8.0 (2021-12-09)
+
+#### Feature
+
+- `@import` supports variable substitution (AnWeber/httpyac#151)
+- render objects as JSON while replacing variables (AnWeber/httpyac#146)
+- add httpResponse as named variable with `${name}Response` (AnWeber/httpyac#152)
+
+#### Fix
+
+- read all `*.env.json` as Intellij Environment Files (#94)
+- Intellij `client.global.set` really changes variables for this run (AnWeber/httpyac#150)
+
 ## 4.7.5 (2021-12-05)
 
 #### Feature
