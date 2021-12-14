@@ -228,6 +228,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         const config = vscode.workspace.getConfiguration(APP_NAME);
         await config.update('environmentSelectedOnStart', activeEnvironment);
       }
+      this.documentStore.documentStoreChangedEmitter.fire();
     } else {
       vscode.window.showInformationMessage('no environment found');
     }
@@ -262,6 +263,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         httpyac.store.userSessionStore.removeUserSession(userSession.id);
         httpyac.io.log.info(`${userSession.label} removed`);
       }
+      this.documentStore.documentStoreChangedEmitter.fire();
     }
   }
 
@@ -303,6 +305,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
             httpFile,
             cookies.map(obj => obj.data)
           );
+          this.documentStore.documentStoreChangedEmitter.fire();
         }
       }
     }
