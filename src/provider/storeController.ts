@@ -236,6 +236,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   }
 
   private async reset(): Promise<void> {
+    this.documentStore.httpFileStore.clear();
     await httpyac.store.userSessionStore.reset();
     await httpyac.store.cookieStore.reset();
   }
