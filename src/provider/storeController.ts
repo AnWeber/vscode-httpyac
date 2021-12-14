@@ -194,22 +194,30 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
     let activeEnvironment: string[] | undefined;
     if (envs) {
-      const pickedObj = await vscode.window.showQuickPick(
-        envs.map(env => ({
-          label: env,
-          picked: this.documentStore.activeEnvironment && this.documentStore.activeEnvironment.indexOf(env) >= 0,
-        })),
-        {
-          placeHolder: 'select environment',
-          ignoreFocusOut: true,
-          canPickMany: getConfigSetting().environmentPickMany,
-        }
-      );
+      const canPickMany = getConfigSetting().environmentPickMany;
+
+      const options: Array<{ label: string; value?: string; picked?: boolean }> = envs.map(env => ({
+        label: env,
+        value: env,
+        picked: this.documentStore.activeEnvironment && this.documentStore.activeEnvironment.indexOf(env) >= 0,
+      }));
+      if (!canPickMany) {
+        options.push({
+          label: `- (no env)`,
+        });
+      }
+      const pickedObj = await vscode.window.showQuickPick(options, {
+        placeHolder: 'select environment',
+        ignoreFocusOut: true,
+        canPickMany,
+      });
       if (pickedObj) {
         if (Array.isArray(pickedObj)) {
-          activeEnvironment = pickedObj.map(obj => obj.label);
+          activeEnvironment = pickedObj.map(obj => obj.value);
+        } else if (pickedObj.value) {
+          activeEnvironment = [pickedObj.value];
         } else {
-          activeEnvironment = [pickedObj.label];
+          activeEnvironment = undefined;
         }
       } else {
         activeEnvironment = undefined;
