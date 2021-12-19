@@ -1,3 +1,12 @@
+## 4.8.2 (2021-12-19)
+
+#### Fix
+
+- replace all whitespace in meta data name and use camelCase instead of underscore AnWeber/httpyac(#154)
+- support nested `envDirName` (#93)
+- allow hyphens in variable name (#95)
+- fix syntax highlighting in Request Line after JSON Response
+
 ## 4.8.1 (2021-12-10)
 
 #### Fix
