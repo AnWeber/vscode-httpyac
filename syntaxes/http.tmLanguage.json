@@ -55,16 +55,8 @@
     {
       "begin": "\\s*(?=(\\[|{[^{]))",
       "name": "http.request.body.json",
-      "end": "^\\s*(?=(\\#{3,}|\\{{2}))",
+      "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*))",
       "contentName": "source.json",
-      "endCaptures": {
-        "0": {
-          "name": "comment.line.sharp.http"
-        },
-        "1": {
-          "name": "entity.name.type.http"
-        }
-      },
       "patterns": [
         {
           "include": "source.json"
@@ -74,16 +66,8 @@
     {
       "begin": "^\\s*(?=<\\S)",
       "name": "http.request.body.xml",
-      "end": "^\\s*(?=(\\#{3,}|\\{{2}))",
+      "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*))",
       "contentName": "source.html",
-      "endCaptures": {
-        "0": {
-          "name": "comment.line.sharp.http"
-        },
-        "1": {
-          "name": "entity.name.type.http"
-        }
-      },
       "patterns": [
         {
           "include": "text.xml"
@@ -93,16 +77,8 @@
     {
       "begin": "(?i)^\\s*(?=(query|mutation|fragment))",
       "name": "http.request.body.graphql",
-      "end": "^\\s*(?=(\\#{3,}|\\{{2}))",
+      "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*))",
       "contentName": "source.graphql",
-      "endCaptures": {
-        "0": {
-          "name": "comment.line.sharp.http"
-        },
-        "1": {
-          "name": "entity.name.type.http"
-        }
-      },
       "patterns": [
         {
           "include": "source.graphql"
