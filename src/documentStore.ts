@@ -2,11 +2,11 @@ import {
   getConfigSetting,
   getEnvironmentConfig,
   getResourceConfig,
-  httpDocumentSelector,
+  allHttpDocumentSelector,
   watchConfigSettings,
 } from './config';
 import { DocumentStore as IDocumentStore } from './extensionApi';
-import { getOutputChannel, logToOuputChannelFactory, logStream } from './io';
+import { getOutputChannel, logToOutputChannelFactory, logStream } from './io';
 import { DisposeProvider } from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
@@ -35,18 +35,18 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         this.httpFileStore.clear();
       }),
       vscode.workspace.onDidCloseTextDocument(document => {
-        if (vscode.languages.match(httpDocumentSelector, document)) {
+        if (vscode.languages.match(allHttpDocumentSelector, document)) {
           this.remove(document);
         }
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
-        if (vscode.languages.match(httpDocumentSelector, document)) {
+        if (vscode.languages.match(allHttpDocumentSelector, document)) {
           await this.getHttpFile(document);
         }
       }),
       vscode.workspace.onDidChangeTextDocument(async event => {
         if (event.contentChanges.length > 0) {
-          if (vscode.languages.match(httpDocumentSelector, event.document)) {
+          if (vscode.languages.match(allHttpDocumentSelector, event.document)) {
             await this.getHttpFile(event.document);
           } else if (
             vscode.languages.match(
@@ -145,7 +145,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         if (!context.scriptConsole) {
           context.scriptConsole = new httpyac.io.Logger({
             level: config.log?.level,
-            logMethod: logToOuputChannelFactory('Console'),
+            logMethod: logToOutputChannelFactory('Console'),
           });
         }
         const resourceConfig = getResourceConfig(context.httpFile);

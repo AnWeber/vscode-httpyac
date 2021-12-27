@@ -1,4 +1,4 @@
-import { FileEnconding, PathLike, io } from 'httpyac';
+import { FileEncoding, PathLike, io } from 'httpyac';
 import { workspace, window, languages, Uri, FileType } from 'vscode';
 
 export function initFileProvider(): void {
@@ -25,6 +25,13 @@ export function initFileProvider(): void {
     }
     throw new Error('No valid uri');
   };
+  io.fileProvider.hasExtension = (fileName: PathLike, extension: string) => {
+    const uri = toUri(fileName);
+    if (uri) {
+      return uri.toString().endsWith(extension);
+    }
+    return false;
+  };
 
   io.fileProvider.joinPath = (fileName: PathLike, path: string): PathLike => {
     const uri = toUri(fileName);
@@ -46,7 +53,7 @@ export function initFileProvider(): void {
       return false;
     }
   };
-  io.fileProvider.readFile = async (fileName: PathLike, encoding: FileEnconding): Promise<string> => {
+  io.fileProvider.readFile = async (fileName: PathLike, encoding: FileEncoding): Promise<string> => {
     const uri = toUri(fileName);
     if (uri) {
       const file = await workspace.fs.readFile(uri);
@@ -73,8 +80,8 @@ export function initFileProvider(): void {
   io.fileProvider.readdir = async (dirname: PathLike): Promise<string[]> => {
     const uri = toUri(dirname);
     if (uri) {
-      const filestats = await workspace.fs.stat(uri);
-      if (filestats.type === FileType.Directory) {
+      const fileStat = await workspace.fs.stat(uri);
+      if (fileStat.type === FileType.Directory) {
         const result = await workspace.fs.readDirectory(uri);
         return result.map(([file]) => file);
       }

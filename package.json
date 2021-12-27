@@ -40,6 +40,7 @@
     "onCommand:httpyac.new",
     "onCommand:httpyac.showHistory",
     "onLanguage:http",
+    "onLanguage:markdown",
     "onView:httpyacHistory"
   ],
   "main": "./dist/extension.js",
@@ -407,7 +408,7 @@
               {
                 "type": "object",
                 "default": {},
-                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "description": "Certificate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
                 "properties": {
                   "cert": {
                     "type": "string",
@@ -559,12 +560,12 @@
           "markdownEnumDescriptions": [
             "only view response body",
             "view only response headers",
-            "view response (statusline, header, body)",
+            "view response (status line, header, body)",
             "view request and response"
           ],
           "default": "body",
           "scope": "resource",
-          "description": "content of respnse view"
+          "description": "content of response view"
         },
         "httpyac.logLevel": {
           "type": "string",
@@ -682,7 +683,7 @@
           "type": "boolean",
           "default": true,
           "scope": "window",
-          "description": "show information, warning and error notifiation message"
+          "description": "show information, warning and error notification message"
         },
         "httpyac.maxHistoryItems": {
           "type": "number",
@@ -858,7 +859,7 @@
         "category": "httpYac"
       },
       {
-        "command": "httpyac.sendall",
+        "command": "httpyac.sendAll",
         "title": "Send All",
         "category": "httpYac",
         "icon": "$(run-all)"
@@ -960,67 +961,67 @@
       "commandPalette": [
         {
           "command": "httpyac.send",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.sendRepeat",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
-          "command": "httpyac.sendall",
-          "when": "editorLangId == http"
+          "command": "httpyac.sendAll",
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.sendSelected",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.generateCode",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.generateCodeSelectLanguage",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.resend",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.show",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.showVariables",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.validateVariables",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.save",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.clearHistory",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.toggle-env",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.reset",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.logout",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.removeCookies",
-          "when": "editorLangId == http"
+          "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
           "command": "httpyac.removeHistory",
@@ -1030,64 +1031,64 @@
       "editor/title": [
         {
           "command": "httpyac.send",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "1_run@1"
         },
         {
-          "command": "httpyac.sendall",
-          "when": "editorLangId == http",
+          "command": "httpyac.sendAll",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "1_run@1"
         },
         {
           "command": "httpyac.toggle-env",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "1_run@1"
         },
         {
           "command": "httpyac.clearHistory",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.logout",
-          "when": "editorLangId == 'http'",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.resend",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.generateCode",
-          "when": "editorLangId == 'http'",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         }
       ],
       "editor/context": [
         {
           "command": "httpyac.send",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.sendRepeat",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.resend",
-          "when": "editorTextFocus && editorLangId == http",
+          "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.toggle-env",
-          "when": "editorLangId == http",
+          "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         },
         {
           "command": "httpyac.generateCode",
-          "when": "editorTextFocus && editorLangId == 'http'",
+          "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
         }
       ],
@@ -1116,25 +1117,25 @@
         "command": "httpyac.send",
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
-        "when": "editorTextFocus && editorLangId == 'http'"
+        "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages"
       },
       {
         "command": "httpyac.resend",
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l",
-        "when": "editorTextFocus && editorLangId == 'http'"
+        "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages"
       },
       {
         "command": "httpyac.toggle-env",
         "key": "ctrl+alt+e",
         "mac": "cmd+alt+e",
-        "when": "editorTextFocus && editorLangId == 'http'"
+        "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages"
       },
       {
         "command": "httpyac.generateCode",
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g",
-        "when": "editorTextFocus && editorLangId == 'http'"
+        "when": "editorTextFocus && editorLangId in httpyac.supportedLanguages"
       }
     ],
     "jsonValidation": [

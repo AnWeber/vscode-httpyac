@@ -33,12 +33,12 @@ more [examples](https://httpyac.github.io/guide/examples) and [guide](https://ht
 | Name | Description |
 | - | - |
 | `httpyac.send` | send request in ActiveTextEditor in active line |
-| `httpyac.sendall` | send all requests in ActiveTextEditor |
+| `httpyac.sendAll` | send all requests in ActiveTextEditor |
 | `httpyac.resend` | resend last request |
 | `httpyac.show` | show cached response of request in ActiveTextEditor in active line |
 | `httpyac.viewHeader` | show response headers, request header and timings of request in ActiveTextEditor in active line |
 | `httpyac.save` | save response of request in ActiveTextEditor in active line |
-| `httpyac.clearall` | clear all cached responses |
+| `httpyac.clearAll` | clear all cached responses |
 | `httpyac.toggle-env` | toggle environment of active text document |
 | `httpyac.generateCode` | generate code of request in ActiveTextEditor in active line |
 | `httpyac.reset` | reset environments, oauth sessions and cookies |

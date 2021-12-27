@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { getConfigSetting, commands, httpDocumentSelector } from '../config';
+import { getConfigSetting, commands, allHttpDocumentSelector } from '../config';
 import { errorHandler } from './errorHandler';
 import * as utils from '../utils';
 import { DocumentStore } from '../documentStore';
@@ -10,7 +10,7 @@ import { ResponseStore } from '../responseStore';
 export class CodeLensProvider extends DisposeProvider implements vscode.CodeLensProvider {
   constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
     super();
-    this.subscriptions = [vscode.languages.registerCodeLensProvider(httpDocumentSelector, this)];
+    this.subscriptions = [vscode.languages.registerCodeLensProvider(allHttpDocumentSelector, this)];
   }
 
   @errorHandler()
@@ -23,8 +23,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
     if (!config?.useCodeLensInNotebook && utils.isNotebook(document)) {
       return result;
     }
-
-    if (httpFile && httpFile.httpRegions.length > 0) {
+    if (httpFile.httpRegions.some(obj => !httpyac.utils.isGlobalHttpRegion(obj))) {
       if (config?.codelens?.sendAll) {
         result.push(
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {

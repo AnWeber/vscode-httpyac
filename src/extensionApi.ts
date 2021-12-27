@@ -46,6 +46,7 @@ export interface HttpYacExtensionApi {
   documentStore: DocumentStore;
   responseStore: ResponseStore;
   httpDocumentSelector: vscode.DocumentSelector;
+  allHttpDocumentSelector: vscode.DocumentSelector;
   environmentChanged: vscode.Event<string[] | undefined>;
   getEnvironmentConfig(path: httpyac.PathLike): Promise<httpyac.EnvironmentConfig>;
   getErrorQuickFix: (err: Error) => string | undefined;

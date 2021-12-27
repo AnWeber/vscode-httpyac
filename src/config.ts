@@ -9,7 +9,7 @@ export const commands = {
   sendRepeat: `${APP_NAME}.sendRepeat`,
   resend: `${APP_NAME}.resend`,
   sendSelected: `${APP_NAME}.sendSelected`,
-  sendAll: `${APP_NAME}.sendall`,
+  sendAll: `${APP_NAME}.sendAll`,
   clearHistory: `${APP_NAME}.clearHistory`,
   show: `${APP_NAME}.show`,
   viewHeader: `${APP_NAME}.viewHeader`,
@@ -32,7 +32,7 @@ export interface ResourceConfig {
   requestDefaultHeaders?: Record<string, string>;
   requestGotOptions?: httpyac.HttpRequest;
   cookieJarEnabled?: boolean;
-  clientCertficates?: Record<string, httpyac.ClientCertificateOptions>;
+  clientCertificates?: Record<string, httpyac.ClientCertificateOptions>;
   environmentVariables?: Record<string, httpyac.Variables>;
   envDirName?: string;
   rootDir?: string;
@@ -131,7 +131,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
       supportAnsiColors: false,
     },
     cookieJarEnabled: config.cookieJarEnabled,
-    clientCertificates: config.clientCertficates,
+    clientCertificates: config.clientCertificates,
     request: config.requestGotOptions,
     requestBodyInjectVariablesExtensions: config.requestBodyInjectVariablesExtensions,
     proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
@@ -141,10 +141,10 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
   };
 
   const uri = toUri(fileName);
-  if (uri && config.clientCertficates) {
+  if (uri && config.clientCertificates) {
     const workspaceFolder = workspace.getWorkspaceFolder(uri);
     if (workspaceFolder) {
-      httpyac.utils.resolveClientCertficates(config, workspaceFolder);
+      httpyac.utils.resolveClientCertificates(config, workspaceFolder);
     }
   }
   return environmentConfig;
@@ -160,3 +160,5 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): Di
 }
 
 export const httpDocumentSelector = [{ language: 'http', scheme: '*' }];
+
+export const allHttpDocumentSelector = [...httpDocumentSelector, { language: 'markdown', scheme: 'file' }];

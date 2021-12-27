@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { APP_NAME, httpDocumentSelector, getConfigSetting, getEnvironmentConfig } from '../config';
+import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConfig } from '../config';
 import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
@@ -36,7 +36,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       vscode.commands.registerCommand(commands.reset, this.reset, this),
       vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
-      vscode.languages.registerCodeLensProvider(httpDocumentSelector, this),
+      vscode.languages.registerCodeLensProvider(allHttpDocumentSelector, this),
       vscode.window.onDidChangeActiveTextEditor(async editor => {
         await this.refreshStatusBarItemWithEditor(editor);
       }),
@@ -54,10 +54,10 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       return result;
     }
     const httpFile = await this.documentStore.getHttpFile(document);
-    const args = [document.uri];
+    if (httpFile.httpRegions.some(obj => !httpyac.utils.isGlobalHttpRegion(obj))) {
+      const args = [document.uri];
 
-    if (config.codelens?.pickEnvironment) {
-      if (httpFile) {
+      if (config.codelens?.pickEnvironment) {
         result.push(
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
             command: commands.toggleEnv,
@@ -66,10 +66,8 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
           })
         );
       }
-    }
 
-    if (config.codelens?.resetEnvironment) {
-      if (httpFile) {
+      if (config.codelens?.resetEnvironment) {
         result.push(
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
             command: commands.reset,
@@ -77,26 +75,26 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
           })
         );
       }
-    }
 
-    if (httpyac.store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
-      result.push(
-        new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-          command: commands.logout,
-          title: `session (${httpyac.store.userSessionStore.userSessions.length})`,
-        })
-      );
-    }
-    if (httpFile && config.codelens?.removeCookies) {
-      const cookies = httpyac.store.cookieStore.getCookies(httpFile);
-      if (cookies.length > 0) {
+      if (httpyac.store.userSessionStore.userSessions.length > 0 && config.codelens?.logoutUserSession) {
         result.push(
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-            command: commands.removeCookies,
-            arguments: args,
-            title: `cookies (${cookies.length})`,
+            command: commands.logout,
+            title: `session (${httpyac.store.userSessionStore.userSessions.length})`,
           })
         );
+      }
+      if (config.codelens?.removeCookies) {
+        const cookies = httpyac.store.cookieStore.getCookies(httpFile);
+        if (cookies.length > 0) {
+          result.push(
+            new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+              command: commands.removeCookies,
+              arguments: args,
+              title: `cookies (${cookies.length})`,
+            })
+          );
+        }
       }
     }
     return result;
@@ -111,7 +109,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   private async refreshStatusBarItemWithEditor(editor: vscode.TextEditor | undefined) {
     if (getConfigSetting().environmentShowStatusBarItem) {
-      if (editor?.document && vscode.languages.match(httpDocumentSelector, editor.document)) {
+      if (editor?.document && vscode.languages.match(allHttpDocumentSelector, editor.document)) {
         const httpFile = await this.documentStore.getHttpFile(editor.document);
         this.refreshEnvStatusBarItem(httpFile);
       } else {

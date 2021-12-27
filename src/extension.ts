@@ -29,10 +29,15 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       new provider.DecorationProvider(documentStore),
       new provider.HttpCompletionItemProvider(documentStore),
       vscode.languages.registerDocumentSymbolProvider(
-        config.httpDocumentSelector,
+        config.allHttpDocumentSelector,
         new provider.HttpDocumentSymbolProvider(documentStore)
       ),
     ]
+  );
+  vscode.commands.executeCommand(
+    'setContext',
+    'httpyac.supportedLanguages',
+    config.allHttpDocumentSelector.map(obj => obj.language)
   );
 
   return {
@@ -40,6 +45,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
     documentStore,
     responseStore,
     httpDocumentSelector: config.httpDocumentSelector,
+    allHttpDocumentSelector: config.allHttpDocumentSelector,
     environmentChanged: storeController.environmentChanged,
     getErrorQuickFix: provider.getErrorQuickFix,
     getEnvironmentConfig: config.getEnvironmentConfig,

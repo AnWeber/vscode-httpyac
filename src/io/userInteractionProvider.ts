@@ -21,8 +21,8 @@ export async function logStream(channel: string, type: string, message: unknown)
   appendToOutputChannel(outputChannel, [message], `${new Date().toLocaleTimeString()} - ${type}: `);
 }
 
-export function logToOuputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {
-  return function logToOuputChannel(level: LogLevel, ...messages: Array<unknown>) {
+export function logToOutputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {
+  return function logToOutputChannel(level: LogLevel, ...messages: Array<unknown>) {
     const outputChannel = getOutputChannel(channel);
     outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
     appendToOutputChannel(outputChannel, messages);
@@ -52,7 +52,7 @@ function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[]
 }
 
 export function initUserInteractionProvider(): Disposable {
-  io.log.options.logMethod = logToOuputChannelFactory('Log');
+  io.log.options.logMethod = logToOutputChannelFactory('Log');
   io.userInteractionProvider.showInformationMessage = async (message: string, ...buttons: Array<string>) =>
     await window.showInformationMessage(message, ...buttons);
   io.userInteractionProvider.showErrorMessage = async (message: string, ...buttons: Array<string>) =>

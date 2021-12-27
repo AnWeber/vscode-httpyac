@@ -1,5 +1,5 @@
 import { DocumentStore } from '../documentStore';
-import { HttpSymbol, HttpSymbolKind } from 'httpyac';
+import { HttpSymbol, HttpSymbolKind, utils } from 'httpyac';
 import * as vscode from 'vscode';
 
 export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
@@ -9,7 +9,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
     const httpFile = await this.documentStore.getHttpFile(document);
 
     const symbols: Array<vscode.DocumentSymbol> = [];
-    if (httpFile) {
+    if (httpFile && httpFile.httpRegions.some(obj => !utils.isGlobalHttpRegion(obj))) {
       for (const httpRegion of httpFile.httpRegions) {
         symbols.push(this.toDocumentSymbol(httpRegion.symbol));
       }
