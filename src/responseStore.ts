@@ -58,6 +58,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     delete response.request?.body;
     delete response.parsedBody;
     delete response.body;
+    delete response.rawHeaders;
     delete response.rawBody;
     delete response.prettyPrintBody;
   }
