@@ -73,8 +73,9 @@ export function initFileProvider(): void {
     const uri = toUri(fileName);
     if (uri) {
       await workspace.fs.writeFile(uri, buffer);
+    } else {
+      throw new Error('No valid uri');
     }
-    throw new Error('No valid uri');
   };
 
   io.fileProvider.readdir = async (dirname: PathLike): Promise<string[]> => {
