@@ -1,3 +1,10 @@
+## 4.9.1 (2022-01-04)
+
+#### Fix
+
+- GRPC name resolution problem when the path was set (AnWeber/httpyac#158)
+- FileProvider writeBuffer method fails in VS Code (#98)
+
 ## 4.9.0 (2021-12-29)
 
 #### Features
