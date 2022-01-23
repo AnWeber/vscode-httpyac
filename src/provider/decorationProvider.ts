@@ -49,8 +49,8 @@ export class DecorationProvider extends DisposeProvider {
   }
 
   private async setEditorDecoration(editor: vscode.TextEditor | undefined) {
-    if (editor && vscode.languages.match(httpDocumentSelector, editor.document)) {
-      const httpFile = await this.documentStore.getHttpFile(editor.document);
+    if (editor) {
+      const httpFile = await this.documentStore.getCurrentHttpFile(editor, httpDocumentSelector);
       if (httpFile) {
         this.setDecoration(httpFile, editor);
       }
@@ -58,11 +58,9 @@ export class DecorationProvider extends DisposeProvider {
   }
 
   private async onDidChangeTextEditorSelection({ textEditor }: vscode.TextEditorSelectionChangeEvent) {
-    if (textEditor && vscode.languages.match(httpDocumentSelector, textEditor.document)) {
-      const httpFile = await this.documentStore.getHttpFile(textEditor.document);
-      if (httpFile) {
-        this.setDecoration(httpFile, textEditor);
-      }
+    const httpFile = await this.documentStore.getCurrentHttpFile(textEditor, httpDocumentSelector);
+    if (httpFile) {
+      this.setDecoration(httpFile, textEditor);
     }
   }
 

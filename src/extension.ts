@@ -28,6 +28,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       new provider.RequestCommandsController(documentStore, responseStore, storageProvider),
       new provider.DecorationProvider(documentStore),
       new provider.HttpCompletionItemProvider(documentStore),
+      new provider.VariablesController(documentStore, storeController.environmentChanged),
       vscode.languages.registerDocumentSymbolProvider(
         config.allHttpDocumentSelector,
         new provider.HttpDocumentSymbolProvider(documentStore)

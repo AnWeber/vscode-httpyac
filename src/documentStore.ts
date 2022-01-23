@@ -18,6 +18,8 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
 
   public readonly httpFileStore: httpyac.store.HttpFileStore;
 
+  public variables: httpyac.Variables | undefined;
+
   documentStoreChangedEmitter: vscode.EventEmitter<void>;
 
   constructor() {
@@ -39,15 +41,21 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
           this.remove(document);
         }
       }),
+      vscode.window.onDidChangeActiveTextEditor(async editor => {
+        this.refreshHttpFileOpen();
+      }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         if (vscode.languages.match(allHttpDocumentSelector, document)) {
           await this.getHttpFile(document);
+          this.documentStoreChangedEmitter.fire();
         }
       }),
       vscode.workspace.onDidChangeTextDocument(async event => {
         if (event.contentChanges.length > 0) {
           if (vscode.languages.match(allHttpDocumentSelector, event.document)) {
             await this.getHttpFile(event.document);
+            delete this.variables;
+            this.documentStoreChangedEmitter.fire();
           } else if (
             vscode.languages.match(
               [
@@ -59,7 +67,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
               event.document
             )
           ) {
-            this.httpFileStore.clear();
+            this.clear();
           } else if (
             vscode.languages.match(
               [
@@ -82,7 +90,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
               event.document
             )
           ) {
-            this.httpFileStore.clear();
+            this.clear();
           }
         }
       }),
@@ -111,6 +119,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     version: number
   ): Promise<httpyac.HttpFile> {
     const config = await getEnvironmentConfig(path);
+    this.refreshHttpFileOpen(true);
     return await this.httpFileStore.getOrCreate(path, getText, version, {
       config,
       activeEnvironment: this.activeEnvironment,
@@ -181,11 +190,40 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         context.require = {
           vscode,
         };
-        return await httpyac.send(context);
+        const result = await httpyac.send(context);
+        this.variables = context.variables;
+        return result;
       }
       return false;
     } finally {
+      this.refreshHttpFileOpen(true);
       this.documentStoreChangedEmitter.fire();
     }
+  }
+
+  clear() {
+    this.httpFileStore.clear();
+    delete this.variables;
+    this.documentStoreChangedEmitter.fire();
+  }
+
+  async getCurrentHttpFile(
+    editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor,
+    documentSelector: vscode.DocumentSelector = allHttpDocumentSelector
+  ): Promise<httpyac.HttpFile | undefined> {
+    if (editor?.document && vscode.languages.match(documentSelector, editor.document)) {
+      return await this.getHttpFile(editor.document);
+    }
+    return undefined;
+  }
+
+  private refreshHttpFileOpen(val = false) {
+    const isHttpFileOpen =
+      val ||
+      vscode.window.visibleTextEditors.some(
+        editor => editor?.document && vscode.languages.match(allHttpDocumentSelector, editor.document)
+      );
+    vscode.commands.executeCommand('setContext', 'httpyacHttpFileOpen', isHttpFileOpen);
+    return isHttpFileOpen;
   }
 }

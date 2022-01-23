@@ -8,3 +8,4 @@ export * from './httpDocumentSymbolProvider';
 export * from './requestCommandsController';
 export * from './responseDocumentController';
 export * from './storeController';
+export * from './variablesController';

@@ -109,8 +109,8 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   private async refreshStatusBarItemWithEditor(editor: vscode.TextEditor | undefined) {
     if (getConfigSetting().environmentShowStatusBarItem) {
-      if (editor?.document && vscode.languages.match(allHttpDocumentSelector, editor.document)) {
-        const httpFile = await this.documentStore.getHttpFile(editor.document);
+      const httpFile = await this.documentStore.getCurrentHttpFile(editor);
+      if (httpFile) {
         this.refreshEnvStatusBarItem(httpFile);
       } else {
         this.envStatusBarItem.hide();
@@ -234,7 +234,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   }
 
   private async reset(): Promise<void> {
-    this.documentStore.httpFileStore.clear();
+    this.documentStore.clear();
     await httpyac.store.userSessionStore.reset();
     await httpyac.store.cookieStore.reset();
   }

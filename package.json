@@ -920,7 +920,8 @@
       {
         "command": "httpyac.reset",
         "title": "Reset Environments",
-        "category": "httpYac"
+        "category": "httpYac",
+        "icon": "$(clear-all)"
       },
       {
         "command": "httpyac.logout",
@@ -1097,6 +1098,11 @@
           "command": "httpyac.clearHistory",
           "when": "view == httpyacHistory",
           "group": "navigation"
+        },
+        {
+          "command": "httpyac.reset",
+          "when": "view == httpyacVariables",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -1156,6 +1162,10 @@
       {
         "view": "httpyacHistory",
         "contents": "No history available."
+      },
+      {
+        "view": "httpyacVariables",
+        "contents": "No variables available."
       }
     ],
     "viewsContainers": {
@@ -1168,12 +1178,18 @@
       ]
     },
     "views": {
-      "explorer": [
+      "httpyac-views": [
         {
           "id": "httpyacHistory",
           "name": "History",
           "visibility": "collapsed",
-          "when": "httpyacHistoryEnabled"
+          "when": "httpyacHistoryEnabled && httpyacHttpFileOpen"
+        },
+        {
+          "id": "httpyacVariables",
+          "name": "Variables Last Request",
+          "visibility": "collapsed",
+          "when": "httpyacHttpFileOpen"
         }
       ]
     }
