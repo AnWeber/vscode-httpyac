@@ -68,7 +68,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     this.responseCache.splice(0, 0, responseItem);
     this.responseCache.length = Math.min(this.responseCache.length, config.maxHistoryItems || 50);
     this.refreshHistory.fire();
-    vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.responseCache.length > 0);
   }
 
   async remove(responseItem: ResponseItem): Promise<boolean> {
@@ -79,12 +78,13 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
       }
       this.responseCache.splice(index, 1);
       this.refreshHistory.fire();
-      if (this.responseCache.length === 0) {
-        vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', false);
-      }
       return true;
     }
     return false;
+  }
+
+  get hasItems() {
+    return this.responseCache.length > 0;
   }
 
   async clear(): Promise<void> {
@@ -95,7 +95,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     }
     this.responseCache.length = 0;
     this.refreshHistory.fire();
-    vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', false);
   }
 
   public async shrink(responseItem: ResponseItem): Promise<void> {

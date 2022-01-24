@@ -10,15 +10,12 @@ import { ResponseStore } from '../responseStore';
 import { ResponseItem } from '../view';
 
 export class RequestCommandsController extends DisposeProvider {
-  onDidChangeCodeLenses: vscode.Event<void>;
-
   constructor(
     private readonly documentStore: DocumentStore,
     private readonly responseStore: ResponseStore,
     private readonly storageProvider: StorageProvider
   ) {
     super();
-    this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.send, this.send, this),
       vscode.commands.registerCommand(commands.sendRepeat, this.sendRepeat, this),

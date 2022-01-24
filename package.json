@@ -1183,13 +1183,19 @@
           "id": "httpyacHistory",
           "name": "History",
           "visibility": "collapsed",
-          "when": "httpyacHistoryEnabled && httpyacHttpFileOpen"
+          "when": "httpyacHistoryEnabled && httpyacAnyHttpFileOpen"
         },
         {
           "id": "httpyacVariables",
           "name": "Variables Last Request",
           "visibility": "collapsed",
-          "when": "httpyacHttpFileOpen"
+          "when": "httpyacAnyHttpFileOpen"
+        },
+        {
+          "id": "httpyacDebug",
+          "name": "Debug",
+          "visibility": "hidden",
+          "when": "editorLangId in httpyac.supportedLanguages"
         }
       ]
     }

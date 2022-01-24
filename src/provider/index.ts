@@ -1,5 +1,7 @@
 export * from './codeLensProvider';
+export * from './contextKeysProvider';
 export * from './decorationProvider';
+export * from './debugViewController';
 export * from './errorHandler';
 export * from './harCommandsController';
 export * from './historyController';

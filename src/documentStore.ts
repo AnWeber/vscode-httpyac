@@ -41,9 +41,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
           this.remove(document);
         }
       }),
-      vscode.window.onDidChangeActiveTextEditor(async editor => {
-        this.refreshHttpFileOpen();
-      }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         if (vscode.languages.match(allHttpDocumentSelector, document)) {
           await this.getHttpFile(document);
@@ -119,7 +116,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     version: number
   ): Promise<httpyac.HttpFile> {
     const config = await getEnvironmentConfig(path);
-    this.refreshHttpFileOpen(true);
     return await this.httpFileStore.getOrCreate(path, getText, version, {
       config,
       activeEnvironment: this.activeEnvironment,
@@ -196,7 +192,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
       }
       return false;
     } finally {
-      this.refreshHttpFileOpen(true);
       this.documentStoreChangedEmitter.fire();
     }
   }
@@ -215,15 +210,5 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
       return await this.getHttpFile(editor.document);
     }
     return undefined;
-  }
-
-  private refreshHttpFileOpen(val = false) {
-    const isHttpFileOpen =
-      val ||
-      vscode.window.visibleTextEditors.some(
-        editor => editor?.document && vscode.languages.match(allHttpDocumentSelector, editor.document)
-      );
-    vscode.commands.executeCommand('setContext', 'httpyacHttpFileOpen', isHttpFileOpen);
-    return isHttpFileOpen;
   }
 }
