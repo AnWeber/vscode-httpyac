@@ -5,7 +5,7 @@ import * as httpyac from 'httpyac';
 import { getEnvironmentConfig } from '../config';
 import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
 
-export class VariablesController extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
+export class VariablesTreeDataProvider extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   variablesChangedEmitter: vscode.EventEmitter<void>;

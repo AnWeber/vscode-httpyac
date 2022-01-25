@@ -31,6 +31,9 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
       }),
     ];
     this.refreshHistory = new vscode.EventEmitter<void>();
+    this.refreshHistory.event(() =>
+      vscode.commands.executeCommand('setContext', 'httpyacHistoryEnabled', this.hasItems)
+    );
   }
 
   get historyChanged(): vscode.Event<void> {

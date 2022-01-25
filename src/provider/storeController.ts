@@ -9,7 +9,6 @@ const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,
   reset: `${APP_NAME}.reset`,
   logout: `${APP_NAME}.logout`,
-  removeCookies: `${APP_NAME}.removeCookies`,
 };
 
 export class StoreController extends utils.DisposeProvider implements vscode.CodeLensProvider {
@@ -35,7 +34,6 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       vscode.commands.registerCommand(commands.toggleEnv, this.toggleEnv, this),
       vscode.commands.registerCommand(commands.reset, this.reset, this),
       vscode.commands.registerCommand(commands.logout, this.logout, this),
-      vscode.commands.registerCommand(commands.removeCookies, this.removeCookies, this),
       vscode.languages.registerCodeLensProvider(allHttpDocumentSelector, this),
       vscode.window.onDidChangeActiveTextEditor(async editor => {
         await this.refreshStatusBarItemWithEditor(editor);
@@ -83,18 +81,6 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
             title: `session (${httpyac.store.userSessionStore.userSessions.length})`,
           })
         );
-      }
-      if (config.codelens?.removeCookies) {
-        const cookies = httpyac.store.cookieStore.getCookies(httpFile);
-        if (cookies.length > 0) {
-          result.push(
-            new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-              command: commands.removeCookies,
-              arguments: args,
-              title: `cookies (${cookies.length})`,
-            })
-          );
-        }
       }
     }
     return result;
@@ -236,7 +222,6 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   private async reset(): Promise<void> {
     this.documentStore.clear();
     await httpyac.store.userSessionStore.reset();
-    await httpyac.store.cookieStore.reset();
   }
 
   private async logout(): Promise<void> {
@@ -263,50 +248,6 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         httpyac.io.log.info(`${userSession.label} removed`);
       }
       this.documentStore.documentStoreChangedEmitter.fire();
-    }
-  }
-
-  @errorHandler()
-  private async removeCookies(document?: utils.DocumentArgument): Promise<void> {
-    const editor = utils.getTextEditor(document);
-    if (editor) {
-      const httpFile = await this.documentStore.getHttpFile(editor.document);
-      if (httpFile) {
-        const cookies = await vscode.window.showQuickPick(
-          httpyac.store.cookieStore.getCookies(httpFile).map(cookie => ({
-            label: `${cookie.key}=${cookie.value} ${Object.entries(cookie)
-              .filter(([key]) => ['key', 'value'].indexOf(key) < 0)
-              .map(([key, value]) => {
-                if (value) {
-                  if (value instanceof Date) {
-                    return `${key}: ${value.toISOString()}`;
-                  }
-                  return `${key}: ${value}`;
-                }
-                return undefined;
-              })
-              .filter(obj => obj)
-              .join(' ')}`,
-            data: cookie,
-          })),
-          {
-            placeHolder: 'select cookies to remove',
-            canPickMany: true,
-            ignoreFocusOut: true,
-            onDidSelectItem: (item: vscode.QuickPickItem & { data: unknown }) => {
-              httpyac.io.log.info(JSON.stringify(item.data, null, 2));
-            },
-          }
-        );
-
-        if (cookies) {
-          httpyac.store.cookieStore.removeCookies(
-            httpFile,
-            cookies.map(obj => obj.data)
-          );
-          this.documentStore.documentStoreChangedEmitter.fire();
-        }
-      }
     }
   }
 }

@@ -24,6 +24,7 @@ export class UserSessionTreeDataProvider
   private removeSession(id: string): void {
     if (id && typeof id === 'string') {
       httpyac.store.userSessionStore.removeUserSession(id);
+      this.documentStore.documentStoreChangedEmitter.fire();
     }
   }
 
@@ -44,9 +45,9 @@ export class UserSessionTreeItem extends vscode.TreeItem {
     super(element.title);
     this.description = element.description;
 
-    this.tooltip = Object.entries(element.details)
+    this.tooltip = `type: ${element.type}\ndescription: ${element.description}\n${Object.entries(element.details)
       .map(([key, value]) => `${key}: ${value}`)
-      .join('\n');
+      .join('\n')}`;
 
     this.command = {
       title: 'remove user session',
@@ -63,6 +64,9 @@ export class UserSessionTreeItem extends vscode.TreeItem {
         break;
       case 'RateLimit':
         this.iconPath = new vscode.ThemeIcon('watch');
+        break;
+      case 'Cookie':
+        this.iconPath = new vscode.ThemeIcon('globe');
         break;
       case 'OAuth2':
         this.iconPath = new vscode.ThemeIcon('key');

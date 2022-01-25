@@ -1,5 +1,4 @@
 export * from './codeLensProvider';
-export * from './contextKeysProvider';
 export * from './decorationProvider';
 export * from './debugTreeDataProvider';
 export * from './errorHandler';
@@ -10,5 +9,5 @@ export * from './httpDocumentSymbolProvider';
 export * from './requestCommandsController';
 export * from './responseDocumentController';
 export * from './storeController';
-export * from './variablesController';
+export * from './variablesTreeDataProvider';
 export * from './userSessionTreeDataProvider';

@@ -728,7 +728,6 @@
             "generateCodeSelectLanguage": false,
             "logoutUserSession": true,
             "pickEnvironment": true,
-            "removeCookies": true,
             "resetEnvironment": false,
             "saveResponse": false,
             "send": true,
@@ -751,10 +750,6 @@
               "default": false
             },
             "logoutUserSession": {
-              "type": "boolean",
-              "default": false
-            },
-            "removeCookies": {
               "type": "boolean",
               "default": false
             },
@@ -929,11 +924,6 @@
         "category": "httpYac"
       },
       {
-        "command": "httpyac.removeCookies",
-        "title": "Remove Cookies",
-        "category": "httpYac"
-      },
-      {
         "command": "httpyac.showHistory",
         "title": "Show History",
         "category": "httpYac",
@@ -1018,10 +1008,6 @@
         },
         {
           "command": "httpyac.logout",
-          "when": "editorLangId in httpyac.supportedLanguages"
-        },
-        {
-          "command": "httpyac.removeCookies",
           "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
@@ -1187,19 +1173,19 @@
           "id": "httpyacHistory",
           "name": "History",
           "visibility": "collapsed",
-          "when": "httpyacHistoryEnabled && httpyacAnyHttpFileOpen"
+          "when": "httpyacHistoryEnabled"
         },
         {
           "id": "httpyacSession",
           "name": "Session",
           "visibility": "collapsed",
-          "when": "httpyacAnyHttpFileOpen"
+          "when": "httpyacSessionEnabled"
         },
         {
           "id": "httpyacVariables",
           "name": "Variables Last Request",
           "visibility": "collapsed",
-          "when": "httpyacAnyHttpFileOpen"
+          "when": "httpyacVariablesEnabled"
         },
         {
           "id": "httpyacDebug",
