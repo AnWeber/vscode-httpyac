@@ -4,7 +4,7 @@ import { DocumentStore } from '../documentStore';
 import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
 import { allHttpDocumentSelector } from '../config';
 
-export class DebugViewController extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
+export class DebugTreeDataProvider extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   #httpFileChangedEmitter: vscode.EventEmitter<void>;

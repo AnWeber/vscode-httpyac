@@ -1,7 +1,7 @@
 export * from './codeLensProvider';
 export * from './contextKeysProvider';
 export * from './decorationProvider';
-export * from './debugViewController';
+export * from './debugTreeDataProvider';
 export * from './errorHandler';
 export * from './harCommandsController';
 export * from './historyController';
@@ -11,3 +11,4 @@ export * from './requestCommandsController';
 export * from './responseDocumentController';
 export * from './storeController';
 export * from './variablesController';
+export * from './userSessionTreeDataProvider';

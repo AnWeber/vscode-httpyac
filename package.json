@@ -1101,7 +1101,7 @@
         },
         {
           "command": "httpyac.reset",
-          "when": "view == httpyacVariables",
+          "when": "view == httpyacVariables || view == httpyacSession",
           "group": "navigation"
         }
       ],
@@ -1164,6 +1164,10 @@
         "contents": "No history available."
       },
       {
+        "view": "httpyacSession",
+        "contents": "No session available."
+      },
+      {
         "view": "httpyacVariables",
         "contents": "No variables available."
       }
@@ -1184,6 +1188,12 @@
           "name": "History",
           "visibility": "collapsed",
           "when": "httpyacHistoryEnabled && httpyacAnyHttpFileOpen"
+        },
+        {
+          "id": "httpyacSession",
+          "name": "Session",
+          "visibility": "collapsed",
+          "when": "httpyacAnyHttpFileOpen"
         },
         {
           "id": "httpyacVariables",
