@@ -25,16 +25,7 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
   }
 
   async getChildren(element?: ObjectItem): Promise<ObjectItem[] | undefined> {
-    let val = element?.value || this.documentStore.variables;
-    if (!val) {
-      const httpFile = await this.documentStore.getCurrentHttpFile();
-      if (httpFile) {
-        val = await httpyac.getVariables({
-          httpFile,
-          config: await getEnvironmentConfig(httpFile.fileName),
-        });
-      }
-    }
+    const val = element?.value || this.documentStore.variables;
     if (val) {
       if (typeof val === 'object') {
         return Object.entries(val).map(([key, value]) => ({ key, value }));
