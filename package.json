@@ -1154,8 +1154,16 @@
         "contents": "No session available."
       },
       {
+        "view": "httpyacEnvironments",
+        "contents": "No environments available."
+      },
+      {
         "view": "httpyacVariables",
         "contents": "No variables available."
+      },
+      {
+        "view": "httpyacDebug",
+        "contents": "no HttpFile Object"
       }
     ],
     "viewsContainers": {
@@ -1176,22 +1184,28 @@
           "when": "httpyacHistoryEnabled"
         },
         {
+          "id": "httpyacVariables",
+          "name": "Variables",
+          "visibility": "collapsed",
+          "when": "resourceLangId in httpyac.supportedLanguages"
+        },
+        {
           "id": "httpyacSession",
           "name": "Session",
           "visibility": "collapsed",
           "when": "httpyacSessionEnabled"
         },
         {
-          "id": "httpyacVariables",
-          "name": "Variables Last Request",
+          "id": "httpyacEnvironments",
+          "name": "Environments",
           "visibility": "collapsed",
-          "when": "httpyacVariablesEnabled"
+          "when": "resourceLangId in httpyac.supportedLanguages"
         },
         {
           "id": "httpyacDebug",
           "name": "Debug",
           "visibility": "hidden",
-          "when": "editorLangId in httpyac.supportedLanguages"
+          "when": "resourceLangId in httpyac.supportedLanguages"
         }
       ]
     }
@@ -1239,6 +1253,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
+    "filesize": "^8.0.7",
     "httpsnippet": "^2.0.0",
     "httpyac": "^4.9.1",
     "lodash": "^4.17.21",

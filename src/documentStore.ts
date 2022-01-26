@@ -18,7 +18,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
 
   public readonly httpFileStore: httpyac.store.HttpFileStore;
 
-  #variables: httpyac.Variables | undefined;
+  variables: httpyac.Variables | undefined;
 
   documentStoreChangedEmitter: vscode.EventEmitter<void>;
 
@@ -104,14 +104,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         });
       }),
     ];
-  }
-
-  get variables() {
-    return this.#variables;
-  }
-  set variables(val: httpyac.Variables | undefined) {
-    vscode.commands.executeCommand('setContext', 'httpyacVariablesEnabled', !!val);
-    this.#variables = val;
   }
 
   get documentStoreChanged(): vscode.Event<void> {
@@ -213,7 +205,7 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
 
   clear() {
     this.httpFileStore.clear();
-    this.variables = undefined;
+    delete this.variables;
     this.documentStoreChangedEmitter.fire();
   }
 

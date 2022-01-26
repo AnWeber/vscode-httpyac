@@ -17,7 +17,15 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
     const fireVariablesChanged = () => this.variablesChangedEmitter.fire();
     documentStore.documentStoreChanged(fireVariablesChanged);
     environmentChanged(fireVariablesChanged);
-    this.subscriptions = [vscode.window.registerTreeDataProvider('httpyacVariables', this)];
+    this.subscriptions = [
+      vscode.window.registerTreeDataProvider('httpyacVariables', this),
+
+      vscode.commands.registerCommand('httpyac.copyToClipboard', this.copyToClipboard, this),
+    ];
+  }
+
+  private copyToClipboard(value: string) {
+    vscode.env.clipboard.writeText(value);
   }
 
   getTreeItem(element: ObjectItem): vscode.TreeItem {
@@ -25,7 +33,16 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
   }
 
   async getChildren(element?: ObjectItem): Promise<ObjectItem[] | undefined> {
-    const val = element?.value || this.documentStore.variables;
+    let val = element?.value || this.documentStore.variables;
+    if (!val) {
+      const httpFile = await this.documentStore.getCurrentHttpFile();
+      if (httpFile) {
+        val = await httpyac.getVariables({
+          httpFile,
+          config: await getEnvironmentConfig(httpFile.fileName),
+        });
+      }
+    }
     if (val) {
       if (typeof val === 'object') {
         return Object.entries(val).map(([key, value]) => ({ key, value }));

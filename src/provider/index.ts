@@ -1,6 +1,7 @@
 export * from './codeLensProvider';
 export * from './decorationProvider';
 export * from './debugTreeDataProvider';
+export * from './environmentTreeDataProvider';
 export * from './errorHandler';
 export * from './harCommandsController';
 export * from './historyController';
