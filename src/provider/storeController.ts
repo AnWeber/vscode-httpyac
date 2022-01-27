@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConfig } from '../config';
+import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConfig, AppConfig } from '../config';
 import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
@@ -7,9 +7,12 @@ import * as utils from '../utils';
 
 const commands = {
   toggleEnv: `${APP_NAME}.toggle-env`,
+  selectEnv: `${APP_NAME}.select-env`,
   reset: `${APP_NAME}.reset`,
   logout: `${APP_NAME}.logout`,
 };
+
+export const NoEnvironment = '- (no env)';
 
 export class StoreController extends utils.DisposeProvider implements vscode.CodeLensProvider {
   onDidChangeCodeLenses: vscode.Event<void>;
@@ -32,6 +35,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     this.onDidChangeCodeLenses = documentStore.documentStoreChanged;
     this.subscriptions = [
       vscode.commands.registerCommand(commands.toggleEnv, this.toggleEnv, this),
+      vscode.commands.registerCommand(commands.selectEnv, this.selectEnv, this),
       vscode.commands.registerCommand(commands.reset, this.reset, this),
       vscode.commands.registerCommand(commands.logout, this.logout, this),
       vscode.languages.registerCodeLensProvider(allHttpDocumentSelector, this),
@@ -161,7 +165,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     if (editor) {
       const httpFile = await this.documentStore.getHttpFile(editor.document);
       if (httpFile) {
-        const env = await this.pickEnv(httpFile);
+        const env = await this.showQuickPickEnvironments(httpFile);
         httpFile.activeEnvironment = env;
         this.refreshEnvStatusBarItem(httpFile);
       }
@@ -169,8 +173,19 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
   }
 
   @errorHandler()
-  private async pickEnv(httpFile: httpyac.HttpFile) {
-    const config = getConfigSetting();
+  private async selectEnv(env?: string | Array<string> | undefined): Promise<void> {
+    const httpFile = await this.documentStore.getCurrentHttpFile();
+    if (httpFile) {
+      if (typeof env === 'string') {
+        this.selectEnvironment(httpFile, env !== NoEnvironment ? [env] : []);
+      } else {
+        this.selectEnvironment(httpFile, env);
+      }
+    }
+  }
+
+  @errorHandler()
+  private async showQuickPickEnvironments(httpFile: httpyac.HttpFile) {
     const envs: Array<string> = await httpyac.getEnvironments({
       httpFile,
       config: await getEnvironmentConfig(httpFile),
@@ -187,7 +202,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       }));
       if (!canPickMany) {
         options.push({
-          label: `- (no env)`,
+          label: NoEnvironment,
         });
       }
       const pickedObj = await vscode.window.showQuickPick(options, {
@@ -206,17 +221,22 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       } else {
         activeEnvironment = undefined;
       }
-      this.documentStore.activeEnvironment = activeEnvironment;
-      this.environmentChangedEmitter.fire(activeEnvironment);
-      if (config.environmentStoreSelectedOnStart) {
-        const config = vscode.workspace.getConfiguration(APP_NAME);
-        await config.update('environmentSelectedOnStart', activeEnvironment);
-      }
-      this.documentStore.documentStoreChangedEmitter.fire();
+      await this.selectEnvironment(httpFile, activeEnvironment);
     } else {
       vscode.window.showInformationMessage('no environment found');
     }
     return activeEnvironment;
+  }
+
+  private async selectEnvironment(httpFile: httpyac.HttpFile, activeEnvironment: string[] | undefined) {
+    httpFile.activeEnvironment = activeEnvironment;
+    this.documentStore.activeEnvironment = activeEnvironment;
+    this.environmentChangedEmitter.fire(activeEnvironment);
+    if (getConfigSetting().environmentStoreSelectedOnStart) {
+      const config = vscode.workspace.getConfiguration(APP_NAME);
+      await config.update('environmentSelectedOnStart', activeEnvironment);
+    }
+    this.documentStore.documentStoreChangedEmitter.fire();
   }
 
   private async reset(): Promise<void> {

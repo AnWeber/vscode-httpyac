@@ -4,6 +4,7 @@ import { DocumentStore } from '../documentStore';
 import * as httpyac from 'httpyac';
 import { getEnvironmentConfig } from '../config';
 import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
+import { NoEnvironment } from './storeController';
 
 export class EnvironmentTreeDataProvider
   extends DisposeProvider
@@ -31,7 +32,6 @@ export class EnvironmentTreeDataProvider
   }
 
   async getChildren(element?: string | ObjectItem): Promise<Array<string> | Array<ObjectItem> | undefined> {
-    const noEnv = `- (no env)`;
     if (!element) {
       const httpFile = await this.documentStore.getCurrentHttpFile();
       if (httpFile) {
@@ -39,7 +39,7 @@ export class EnvironmentTreeDataProvider
           httpFile,
           config: await getEnvironmentConfig(httpFile.fileName),
         });
-        environments.push(noEnv);
+        environments.push(NoEnvironment);
         return environments;
       }
     } else {
@@ -50,7 +50,7 @@ export class EnvironmentTreeDataProvider
           val = await httpyac.getVariables({
             httpFile: {
               ...httpFile,
-              activeEnvironment: element === noEnv ? [] : [element],
+              activeEnvironment: element === NoEnvironment ? [] : [element],
             },
             config: await getEnvironmentConfig(httpFile.fileName),
           });
@@ -76,6 +76,7 @@ export class EnvironmentTreeItem extends vscode.TreeItem {
   constructor(element: string) {
     super(element);
     this.tooltip = element;
+    this.contextValue = 'env';
     this.iconPath = new vscode.ThemeIcon('server-environment');
     this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
   }

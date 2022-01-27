@@ -913,6 +913,12 @@
         "icon": "$(settings-gear)"
       },
       {
+        "command": "httpyac.select-env",
+        "title": "Select Environment",
+        "category": "httpYac",
+        "icon": "$(check)"
+      },
+      {
         "command": "httpyac.reset",
         "title": "Reset Environments",
         "category": "httpYac",
@@ -1017,6 +1023,10 @@
           "when": "editorLangId in httpyac.supportedLanguages"
         },
         {
+          "command": "httpyac.select-env",
+          "when": "false"
+        },
+        {
           "command": "httpyac.removeHistory",
           "when": "false"
         },
@@ -1110,6 +1120,11 @@
         {
           "command": "httpyac.removeSession",
           "when": "view == httpyacSession && viewItem == session",
+          "group": "inline"
+        },
+        {
+          "command": "httpyac.select-env",
+          "when": "view == httpyacEnvironments && viewItem == env",
           "group": "inline"
         }
       ]
