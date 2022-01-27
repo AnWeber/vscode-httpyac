@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { DisposeProvider } from '../utils';
 import { DocumentStore } from '../documentStore';
+import { ObjectItem, ObjectTreeItem, isObjectItem, toObjectItems } from './objectTreeItem';
 
 export class UserSessionTreeDataProvider
   extends DisposeProvider
-  implements vscode.TreeDataProvider<httpyac.UserSession>
+  implements vscode.TreeDataProvider<httpyac.UserSession | ObjectItem>
 {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
@@ -21,22 +22,43 @@ export class UserSessionTreeDataProvider
     ];
   }
 
-  private removeSession(id: string): void {
-    if (id && typeof id === 'string') {
-      httpyac.store.userSessionStore.removeUserSession(id);
+  private removeSession(userSession: httpyac.UserSession | undefined): void {
+    if (userSession?.id && typeof userSession.id === 'string') {
+      httpyac.store.userSessionStore.removeUserSession(userSession.id);
       this.documentStore.documentStoreChangedEmitter.fire();
     }
   }
 
-  getTreeItem(element: httpyac.UserSession): vscode.TreeItem {
+  getTreeItem(element: httpyac.UserSession | ObjectItem): vscode.TreeItem {
+    if (isObjectItem(element)) {
+      return new ObjectTreeItem(element);
+    }
     return new UserSessionTreeItem(element);
   }
 
-  async getChildren(element?: httpyac.UserSession): Promise<httpyac.UserSession[] | undefined> {
-    if (!element) {
-      return httpyac.store.userSessionStore.userSessions;
+  async getChildren(
+    element?: httpyac.UserSession
+  ): Promise<Array<httpyac.UserSession> | Array<ObjectItem> | undefined> {
+    if (element) {
+      if (isObjectItem(element)) {
+        return toObjectItems(element.value);
+      }
+      const result = toObjectItems(element.details) || [];
+      if (httpyac.variables.replacer.isOpenIdInformation(element)) {
+        result.push({
+          key: 'access_token',
+          value: httpyac.utils.decodeJWT(element.accessToken),
+        });
+        if (element.refreshToken) {
+          result.push({
+            key: 'refresh_token',
+            value: httpyac.utils.decodeJWT(element.refreshToken),
+          });
+        }
+      }
+      return result;
     }
-    return undefined;
+    return httpyac.store.userSessionStore.userSessions;
   }
 }
 
@@ -45,21 +67,18 @@ export class UserSessionTreeItem extends vscode.TreeItem {
     super(element.title);
     this.description = element.description;
 
-    this.tooltip = `type: ${element.type}\ndescription: ${element.description}\n${Object.entries(element.details)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join('\n')}`;
+    this.tooltip = `type: ${element.type}\ndescription: ${element.description}`;
 
-    this.command = {
-      title: 'remove user session',
-      command: `httpyac.removeSession`,
-      arguments: [element.id],
-    };
+    this.contextValue = 'session';
+    this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
 
     switch (element.type) {
       case 'LAST_RESPONSE':
+        this.collapsibleState = vscode.TreeItemCollapsibleState.None;
         this.iconPath = new vscode.ThemeIcon('history');
         break;
       case 'Stream':
+        this.collapsibleState = vscode.TreeItemCollapsibleState.None;
         this.iconPath = new vscode.ThemeIcon('radio-tower');
         break;
       case 'RateLimit':

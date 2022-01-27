@@ -942,6 +942,12 @@
         "icon": "$(close)"
       },
       {
+        "command": "httpyac.removeSession",
+        "title": "Remove Session",
+        "category": "httpYac",
+        "icon": "$(close)"
+      },
+      {
         "command": "httpyac.pruneStorage",
         "title": "remove all files in cache dir",
         "category": "httpYac",
@@ -1012,6 +1018,10 @@
         },
         {
           "command": "httpyac.removeHistory",
+          "when": "false"
+        },
+        {
+          "command": "httpyac.removeSession",
           "when": "false"
         }
       ],
@@ -1095,6 +1105,11 @@
         {
           "command": "httpyac.removeHistory",
           "when": "view == httpyacHistory && viewItem == responseItem",
+          "group": "inline"
+        },
+        {
+          "command": "httpyac.removeSession",
+          "when": "view == httpyacSession && viewItem == session",
           "group": "inline"
         }
       ]
