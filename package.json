@@ -1094,7 +1094,7 @@
       "view/item/context": [
         {
           "command": "httpyac.removeHistory",
-          "when": "view == httpyacHistory",
+          "when": "view == httpyacHistory && viewItem == responseItem",
           "group": "inline"
         }
       ]

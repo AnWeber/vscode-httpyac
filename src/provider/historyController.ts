@@ -5,6 +5,7 @@ import { ResponseStore } from '../responseStore';
 import { DocumentStore, ResponseItem } from '../extensionApi';
 import { errorHandler } from './errorHandler';
 import * as httpyac from 'httpyac';
+import { ObjectItem, isObjectItem, ObjectTreeItem, toObjectItems } from './objectTreeItem';
 
 class ResponseTreeItem extends vscode.TreeItem {
   constructor(readonly responseItem: ResponseItem) {
@@ -12,6 +13,8 @@ class ResponseTreeItem extends vscode.TreeItem {
     this.description = `${responseItem.response.statusCode} - ${getTimeAgo(responseItem.created)}`;
     this.tooltip = httpyac.utils.toHttpString(responseItem.response);
     this.iconPath = new vscode.ThemeIcon('gist');
+    this.contextValue = 'responseItem';
+    this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
     this.command = {
       title: 'show response',
       command: commands.showHistoryResponse,
@@ -20,7 +23,7 @@ class ResponseTreeItem extends vscode.TreeItem {
   }
 }
 
-export class HistoryController extends DisposeProvider implements vscode.TreeDataProvider<ResponseItem> {
+export class HistoryController extends DisposeProvider implements vscode.TreeDataProvider<ResponseItem | ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   constructor(readonly documentStore: DocumentStore, readonly responseStore: ResponseStore) {
@@ -37,11 +40,20 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
     ];
   }
 
-  getTreeItem(element: ResponseItem): vscode.TreeItem {
+  getTreeItem(element: ResponseItem | ObjectItem): vscode.TreeItem {
+    if (isObjectItem(element)) {
+      return new ObjectTreeItem(element);
+    }
     return new ResponseTreeItem(element);
   }
 
-  async getChildren(): Promise<ResponseItem[]> {
+  async getChildren(element: ResponseItem | ObjectItem): Promise<Array<ResponseItem> | Array<ObjectItem> | undefined> {
+    if (element) {
+      if (isObjectItem(element)) {
+        return toObjectItems(element.value);
+      }
+      return toObjectItems(element);
+    }
     return this.responseStore.responseCache;
   }
 

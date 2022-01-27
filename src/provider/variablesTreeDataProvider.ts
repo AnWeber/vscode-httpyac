@@ -3,7 +3,7 @@ import { DisposeProvider } from '../utils';
 import { DocumentStore } from '../documentStore';
 import * as httpyac from 'httpyac';
 import { getEnvironmentConfig } from '../config';
-import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
+import { ObjectItem, ObjectTreeItem, toObjectItems } from './objectTreeItem';
 
 export class VariablesTreeDataProvider extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
@@ -43,17 +43,6 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
         });
       }
     }
-    if (val) {
-      if (typeof val === 'object') {
-        return Object.entries(val).map(([key, value]) => ({ key, value }));
-      }
-      if (Array.isArray(val)) {
-        return val.map((value, index) => ({
-          key: `${index}`,
-          value,
-        }));
-      }
-    }
-    return undefined;
+    return toObjectItems(val);
   }
 }

@@ -5,6 +5,27 @@ export interface ObjectItem {
   key: string;
   value: unknown;
 }
+export function isObjectItem(obj: unknown): obj is ObjectItem {
+  const val = obj as ObjectItem;
+  return !!val?.key;
+}
+
+export function toObjectItems(val: unknown): Array<ObjectItem> | undefined {
+  let result: Array<ObjectItem> | undefined;
+  if (val) {
+    if (typeof val === 'object') {
+      result = Object.entries(val).map(([key, value]) => ({ key, value }));
+    }
+    if (Array.isArray(val)) {
+      result = val.map((value, index) => ({
+        key: `${index}`,
+        value,
+      }));
+    }
+  }
+  return result?.filter(obj => ['function', 'undefined'].indexOf(typeof obj.value) < 0);
+}
+
 export class ObjectTreeItem extends vscode.TreeItem {
   constructor(element: ObjectItem) {
     super(element.key);
