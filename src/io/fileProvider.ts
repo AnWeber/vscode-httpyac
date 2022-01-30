@@ -94,10 +94,14 @@ export function initFileProvider(): void {
 
   io.fileProvider.fsPath = (fileName: PathLike) => {
     const uri = toUri(fileName);
-    if (uri) {
-      return uri.fsPath;
+    if (uri && uri.scheme === 'file') {
+      try {
+        return uri.fsPath;
+      } catch (err) {
+        io.log.debug(err);
+      }
     }
-    throw new Error('No valid uri');
+    return undefined;
   };
 }
 

@@ -1,3 +1,10 @@
+## Unreleased
+
+#### Fix
+
+- add fallback, if fsPath results in undefined/ error (AnWeber/httpbook#43)
+- Error parsing grpc URL starting with grpc fixed (mistaken for protocol)
+
 ## 4.10.0 (2022-01-27)
 
 #### Features
