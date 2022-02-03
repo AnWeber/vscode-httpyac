@@ -63,7 +63,7 @@
           "http",
           "rest"
         ],
-        "firstLine": "^\\s*(MQTT|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+.*?$",
+        "firstLine": "^\\s*(MQTT|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+[^\\s(]*\\s*?$",
         "configuration": "./language-configuration.json"
       }
     ],
@@ -98,7 +98,7 @@
               "type": "string"
             },
             "Accept": {
-              "description": "Media type(s) that is/are acceptable for the response. See Content negotiation.",
+              "description": "Media type(s) that is/are acceptable for the response. See Content negotiation.",
               "type": "string"
             },
             "Accept-Charset": {
@@ -110,27 +110,27 @@
               "type": "string"
             },
             "Accept-Encoding": {
-              "description": "List of acceptable encodings. See HTTP compression.",
+              "description": "List of acceptable encodings. See HTTP compression.",
               "type": "string"
             },
             "Accept-Language": {
-              "description": "List of acceptable human languages for response. See Content negotiation.",
+              "description": "List of acceptable human languages for response. See Content negotiation.",
               "type": "string"
             },
             "Access-Control-Request-Method": {
-              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
+              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
               "type": "string"
             },
             "Access-Control-Request-Headers": {
-              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
+              "description": "Initiates a request for cross-origin resource sharing with Origin (below).",
               "type": "string"
             },
             "Authorization": {
-              "description": "Authentication credentials for HTTP authentication.",
+              "description": "Authentication credentials for HTTP authentication.",
               "type": "string"
             },
             "Cache-Control": {
-              "description": "Used to specify directives that must be obeyed by all caching mechanisms along the request-response chain.",
+              "description": "Used to specify directives that must be obeyed by all caching mechanisms along the request-response chain.",
               "type": "string"
             },
             "Connection": {
@@ -138,27 +138,27 @@
               "type": "string"
             },
             "Content-Encoding": {
-              "description": "The type of encoding used on the data. See HTTP compression.",
+              "description": "The type of encoding used on the data. See HTTP compression.",
               "type": "string"
             },
             "Content-Length": {
-              "description": "The length of the request body in octets (8-bit bytes).",
+              "description": "The length of the request body in octets (8-bit bytes).",
               "type": "string"
             },
             "Content-MD5": {
-              "description": "A Base64-encoded binary MD5 sum of the content of the request body.",
+              "description": "A Base64-encoded binary MD5 sum of the content of the request body.",
               "type": "string"
             },
             "Content-Type": {
-              "description": "The Media type of the body of the request (used with POST and PUT requests).",
+              "description": "The Media type of the body of the request (used with POST and PUT requests).",
               "type": "string"
             },
             "Cookie": {
-              "description": "An HTTP cookie previously sent by the server with Set-Cookie (below).",
+              "description": "An HTTP cookie previously sent by the server with Set-Cookie (below).",
               "type": "string"
             },
             "Date": {
-              "description": "The date and time at which the message was originated (in HTTP-date format as defined by RFC 7231 Date/Time Formats).",
+              "description": "The date and time at which the message was originated (in HTTP-date format as defined by RFC 7231 Date/Time Formats).",
               "type": "string"
             },
             "Expect": {
@@ -174,11 +174,11 @@
               "type": "string"
             },
             "Host": {
-              "description": "The domain name of the server (for virtual hosting), and the TCP port number on which the server is listening. The port number may be omitted if the port is the standard port for the service requested. Mandatory since HTTP/1.1. If the request is generated directly in HTTP/2, it should not be used.",
+              "description": "The domain name of the server (for virtual hosting), and the TCP port number on which the server is listening. The port number may be omitted if the port is the standard port for the service requested. Mandatory since HTTP/1.1. If the request is generated directly in HTTP/2, it should not be used.",
               "type": "string"
             },
             "HTTP2-Settings": {
-              "description": "A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly one HTTP2-Setting header field. The HTTP2-Settings header field is a connection-specific header field that includes parameters that govern the HTTP/2 connection, provided in anticipation of the server accepting the request to upgrade.",
+              "description": "A request that upgrades from HTTP/1.1 to HTTP/2 MUST include exactly one HTTP2-Setting header field. The HTTP2-Settings header field is a connection-specific header field that includes parameters that govern the HTTP/2 connection, provided in anticipation of the server accepting the request to upgrade.",
               "type": "string"
             },
             "If-Match": {
@@ -186,11 +186,11 @@
               "type": "string"
             },
             "If-Modified-Since": {
-              "description": "Allows a 304 Not Modified to be returned if content is unchanged.",
+              "description": "Allows a 304 Not Modified to be returned if content is unchanged.",
               "type": "string"
             },
             "If-None-Match": {
-              "description": "Allows a 304 Not Modified to be returned if content is unchanged, see HTTP ETag.",
+              "description": "Allows a 304 Not Modified to be returned if content is unchanged, see HTTP ETag.",
               "type": "string"
             },
             "If-Range": {
@@ -206,7 +206,7 @@
               "type": "string"
             },
             "Origin": {
-              "description": "Initiates a request for cross-origin resource sharing (asks server for Access-Control-* response fields).",
+              "description": "Initiates a request for cross-origin resource sharing (asks server for Access-Control-* response fields).",
               "type": "string"
             },
             "Pragma": {
@@ -218,7 +218,7 @@
               "type": "string"
             },
             "Range": {
-              "description": "Request only part of an entity. Bytes are numbered from 0. See Byte serving.",
+              "description": "Request only part of an entity. Bytes are numbered from 0. See Byte serving.",
               "type": "string"
             },
             "Referer": {
@@ -226,19 +226,19 @@
               "type": "string"
             },
             "TE": {
-              "description": "The transfer encodings the user agent is willing to accept: the same values as for the response header field Transfer-Encoding can be used, plus the trailers value (related to the chunked transfer method) to notify the server it expects to receive additional fields in the trailer after the last, zero-sized, chunk. Only trailers is supported in HTTP/2.",
+              "description": "The transfer encodings the user agent is willing to accept: the same values as for the response header field Transfer-Encoding can be used, plus the trailers value (related to the chunked transfer method) to notify the server it expects to receive additional fields in the trailer after the last, zero-sized, chunk. Only trailers is supported in HTTP/2.",
               "type": "string"
             },
             "Trailer": {
-              "description": "The Trailer general field value indicates that the given set of header fields is present in the trailer of a message encoded with chunked transfer coding.",
+              "description": "The Trailer general field value indicates that the given set of header fields is present in the trailer of a message encoded with chunked transfer coding.",
               "type": "string"
             },
             "Transfer-Encoding": {
-              "description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity. Must not be used with HTTP/2",
+              "description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity. Must not be used with HTTP/2",
               "type": "string"
             },
             "User-Agent": {
-              "description": "The user agent string of the user agent.",
+              "description": "The user agent string of the user agent.",
               "type": "string"
             },
             "Upgrade": {
@@ -254,27 +254,27 @@
               "type": "string"
             },
             "Upgrade-Insecure-Requests": {
-              "description": "Tells a server which (presumably in the middle of a HTTP -> HTTPS migration) hosts mixed content that the client would prefer redirection to HTTPS and can handle Content-Security-Policy: upgrade-insecure-requests Must not be used with HTTP/2",
+              "description": "Tells a server which (presumably in the middle of a HTTP -> HTTPS migration) hosts mixed content that the client would prefer redirection to HTTPS and can handle Content-Security-Policy: upgrade-insecure-requests Must not be used with HTTP/2",
               "type": "string"
             },
             "X-Requested-With": {
-              "description": "Mainly used to identify Ajax requests (most JavaScript frameworks send this field with value of XMLHttpRequest); also identifies Android apps using WebView",
+              "description": "Mainly used to identify Ajax requests (most JavaScript frameworks send this field with value of XMLHttpRequest); also identifies Android apps using WebView",
               "type": "string"
             },
             "DNT": {
-              "description": "Requests a web application to disable their tracking of a user. This is Mozilla`s version of the X-Do-Not-Track header field (since Firefox 4.0 Beta 11). Safari and IE9 also have support for this field. On March 7, 2011, a draft proposal was submitted to IETF. The W3C Tracking Protection Working Group is producing a specification.",
+              "description": "Requests a web application to disable their tracking of a user. This is Mozilla`s version of the X-Do-Not-Track header field (since Firefox 4.0 Beta 11). Safari and IE9 also have support for this field. On March 7, 2011, a draft proposal was submitted to IETF. The W3C Tracking Protection Working Group is producing a specification.",
               "type": "string"
             },
             "X-Forwarded-For": {
-              "description": "A de facto standard for identifying the originating IP address of a client connecting to a web server through an HTTP proxy or load balancer. Superseded by Forwarded header.",
+              "description": "A de facto standard for identifying the originating IP address of a client connecting to a web server through an HTTP proxy or load balancer. Superseded by Forwarded header.",
               "type": "string"
             },
             "X-Forwarded-Host": {
-              "description": "A de facto standard for identifying the original host requested by the client in the Host HTTP request header, since the host name and/or port of the reverse proxy (load balancer) may differ from the origin server handling the request. Superseded by Forwarded header.",
+              "description": "A de facto standard for identifying the original host requested by the client in the Host HTTP request header, since the host name and/or port of the reverse proxy (load balancer) may differ from the origin server handling the request. Superseded by Forwarded header.",
               "type": "string"
             },
             "X-Forwarded-Proto": {
-              "description": "A de facto standard for identifying the originating protocol of an HTTP request, since a reverse proxy (or a load balancer) may communicate with a web server using HTTP even if the request to the reverse proxy is HTTPS. An alternative form of the header (X-ProxyUser-Ip) is used by Google clients talking to Google servers. Superseded by Forwarded header.",
+              "description": "A de facto standard for identifying the originating protocol of an HTTP request, since a reverse proxy (or a load balancer) may communicate with a web server using HTTP even if the request to the reverse proxy is HTTPS. An alternative form of the header (X-ProxyUser-Ip) is used by Google clients talking to Google servers. Superseded by Forwarded header.",
               "type": "string"
             },
             "Front-End-Https": {
@@ -298,11 +298,11 @@
               "type": "string"
             },
             "X-UIDH": {
-              "description": "Server-side deep packet insertion of a unique ID identifying customers of Verizon Wireless; also known as perma-cookie or supercookie",
+              "description": "Server-side deep packet insertion of a unique ID identifying customers of Verizon Wireless; also known as perma-cookie or supercookie",
               "type": "string"
             },
             "X-Csrf-Token": {
-              "description": "Used to prevent cross-site request forgery. Alternative header names are: X-CSRFToken and X-XSRF-TOKEN",
+              "description": "Used to prevent cross-site request forgery. Alternative header names are: X-CSRFToken and X-XSRF-TOKEN",
               "type": "string"
             },
             "X-Request-ID": {
@@ -818,7 +818,7 @@
           ],
           "default": "none",
           "scope": "window",
-          "description": "default color for statusbaritem, if changed corresponding color is used for default env detection"
+          "description": "default color for StatusBarItem, if changed corresponding color is used for default env detection"
         },
         "httpyac.progressDefaultLocation": {
           "type": "string",
