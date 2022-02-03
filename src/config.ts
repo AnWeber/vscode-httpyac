@@ -1,6 +1,6 @@
 import { toUri } from './io';
 import * as httpyac from 'httpyac';
-import { Disposable, workspace, DecorationRenderOptions } from 'vscode';
+import * as vscode from 'vscode';
 
 export const APP_NAME = 'httpyac';
 
@@ -61,8 +61,8 @@ export interface AppConfig {
   useMethodInSendCodeLens?: boolean;
   useDecorationProvider?: boolean;
   maxHistoryItems?: number;
-  decorationActiveRegion?: DecorationRenderOptions;
-  decorationInactiveRegion?: DecorationRenderOptions;
+  decorationActiveRegion?: vscode.DecorationRenderOptions;
+  decorationInactiveRegion?: vscode.DecorationRenderOptions;
   showNotificationPopup?: boolean;
   useCodeLensInNotebook?: boolean;
   generateCodeDefaultLanguage?: {
@@ -94,14 +94,14 @@ export interface AppConfig {
 
 export function getConfigSetting(): AppConfig {
   const result: AppConfig = {};
-  Object.assign(result, workspace.getConfiguration(APP_NAME));
+  Object.assign(result, vscode.workspace.getConfiguration(APP_NAME));
   return result;
 }
 
 export function getResourceConfig(fileName: httpyac.PathLike): ResourceConfig {
   const result: ResourceConfig = {};
 
-  Object.assign(result, workspace.getConfiguration(APP_NAME), toUri(fileName) || undefined);
+  Object.assign(result, vscode.workspace.getConfiguration(APP_NAME), toUri(fileName) || undefined);
   return result;
 }
 
@@ -122,7 +122,7 @@ function toLogLevel(level: string | undefined): httpyac.LogLevel {
 
 export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<httpyac.EnvironmentConfig> {
   const config = getResourceConfig(fileName);
-  const httpOptions = workspace.getConfiguration('http');
+  const httpOptions = vscode.workspace.getConfiguration('http');
 
   const environmentConfig: httpyac.EnvironmentConfig = {
     environments: config.environmentVariables,
@@ -142,7 +142,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
 
   const uri = toUri(fileName);
   if (uri && config.clientCertificates) {
-    const workspaceFolder = workspace.getWorkspaceFolder(uri);
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
     if (workspaceFolder) {
       httpyac.utils.resolveClientCertificates(config, workspaceFolder);
     }
@@ -150,15 +150,17 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
   return environmentConfig;
 }
 
-export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): Disposable {
+export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vscode.Disposable {
   watcher(getConfigSetting());
-  return workspace.onDidChangeConfiguration(changeEvent => {
+  return vscode.workspace.onDidChangeConfiguration(changeEvent => {
     if (changeEvent.affectsConfiguration(APP_NAME)) {
       watcher(getConfigSetting());
     }
   });
 }
 
-export const httpDocumentSelector = [{ language: 'http', scheme: '*' }];
+export const httpDocumentSelector: vscode.DocumentSelector = [{ language: 'http', scheme: '*' }];
 
-export const allHttpDocumentSelector = [...httpDocumentSelector, { language: 'markdown', scheme: 'file' }];
+export const markdownDocumentSelector: vscode.DocumentSelector = [{ language: 'markdown', scheme: '*' }];
+
+export const allHttpDocumentSelector: vscode.DocumentSelector = [...httpDocumentSelector, ...markdownDocumentSelector];

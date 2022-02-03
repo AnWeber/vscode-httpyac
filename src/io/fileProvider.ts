@@ -25,10 +25,18 @@ export function initFileProvider(): void {
     }
     throw new Error('No valid uri');
   };
-  io.fileProvider.hasExtension = (fileName: PathLike, extension: string) => {
+  io.fileProvider.hasExtension = (fileName: PathLike, ...extensions: Array<string>) => {
     const uri = toUri(fileName);
     if (uri) {
-      return uri.toString().endsWith(extension);
+      if (extensions.some(ext => uri.toString().endsWith(ext))) {
+        return true;
+      }
+      if (extensions.indexOf('markdown') >= 0) {
+        const editor = window.visibleTextEditors.find(obj => obj.document?.uri === uri);
+        if (editor && editor.document.languageId === 'markdown') {
+          return true;
+        }
+      }
     }
     return false;
   };
