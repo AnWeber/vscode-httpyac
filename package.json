@@ -41,6 +41,7 @@
     "onCommand:httpyac.showHistory",
     "onLanguage:http",
     "onLanguage:markdown",
+    "onLanguage:asciidoc",
     "onView:httpyacHistory"
   ],
   "main": "./dist/extension.js",

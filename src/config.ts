@@ -163,4 +163,10 @@ export const httpDocumentSelector: vscode.DocumentSelector = [{ language: 'http'
 
 export const markdownDocumentSelector: vscode.DocumentSelector = [{ language: 'markdown', scheme: '*' }];
 
-export const allHttpDocumentSelector: vscode.DocumentSelector = [...httpDocumentSelector, ...markdownDocumentSelector];
+export const asciiDocumentSelector: vscode.DocumentSelector = [{ language: 'asciidoc', scheme: '*' }];
+
+export const allHttpDocumentSelector: vscode.DocumentSelector = [
+  ...httpDocumentSelector,
+  ...markdownDocumentSelector,
+  ...asciiDocumentSelector,
+];

@@ -32,10 +32,10 @@ export function initFileProvider(): void {
         return true;
       }
       if (extensions.indexOf('markdown') >= 0) {
-        const editor = window.visibleTextEditors.find(obj => obj.document?.uri === uri);
-        if (editor && editor.document.languageId === 'markdown') {
-          return true;
-        }
+        return isUriLanguageId(uri, 'markdown');
+      }
+      if (extensions.indexOf('asciidoc') >= 0) {
+        return isUriLanguageId(uri, 'asciidoc');
       }
     }
     return false;
@@ -135,4 +135,12 @@ export function toUri(pathLike: PathLike): Uri | false {
 function isVirtualDocument(pathLike: PathLike): pathLike is VirtualDocument {
   const virtualDocument = pathLike as VirtualDocument;
   return !!virtualDocument.uri;
+}
+
+function isUriLanguageId(uri: Uri, languageId: string) {
+  const editor = window.visibleTextEditors.find(obj => obj.document?.uri === uri);
+  if (editor && editor.document.languageId === languageId) {
+    return true;
+  }
+  return false;
 }
