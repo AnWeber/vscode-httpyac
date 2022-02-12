@@ -399,7 +399,7 @@
           "scope": "resource",
           "description": "is cookiejar support enabled"
         },
-        "httpyac.clientCertficates": {
+        "httpyac.clientCertificates": {
           "type": "object",
           "scope": "resource",
           "description": "Certificate paths for different hosts. The path can be absolute path or relative path to workspace",
