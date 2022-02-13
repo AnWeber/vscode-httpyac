@@ -44,7 +44,7 @@ export class UserSessionTreeDataProvider
         return toObjectItems(element.value);
       }
       const result = toObjectItems(element.details) || [];
-      if (httpyac.variables.replacer.isOpenIdInformation(element)) {
+      if (httpyac.isOpenIdInformation(element)) {
         result.push({
           key: 'access_token',
           value: httpyac.utils.decodeJWT(element.accessToken),
@@ -89,6 +89,9 @@ export class UserSessionTreeItem extends vscode.TreeItem {
         break;
       case 'OAuth2':
         this.iconPath = new vscode.ThemeIcon('key');
+        break;
+      case 'intellij_global_cache':
+        this.iconPath = new vscode.ThemeIcon('database');
         break;
       default:
         this.iconPath = new vscode.ThemeIcon('question');

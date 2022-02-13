@@ -582,7 +582,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
         text?: string;
       }> = [];
       const line = textLine.trim().slice(1).trim();
-      for (const obj of httpyac.parser.knownMetaData) {
+      for (const obj of httpyac.utils.knownMetaData) {
         const item = {
           name: `@${obj.name}`,
           description: obj.description,
