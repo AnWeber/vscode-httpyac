@@ -24,9 +24,24 @@ export async function logStream(channel: string, type: string, message: unknown)
 export function logToOutputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {
   return function logToOutputChannel(level: LogLevel, ...messages: Array<unknown>) {
     const outputChannel = getOutputChannel(channel);
-    outputChannel.append(`${LogLevel[level].toUpperCase()}: `);
+    outputChannel.append(`${toLevelString(level).toUpperCase()}: `);
     appendToOutputChannel(outputChannel, messages);
   };
+}
+
+function toLevelString(level: LogLevel) {
+  switch (level) {
+    case LogLevel.trace:
+      return 'TRACE';
+    case LogLevel.debug:
+      return 'DEBUG';
+    case LogLevel.warn:
+      return 'WARN';
+    case LogLevel.error:
+      return 'ERROR';
+    default:
+      return 'INFO';
+  }
 }
 
 function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[], prefix?: string) {

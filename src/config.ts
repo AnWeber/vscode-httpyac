@@ -30,7 +30,7 @@ export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';
 export interface ResourceConfig {
   requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>;
-  requestGotOptions?: httpyac.HttpRequest;
+  requestGotOptions?: Record<string, unknown>;
   cookieJarEnabled?: boolean;
   clientCertificates?: Record<string, httpyac.ClientCertificateOptions>;
   environmentVariables?: Record<string, httpyac.Variables>;
@@ -159,13 +159,13 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vs
   });
 }
 
-export const httpDocumentSelector: vscode.DocumentSelector = [{ language: 'http', scheme: '*' }];
+export const httpDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'http', scheme: '*' }];
 
-export const markdownDocumentSelector: vscode.DocumentSelector = [{ language: 'markdown', scheme: '*' }];
+export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'markdown', scheme: '*' }];
 
-export const asciiDocumentSelector: vscode.DocumentSelector = [{ language: 'asciidoc', scheme: '*' }];
+export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'asciidoc', scheme: '*' }];
 
-export const allHttpDocumentSelector: vscode.DocumentSelector = [
+export const allHttpDocumentSelector: Array<vscode.DocumentFilter> = [
   ...httpDocumentSelector,
   ...markdownDocumentSelector,
   ...asciiDocumentSelector,

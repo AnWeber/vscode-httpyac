@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConfig, AppConfig } from '../config';
+import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConfig } from '../config';
 import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';

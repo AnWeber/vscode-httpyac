@@ -445,7 +445,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             },
           ]
         );
-      } else if (httpyac.utils.isMQTTRequest(httpRegion.request)) {
+      } else if (httpRegion.request.method === 'MQTT') {
         result.push(
           ...[
             {
@@ -479,13 +479,13 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             { name: 'topic', description: 'topic to subscribe and publish to', kind: vscode.CompletionItemKind.Field },
           ]
         );
-      } else if (httpyac.utils.isEventSourceRequest(httpRegion.request)) {
+      } else if (httpRegion.request.method === 'SSE') {
         result.push(
           ...[
             { name: 'Event', description: 'Server Sent Events to add listener', kind: vscode.CompletionItemKind.Field },
           ]
         );
-      } else if (httpyac.utils.isGrpcRequest(httpRegion.request)) {
+      } else if (httpRegion.request.method === 'GRPC') {
         result.push(
           ...[
             {

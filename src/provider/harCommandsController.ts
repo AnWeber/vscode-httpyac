@@ -80,7 +80,7 @@ export class HarCommandsController extends DisposeProvider {
             if (httpyac.utils.isHttpRegionSendContext(context)) {
               return httpyac.HookCancel;
             }
-            return request;
+            return undefined;
           });
           try {
             await this.documentStore.send(context);
