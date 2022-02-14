@@ -1,16 +1,14 @@
 import * as config from './config';
 import { DocumentStore } from './documentStore';
 import { HttpYacExtensionApi } from './extensionApi';
-import * as io from './io';
+import { initIOProvider, StorageProvider } from './io';
 import * as provider from './provider';
 import { ResponseStore } from './responseStore';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi {
-  io.initFileProvider();
-
-  const storageProvider = new io.StorageProvider(context.globalStorageUri);
+  const storageProvider = new StorageProvider(context.globalStorageUri);
   const documentStore = new DocumentStore();
   const responseStore = new ResponseStore(storageProvider);
 
@@ -20,7 +18,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       documentStore,
       responseStore,
       storeController,
-      io.initUserInteractionProvider(),
+      initIOProvider(),
       new provider.CodeLensProvider(documentStore, responseStore),
       new provider.HistoryController(documentStore, responseStore),
       new provider.ResponseDocumentController(responseStore),

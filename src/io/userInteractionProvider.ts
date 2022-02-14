@@ -66,8 +66,11 @@ function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[]
   }
 }
 
-export function initUserInteractionProvider(): Disposable {
+export function initLog() {
   io.log.options.logMethod = logToOutputChannelFactory('Log');
+}
+
+export function initUserInteractionProvider(): Disposable {
   io.userInteractionProvider.showInformationMessage = async (message: string, ...buttons: Array<string>) =>
     await window.showInformationMessage(message, ...buttons);
   io.userInteractionProvider.showErrorMessage = async (message: string, ...buttons: Array<string>) =>

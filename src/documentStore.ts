@@ -190,9 +190,6 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
         if (!context.config) {
           context.config = config;
         }
-        context.require = {
-          vscode,
-        };
         const result = await httpyac.send(context);
         this.variables = context.variables;
         return result;
