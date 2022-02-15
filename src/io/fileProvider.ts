@@ -1,7 +1,9 @@
 import { FileEncoding, PathLike, io } from 'httpyac';
 import { workspace, window, languages, Uri, FileType } from 'vscode';
+import { EOL } from 'os';
 
 export function initFileProvider(): void {
+  io.fileProvider.EOL = EOL;
   io.fileProvider.isAbsolute = async (fileName: PathLike) => {
     const uri = toUri(fileName);
     return uri && (await io.fileProvider.exists(uri));
