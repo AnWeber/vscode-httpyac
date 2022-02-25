@@ -32,7 +32,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
     const result: Array<HttpCompletionItem> = [];
 
-    result.push(...this.getRequstMethodCompletionItems(textLine));
+    result.push(...this.getRequestMethodCompletionItems(textLine));
 
     result.push(...this.getRequestHeaders(textLine, isInRequestLine, httpRegion));
 
@@ -50,7 +50,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     });
   }
 
-  private getRequstMethodCompletionItems(textLine: string): Array<HttpCompletionItem> {
+  private getRequestMethodCompletionItems(textLine: string): Array<HttpCompletionItem> {
     const result = [
       {
         name: 'GET',
@@ -495,6 +495,152 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             },
           ]
         );
+      } else if (httpRegion.request.method === 'AMQP') {
+        result.push(
+          ...[
+            { name: 'amqp_exchange', description: 'Exchange', kind: vscode.CompletionItemKind.Field },
+            { name: 'amqp_queue', description: 'Queue', kind: vscode.CompletionItemKind.Field },
+            {
+              name: 'amqp_method',
+              description:
+                'Method (default if no body, consume, with body publish. Valid Values: bind, unbind, declare, delete, consume, publish, purge, ack, nack, cancel',
+              kind: vscode.CompletionItemKind.Field,
+            },
+            { name: 'amqp_routing_key', description: 'Routing Key', kind: vscode.CompletionItemKind.Field },
+          ]
+        );
+
+        const method = httpyac.utils.getHeader(httpRegion?.request?.headers, 'amqp_method') || '';
+        if (httpyac.utils.isString(method)) {
+          switch (method.toLowerCase()) {
+            case 'bind':
+            case 'unbind':
+              result.push(
+                ...[
+                  {
+                    name: 'amqp_exchange_destination',
+                    description: 'Exchange destination for Bind/ Unbind',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                ]
+              );
+              break;
+            case 'declare':
+              result.push(
+                ...[
+                  {
+                    name: 'amqp_passive',
+                    description: `if the exchange name doesn't exists the channel will be closed with an error, fulfilled if the exchange name does exists`,
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_durable',
+                    description: 'if the exchange should survive server restarts',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_auto_delete',
+                    description: 'if the exchange should be deleted when the last binding from it is deleted',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_internal',
+                    description: `if exchange is internal to the server. Client's can't publish to internal exchanges.`,
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                ]
+              );
+              break;
+            case 'delete':
+              result.push(
+                ...[
+                  {
+                    name: 'amqp_if_unused',
+                    description: `only delete if the queue doesn't have any consumers`,
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_if_empty',
+                    description: 'only delete if the queue is empty',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                ]
+              );
+              break;
+            case 'ack':
+            case 'nack':
+            case 'cancel':
+              result.push({
+                name: 'amqp_tag',
+                description: 'tag of the consumer, will be server generated if left empty',
+                kind: vscode.CompletionItemKind.Field,
+              });
+              break;
+            case 'consume':
+            case 'publish':
+            case '':
+              result.push(
+                ...[
+                  {
+                    name: 'amqp_tag',
+                    description: 'tag of the consumer, will be server generated if left empty',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_no_ack',
+                    description:
+                      'if messages are removed from the server upon delivery, or have to be acknowledged (default: false)',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_exclusive',
+                    description:
+                      'if this can be the only consumer of the queue, will return an Error if there are other consumers to the queue already',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+
+                  {
+                    name: 'amqp_correlation_id',
+                    description: 'for RPC requests',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_content_type',
+                    description: 'content type of body, eg. application/json',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_content_encoding',
+                    description: 'content encoding of body, eg. gzip',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  {
+                    name: 'amqp_deliveryMode',
+                    description: '1 for transient messages, 2 for persistent messages',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  { name: 'amqp_expiration', description: 'Exchange', kind: vscode.CompletionItemKind.Field },
+                  {
+                    name: 'amqp_messageId',
+                    description: 'Message TTL, in milliseconds, as string',
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                  { name: 'amqp_priority', description: 'between 0 and 255', kind: vscode.CompletionItemKind.Field },
+                  { name: 'amqp_replyTo', description: 'for RPC requests', kind: vscode.CompletionItemKind.Field },
+                  { name: 'amqp_type', description: 'type', kind: vscode.CompletionItemKind.Field },
+                  { name: 'amqp_userId', description: 'user id', kind: vscode.CompletionItemKind.Field },
+                  {
+                    name: 'amqp_mandatory',
+                    description: `if the message should be returned if there's no queue to be delivered to`,
+                    kind: vscode.CompletionItemKind.Field,
+                  },
+                ]
+              );
+              break;
+            default:
+              break;
+          }
+        }
       }
       if (result) {
         return result.filter(
