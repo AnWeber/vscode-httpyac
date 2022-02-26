@@ -2,7 +2,7 @@ import { getConfigSetting } from '../config';
 import { ResponseItem as IResponseItem } from '../extensionApi';
 import * as httpyac from 'httpyac';
 import { extension } from 'mime-types';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import * as vscode from 'vscode';
 
 export class ResponseItem implements IResponseItem {
@@ -22,8 +22,8 @@ export class ResponseItem implements IResponseItem {
   loadResponseBody?: () => Promise<void>;
 
   constructor(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
-    this.id = uuidv4();
-    this.name = this.getName(response, httpRegion);
+    this.id = uuid();
+    this.name = response.name || httpRegion?.symbol.name || `${response.protocol} ${response.statusCode}`;
     this.line = httpRegion?.symbol?.startLine;
     this.created = new Date();
 
@@ -33,16 +33,6 @@ export class ResponseItem implements IResponseItem {
     this.testResults = httpRegion?.testResults;
     this.response = response;
     this.isCachedResponse = false;
-  }
-
-  private getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
-    if (httpRegion) {
-      return httpRegion.symbol.name;
-    }
-    if (response.request) {
-      return `${response.request?.method} ${response.request?.url}`;
-    }
-    return `${response.protocol} ${response.statusCode}`;
   }
 
   public async removeDocument(): Promise<void> {

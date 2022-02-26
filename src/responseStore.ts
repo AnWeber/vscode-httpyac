@@ -51,19 +51,13 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     );
   }
 
-  public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void> {
+  public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion, show = true): Promise<void> {
     const responseItem = new view.ResponseItem(response, httpRegion);
-    await this.show(responseItem);
+    if (show) {
+      await this.show(responseItem);
+    }
+    await this.shrink(responseItem);
     this.addToCache(responseItem);
-  }
-
-  private shrinkResponseItem(response: httpyac.HttpResponse) {
-    delete response.request?.body;
-    delete response.parsedBody;
-    delete response.body;
-    delete response.rawHeaders;
-    delete response.rawBody;
-    delete response.prettyPrintBody;
   }
 
   private addToCache(responseItem: view.ResponseItem) {
@@ -123,6 +117,15 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     }
   }
 
+  private shrinkResponseItem(response: httpyac.HttpResponse) {
+    delete response.request?.body;
+    delete response.parsedBody;
+    delete response.body;
+    delete response.rawHeaders;
+    delete response.rawBody;
+    delete response.prettyPrintBody;
+  }
+
   public async show(responseItem: ResponseItem): Promise<void> {
     for (const responseHandler of this.responseHandlers) {
       const result = await responseHandler(responseItem);
@@ -133,8 +136,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
         break;
       }
     }
-
-    await this.shrink(responseItem);
   }
 
   private async prettyPrint(editor: vscode.TextEditor): Promise<void> {

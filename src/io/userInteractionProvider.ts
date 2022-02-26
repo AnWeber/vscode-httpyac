@@ -1,5 +1,5 @@
 import { APP_NAME } from '../config';
-import { io, LogLevel, utils } from 'httpyac';
+import { io, LogLevel, HttpResponse, StreamResponse, utils } from 'httpyac';
 import { Disposable, OutputChannel, window, env } from 'vscode';
 
 const outputChannels: Record<string, OutputChannel> = {};
@@ -16,9 +16,13 @@ export function getOutputChannel(channel: string, show = false): OutputChannel {
   return outputChannel;
 }
 
-export async function logStream(channel: string, type: string, message: unknown): Promise<void> {
-  const outputChannel = getOutputChannel(channel, true);
-  appendToOutputChannel(outputChannel, [message], `${new Date().toLocaleTimeString()} - ${type}: `);
+export async function logStream(type: string, response: HttpResponse & StreamResponse): Promise<void> {
+  const outputChannel = getOutputChannel(response.protocol, true);
+  appendToOutputChannel(
+    outputChannel,
+    [response.message || response.body],
+    `${new Date().toLocaleTimeString()} - ${type}: `
+  );
 }
 
 export function logToOutputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {

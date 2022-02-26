@@ -687,6 +687,12 @@
           "scope": "window",
           "description": "show information, warning and error notification message"
         },
+        "httpyac.addStreamingResponsesToHistory": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "add streaming responses to history"
+        },
         "httpyac.maxHistoryItems": {
           "type": "number",
           "default": 50,

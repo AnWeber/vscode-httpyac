@@ -112,10 +112,11 @@ export class RequestCommandsController extends DisposeProvider {
 
   private async sendRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined) {
     if (context) {
+      const config = getConfigSetting();
       await vscode.window.withProgress(
         {
           location:
-            getConfigSetting().progressDefaultLocation === 'window'
+            config.progressDefaultLocation === 'window'
               ? vscode.ProgressLocation.Window
               : vscode.ProgressLocation.Notification,
           cancellable: true,
@@ -130,9 +131,14 @@ export class RequestCommandsController extends DisposeProvider {
             },
             report: data => progress.report(data),
           };
+          context.logStream = async (_type, response) => {
+            if (config.addStreamingResponsesToHistory) {
+              await this.responseStore.add(response, undefined, false);
+            }
+          };
           context.logResponse = async (response, httpRegion) => {
             context.progress?.report?.({
-              message: 'update view',
+              message: 'show view',
             });
             await this.responseStore.add(response, httpRegion);
           };

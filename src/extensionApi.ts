@@ -37,7 +37,7 @@ export interface DocumentStore {
 export interface ResponseStore {
   readonly hasItems: boolean;
   readonly historyChanged: vscode.Event<void>;
-  add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): Promise<void>;
+  add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion, show?: boolean): Promise<void>;
   remove(responseItem: ResponseItem): Promise<boolean>;
   clear(): Promise<void>;
 }

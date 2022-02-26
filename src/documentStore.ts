@@ -175,14 +175,16 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
               responseBodyLength: 1024,
             }
           );
-          const logStreamCache = context.logStream;
-          context.logStream = async (channel, type, message) => {
-            await logStream(channel, type, message);
-            logStreamCache?.(channel, type, message);
+          const logContextStream = context.logStream;
+          context.logStream = async (type, message) => {
+            await logStream(type, message);
+            if (logContextStream) {
+              await logContextStream?.(type, message);
+            }
           };
           const logResponse = context.logResponse;
           context.logResponse = async (response, httpRegion) => {
-            outputChannelLogResponse(response, httpRegion);
+            await outputChannelLogResponse(response, httpRegion);
             await logResponse?.(response, httpRegion);
           };
         }

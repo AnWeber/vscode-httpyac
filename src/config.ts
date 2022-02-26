@@ -60,6 +60,7 @@ export interface AppConfig {
   responseViewColumn?: string;
   useMethodInSendCodeLens?: boolean;
   useDecorationProvider?: boolean;
+  addStreamingResponsesToHistory?: boolean;
   maxHistoryItems?: number;
   decorationActiveRegion?: vscode.DecorationRenderOptions;
   decorationInactiveRegion?: vscode.DecorationRenderOptions;
