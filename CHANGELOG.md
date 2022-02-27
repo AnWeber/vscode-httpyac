@@ -7,7 +7,7 @@
 #### Features
 
 - added [RabbitMQ Support](http://localhost:8080/guide/request.html#amqp-rabbitmq)
-- add OAuth2 Variable Prefix to Session to allow cache of different user login (#207)
+- add OAuth2 Variable Prefix to Session to allow cache of different user login (AnWeber/httpyac#207)
 - Stream Responses are added to history (disable with setting `addStreamingResponsesToHistory`)
 
 #### Fixes
