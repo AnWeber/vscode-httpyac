@@ -1,3 +1,20 @@
+## 5.0.0 (2022-02-27)
+
+#### Breaking Changes
+
+- Setting Got Options directly on the request will be removed in one of the next versions. Got checks in v12 whether only valid options are set. But since options and custom properties are mixed at the request object, such a separation would be difficult. Please change `request[...]` to `request.options[...]`.
+
+#### Features
+
+- added [RabbitMQ Support](http://localhost:8080/guide/request.html#amqp-rabbitmq)
+- add OAuth2 Variable Prefix to Session to allow cache of different user login (#207)
+- Stream Responses are added to history (disable with setting `addStreamingResponsesToHistory`)
+
+#### Fixes
+
+- transitive request references (`@import`) not being resolved (AnWeber/httpyac#205)
+- import of modified variables works when using `@forceRef` (AnWeber/httpyac#205)
+
 ## 4.10.2 (2022-02-08)
 
 #### Features
