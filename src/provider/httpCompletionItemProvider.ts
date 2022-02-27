@@ -567,8 +567,39 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
                 ]
               );
               break;
-            case 'ack':
             case 'nack':
+              result.push(
+                {
+                  name: 'amqp_tag',
+                  description: 'tag of the consumer, will be server generated if left empty',
+                  kind: vscode.CompletionItemKind.Field,
+                },
+                {
+                  name: 'amqp_requeue',
+                  description: `if the message should be requeued or removed`,
+                  kind: vscode.CompletionItemKind.Field,
+                },
+                {
+                  name: 'amqp_multiple',
+                  description: `batch confirm all messages up to this delivery tag`,
+                  kind: vscode.CompletionItemKind.Field,
+                }
+              );
+              break;
+            case 'ack':
+              result.push(
+                {
+                  name: 'amqp_tag',
+                  description: 'tag of the consumer, will be server generated if left empty',
+                  kind: vscode.CompletionItemKind.Field,
+                },
+                {
+                  name: 'amqp_multiple',
+                  description: `batch confirm all messages up to this delivery tag`,
+                  kind: vscode.CompletionItemKind.Field,
+                }
+              );
+              break;
             case 'cancel':
               result.push({
                 name: 'amqp_tag',
