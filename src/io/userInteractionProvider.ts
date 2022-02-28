@@ -100,8 +100,21 @@ export function initUserInteractionProvider(): Disposable {
       ignoreFocusOut: true,
     });
 
-  io.userInteractionProvider.setClipboard = async message => await env.clipboard.writeText(message);
-  io.userInteractionProvider.getClipboard = async () => await env.clipboard.readText();
+  io.userInteractionProvider.setClipboard = async message => {
+    try {
+      await env.clipboard.writeText(message);
+    } catch (err) {
+      io.log.warn(err);
+    }
+  };
+  io.userInteractionProvider.getClipboard = async () => {
+    try {
+      return await env.clipboard.readText();
+    } catch (err) {
+      io.log.warn(err);
+    }
+    return '';
+  };
 
   return {
     dispose: function dispose() {
