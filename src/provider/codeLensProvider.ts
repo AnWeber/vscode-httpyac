@@ -73,8 +73,8 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
             if (!httpRegion.request) {
               title = 'execute';
             } else if (
-              httpRegion.request.method &&
-              ['AMQP', 'MQTT', 'SSE', 'WS', 'GRPC'].indexOf(httpRegion.request.method) >= 0
+              httpRegion.request.protocol &&
+              ['AMQP', 'MQTT', 'SSE', 'WS', 'GRPC'].indexOf(httpRegion.request.protocol) >= 0
             ) {
               title = 'connect';
             }

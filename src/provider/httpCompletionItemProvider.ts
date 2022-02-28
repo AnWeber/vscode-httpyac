@@ -445,7 +445,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             },
           ]
         );
-      } else if (httpRegion.request.method === 'MQTT') {
+      } else if (httpRegion.request.protocol === 'MQTT') {
         result.push(
           ...[
             {
@@ -479,13 +479,13 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             { name: 'topic', description: 'topic to subscribe and publish to', kind: vscode.CompletionItemKind.Field },
           ]
         );
-      } else if (httpRegion.request.method === 'SSE') {
+      } else if (httpRegion.request.protocol === 'SSE') {
         result.push(
           ...[
             { name: 'Event', description: 'Server Sent Events to add listener', kind: vscode.CompletionItemKind.Field },
           ]
         );
-      } else if (httpRegion.request.method === 'GRPC') {
+      } else if (httpRegion.request.protocol === 'GRPC') {
         result.push(
           ...[
             {
@@ -495,7 +495,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
             },
           ]
         );
-      } else if (httpRegion.request.method === 'AMQP') {
+      } else if (httpRegion.request.protocol === 'AMQP') {
         result.push(
           ...[
             { name: 'amqp_exchange', description: 'Exchange', kind: vscode.CompletionItemKind.Field },
