@@ -2,7 +2,7 @@
 
 #### Fixes
 
-- add mergeRawHttpHeaders to utils (#209)
+- add mergeRawHttpHeaders to utils (AnWeber/httpyac#209)
 
 ## 5.0.0 (2022-02-27)
 
