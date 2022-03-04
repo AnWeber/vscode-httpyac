@@ -7,11 +7,11 @@ import {
 } from './config';
 import { DocumentStore as IDocumentStore } from './extensionApi';
 import { getOutputChannel, logToOutputChannelFactory, logStream } from './io';
-import { DisposeProvider } from './utils';
+import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 
-export class DocumentStore extends DisposeProvider implements IDocumentStore {
+export class DocumentStore extends utils.DisposeProvider implements IDocumentStore {
   activeEnvironment: Array<string> | undefined;
 
   public getDocumentPathLike: (document: vscode.TextDocument) => httpyac.PathLike;
@@ -26,7 +26,16 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
     super();
     this.documentStoreChangedEmitter = new vscode.EventEmitter<void>();
     this.httpFileStore = new httpyac.store.HttpFileStore();
-    this.getDocumentPathLike = document => document.uri;
+    this.getDocumentPathLike = document => {
+      if (utils.isNotebook(document)) {
+        return {
+          uri: document.uri,
+          fileUri: document.notebook.uri,
+          toString: () => document.uri.toString(),
+        };
+      }
+      return document.uri;
+    };
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
 
     this.subscriptions = [
