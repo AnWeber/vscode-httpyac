@@ -50,8 +50,8 @@
   "capabilities": {
     "virtualWorkspaces": true,
     "untrustedWorkspaces": {
-      "supported": false,
-      "description": "untrusted workspace are not supported, because project files are executed using javascript"
+      "supported": "limited",
+      "description": "javascript execution is not supported in untrusted workspace"
     }
   },
   "extensionKind": [

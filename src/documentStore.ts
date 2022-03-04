@@ -48,6 +48,9 @@ export class DocumentStore extends DisposeProvider implements IDocumentStore {
           this.remove(document);
         }
       }),
+      vscode.workspace.onDidGrantWorkspaceTrust(() => {
+        this.httpFileStore.clear();
+      }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         if (vscode.languages.match(allHttpDocumentSelector, document)) {
           await this.getHttpFile(document);

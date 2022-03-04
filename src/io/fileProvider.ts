@@ -122,16 +122,23 @@ interface VirtualDocument {
 }
 
 export function toUri(pathLike: PathLike): Uri | false {
+  let result: Uri | false = false;
   if (typeof pathLike === 'string') {
-    return Uri.file(pathLike);
+    result = Uri.file(pathLike);
+  } else if (pathLike instanceof Uri) {
+    result = pathLike;
+  } else if (isVirtualDocument(pathLike)) {
+    result = pathLike.fileUri || pathLike.uri;
   }
-  if (pathLike instanceof Uri) {
-    return pathLike;
+  if (result && !workspace.isTrusted) {
+    if (!workspace.getWorkspaceFolder(result)) {
+      const message = `Not Trusted Workspace cannot access uri outside of workspace.`;
+      io.userInteractionProvider.showWarnMessage?.(message);
+      io.log.warn(message);
+      result = false;
+    }
   }
-  if (isVirtualDocument(pathLike)) {
-    return pathLike.fileUri || pathLike.uri;
-  }
-  return false;
+  return result;
 }
 
 function isVirtualDocument(pathLike: PathLike): pathLike is VirtualDocument {

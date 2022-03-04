@@ -1,13 +1,13 @@
 import { APP_NAME } from '../config';
 import { io, LogLevel, HttpResponse, StreamResponse, utils } from 'httpyac';
-import { Disposable, OutputChannel, window, env } from 'vscode';
+import * as vscode from 'vscode';
 
-const outputChannels: Record<string, OutputChannel> = {};
+const outputChannels: Record<string, vscode.OutputChannel> = {};
 
-export function getOutputChannel(channel: string, show = false): OutputChannel {
+export function getOutputChannel(channel: string, show = false): vscode.OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = window.createOutputChannel(`${APP_NAME} - ${channel}`);
+    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`);
     if (show) {
       outputChannel.show(true);
     }
@@ -48,7 +48,7 @@ function toLevelString(level: LogLevel) {
   }
 }
 
-function appendToOutputChannel(outputChannel: OutputChannel, messages: unknown[], prefix?: string) {
+function appendToOutputChannel(outputChannel: vscode.OutputChannel, messages: unknown[], prefix?: string) {
   for (const param of messages) {
     if (param !== undefined) {
       if (prefix) {
@@ -74,44 +74,59 @@ export function initLog() {
   io.log.options.logMethod = logToOutputChannelFactory('Log');
 }
 
-export function initUserInteractionProvider(): Disposable {
+export function initUserInteractionProvider(): vscode.Disposable {
+  io.userInteractionProvider.isTrusted = (message?: string) => {
+    if (!vscode.workspace.isTrusted) {
+      io.log.warn(`Workspace is not trusted. ${message || 'Function'} is disabled`);
+      return false;
+    }
+    return true;
+  };
   io.userInteractionProvider.showInformationMessage = async (message: string, ...buttons: Array<string>) =>
-    await window.showInformationMessage(message, ...buttons);
+    await vscode.window.showInformationMessage(message, ...buttons);
   io.userInteractionProvider.showErrorMessage = async (message: string, ...buttons: Array<string>) =>
-    await window.showErrorMessage(message, ...buttons);
+    await vscode.window.showErrorMessage(message, ...buttons);
   io.userInteractionProvider.showWarnMessage = async (message: string, ...buttons: Array<string>) =>
-    await window.showWarningMessage(message, ...buttons);
+    await vscode.window.showWarningMessage(message, ...buttons);
   io.userInteractionProvider.showNote = async (note: string) => {
     const buttonTitle = 'Execute';
-    const result = await window.showWarningMessage(note, { modal: true }, buttonTitle);
+    const result = await vscode.window.showWarningMessage(note, { modal: true }, buttonTitle);
     return result === buttonTitle;
   };
   io.userInteractionProvider.showInputPrompt = async (message: string, defaultValue?: string, maskedInput?: boolean) =>
-    await window.showInputBox({
-      placeHolder: message,
+    await vscode.window.showInputBox({
+      placeHolder: vscode.workspace.isTrusted ? message : `Workspace not trusted: ${message}`,
       value: defaultValue,
       prompt: message,
       ignoreFocusOut: true,
       password: maskedInput,
     });
   io.userInteractionProvider.showListPrompt = async (message: string, values: string[]) =>
-    await window.showQuickPick(values, {
+    await vscode.window.showQuickPick(values, {
       placeHolder: message,
       ignoreFocusOut: true,
     });
 
   io.userInteractionProvider.setClipboard = async message => {
-    try {
-      await env.clipboard.writeText(message);
-    } catch (err) {
-      io.log.warn(err);
+    if (vscode.workspace.isTrusted) {
+      try {
+        await vscode.env.clipboard.writeText(message);
+      } catch (err) {
+        io.log.warn(err);
+      }
+    } else {
+      io.log.warn(`Workspace is not trusted. setClipboard is disabled`);
     }
   };
   io.userInteractionProvider.getClipboard = async () => {
-    try {
-      return await env.clipboard.readText();
-    } catch (err) {
-      io.log.warn(err);
+    if (vscode.workspace.isTrusted) {
+      try {
+        return await vscode.env.clipboard.readText();
+      } catch (err) {
+        io.log.warn(err);
+      }
+    } else {
+      io.log.warn(`Workspace is not trusted. getClipboard is disabled`);
     }
     return '';
   };
