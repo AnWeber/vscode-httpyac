@@ -44,7 +44,7 @@ export class UserSessionTreeDataProvider
         return toObjectItems(element.value);
       }
       const result = toObjectItems(element.details) || [];
-      if (httpyac.isOpenIdInformation(element)) {
+      if (httpyac.utils.isOpenIdInformation(element)) {
         result.push({
           key: 'access_token',
           value: httpyac.utils.decodeJWT(element.accessToken),
