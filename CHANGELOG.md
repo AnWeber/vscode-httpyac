@@ -1,3 +1,16 @@
+## 5.1.0 (2022-03-06)
+
+#### Features
+
+- add workspace trust support (#104)
+- OAuth2 Authorization Code Flow and Password Flow supports public clients (AnWeber/httpyac#214)
+
+#### Fixes
+
+- Parsing Error of Markdown in Notebook Editor (#106)
+- fixed parsing of meta data `# @jwt`
+- fix order of variable replacer (AnWeber/httpyac#216)
+
 ## 5.0.4 (2022-02-28)
 
 #### Fixes
