@@ -82,6 +82,7 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
       const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
         for (const httpRegion of httpFile.httpRegions) {
+          httpRegion.variablesPerEnv = {};
           delete httpRegion.response;
         }
       }
