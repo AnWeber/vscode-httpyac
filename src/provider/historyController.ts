@@ -77,16 +77,7 @@ export class HistoryController extends DisposeProvider implements vscode.TreeDat
 
   @errorHandler()
   private async clearHistory(): Promise<void> {
-    const document = vscode.window.activeTextEditor?.document;
-    if (document) {
-      const httpFile = await this.documentStore.getHttpFile(document);
-      if (httpFile) {
-        for (const httpRegion of httpFile.httpRegions) {
-          httpRegion.variablesPerEnv = {};
-          delete httpRegion.response;
-        }
-      }
-    }
+    this.documentStore.clear();
     await this.responseStore.clear();
   }
 

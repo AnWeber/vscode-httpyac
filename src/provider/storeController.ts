@@ -3,6 +3,7 @@ import { APP_NAME, allHttpDocumentSelector, getConfigSetting, getEnvironmentConf
 import * as httpyac from 'httpyac';
 import { errorHandler } from './errorHandler';
 import { DocumentStore } from '../documentStore';
+import { ResponseStore } from '../extensionApi';
 import * as utils from '../utils';
 
 const commands = {
@@ -25,7 +26,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   private environmentChangedEmitter: vscode.EventEmitter<string[] | undefined>;
 
-  constructor(private readonly documentStore: DocumentStore) {
+  constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
     super();
     this.envStatusBarItem = vscode.window.createStatusBarItem('vscode_httpyac_env', vscode.StatusBarAlignment.Right);
     this.envStatusBarItem.name = 'httpyac: Select Environment';
@@ -241,6 +242,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   private async reset(): Promise<void> {
     this.documentStore.clear();
+    await this.responseStore.clear();
     await httpyac.store.userSessionStore.reset();
   }
 
