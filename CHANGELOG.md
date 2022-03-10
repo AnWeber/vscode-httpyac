@@ -1,3 +1,16 @@
+## 5.2.0 (2022-03-10)
+
+#### Features
+
+- add [RFC7636](https://datatracker.ietf.org/doc/html/rfc7636) OAuth2 Authorization Code Flow with PKCE support (AnWeber/httpyac#219)
+- add [RFC8707](https://datatracker.ietf.org/doc/html/rfc8707) OAuth2 Resource Indicator support (AnWeber/httpyac#218)
+- change `removeHistory` command to clear all Variables to (#108)
+
+#### Fix
+
+- `# @import` does not store file in httpFileStore, if it is not already loaded in the store (#110)
+- fix issue in output redirection to absolute file paths (#109)
+
 ## 5.1.0 (2022-03-06)
 
 #### Features
