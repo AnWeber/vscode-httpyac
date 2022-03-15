@@ -1264,7 +1264,7 @@
     "watch": "npm run esbuild -- --watch",
     "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
     "eslint": "eslint src --ext ts",
-    "lint": "npm run format && npm run eslint && npm run lockfile-lint",
+    "lint": "npm run format && npm run eslint && npm run lockfile-lint && tsc --noEmit",
     "prepare": "husky install",
     "package": "npx vsce package"
   },
