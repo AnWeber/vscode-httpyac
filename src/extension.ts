@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
   const documentStore = new DocumentStore();
   const responseStore = new ResponseStore(storageProvider);
 
-  const storeController = new provider.StoreController(documentStore);
+  const storeController = new provider.StoreController(documentStore, responseStore);
   context.subscriptions.push(
     ...[
       documentStore,
