@@ -100,7 +100,10 @@ function getExtensionByUrl(_response: httpyac.HttpResponse, httpRegion?: httpyac
     }
     const dotIndex = url.lastIndexOf('.');
     if (dotIndex > 0 && [4, 5].indexOf(url.length - dotIndex) >= 0) {
-      return url.slice(dotIndex + 1);
+      const extension = url.slice(dotIndex + 1);
+      if (extension.indexOf('}}') < 0) {
+        return extension;
+      }
     }
   }
   return false;
