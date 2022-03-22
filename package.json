@@ -519,6 +519,20 @@
           "scope": "resource",
           "description": "prefer mimetype or extension to determine uri extension"
         },
+        "httpyac.responseViewPreferredFilename": {
+          "type": "string",
+          "enum": [
+            "metaData",
+            "statusCodeAndUrl"
+          ],
+          "markdownEnumDescriptions": [
+            "prefer metaData name",
+            "prefer statusCode and Url"
+          ],
+          "default": "statusCodeAndUrl",
+          "scope": "resource",
+          "description": "preferred filename for response view"
+        },
         "httpyac.responseViewLanguageMap": {
           "type": "object",
           "scope": "resource",

@@ -53,6 +53,7 @@ export interface AppConfig {
   responseViewHeader?: Array<string>;
   responseViewContent?: ResponseViewContent;
   responseViewExtensionRecognition?: 'mimetype' | 'extension' | 'regex';
+  responseViewPreferredFilename?: 'metaData' | 'statusCodeAndUrl';
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none';
   responseViewPrettyPrint?: boolean;
   responseViewPreserveFocus?: boolean;

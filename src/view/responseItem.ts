@@ -23,7 +23,7 @@ export class ResponseItem implements IResponseItem {
 
   constructor(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
     this.id = uuid();
-    this.name = response.name || httpRegion?.symbol.name || `${response.protocol} ${response.statusCode}`;
+    this.name = getName(response, httpRegion);
     this.line = httpRegion?.symbol?.startLine;
     this.created = new Date();
 
@@ -59,6 +59,30 @@ function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRe
     return 'pdf.preview';
   }
   return undefined;
+}
+
+type GetNameAction = (response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) => string | undefined;
+
+function getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
+  const config = getConfigSetting();
+
+  const getMetaDataName: GetNameAction = (_response, httpRegion) => httpRegion?.metaData?.name;
+  const getResponseName: GetNameAction = response => response.name;
+
+  let nameGetters: Array<GetNameAction>;
+  if (config.responseViewPreferredFilename === 'metaData') {
+    nameGetters = [getMetaDataName, getResponseName];
+  } else {
+    nameGetters = [getResponseName, getMetaDataName];
+  }
+
+  for (const getName of nameGetters) {
+    const result = getName(response, httpRegion);
+    if (result) {
+      return result;
+    }
+  }
+  return `${response.protocol} ${response.statusCode}`;
 }
 
 function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
