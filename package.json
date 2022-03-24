@@ -529,7 +529,7 @@
             "prefer metaData name",
             "prefer statusCode and Url"
           ],
-          "default": "statusCodeAndUrl",
+          "default": "metaData",
           "scope": "resource",
           "description": "preferred filename for response view"
         },
