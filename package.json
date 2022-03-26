@@ -523,11 +523,13 @@
           "type": "string",
           "enum": [
             "metaData",
-            "statusCodeAndUrl"
+            "statusCodeAndUrl",
+            "responseCount"
           ],
           "markdownEnumDescriptions": [
             "prefer metaData name",
-            "prefer statusCode and Url"
+            "prefer statusCode and Url",
+            "prefer name response with unique number"
           ],
           "default": "metaData",
           "scope": "resource",

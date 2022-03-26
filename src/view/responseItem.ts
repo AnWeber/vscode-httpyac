@@ -63,15 +63,19 @@ function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRe
 
 type GetNameAction = (response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) => string | undefined;
 
+let responseCount = 0;
 function getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
   const config = getConfigSetting();
 
   const getMetaDataName: GetNameAction = (_response, httpRegion) => httpRegion?.metaData?.name;
   const getResponseName: GetNameAction = response => response.name;
+  const getResponseCountName: GetNameAction = () => `response_${++responseCount}`;
 
   let nameGetters: Array<GetNameAction>;
   if (config.responseViewPreferredFilename === 'metaData') {
     nameGetters = [getMetaDataName, getResponseName];
+  } else if (config.responseViewPreferredFilename === 'responseCount') {
+    nameGetters = [getResponseCountName];
   } else {
     nameGetters = [getResponseName, getMetaDataName];
   }
