@@ -1,3 +1,10 @@
+## 5.2.3 (2022-03-26)
+
+#### Fix
+
+- Security fix for transitive Dependency minimist
+- more options to modify name of response preview (#114)
+
 ## 5.2.2 (2022-03-20)
 
 #### Fix
