@@ -1240,31 +1240,31 @@
           "id": "httpyacHistory",
           "name": "History",
           "visibility": "collapsed",
-          "when": "httpyacHistoryEnabled"
+          "when": "httpyac.historyEnabled"
         },
         {
           "id": "httpyacVariables",
           "name": "Variables",
           "visibility": "collapsed",
-          "when": "resourceLangId in httpyac.supportedLanguages"
+          "when": "httpyac.anyHttpFileOpen"
         },
         {
           "id": "httpyacSession",
           "name": "Session",
           "visibility": "collapsed",
-          "when": "httpyacSessionEnabled"
+          "when": "httpyac.sessionEnabled"
         },
         {
           "id": "httpyacEnvironments",
           "name": "Environments",
           "visibility": "collapsed",
-          "when": "resourceLangId in httpyac.supportedLanguages"
+          "when": "httpyac.anyHttpFileOpen"
         },
         {
           "id": "httpyacDebug",
           "name": "Debug",
           "visibility": "hidden",
-          "when": "resourceLangId in httpyac.supportedLanguages"
+          "when": "httpyac.httpFileOpen"
         }
       ]
     }

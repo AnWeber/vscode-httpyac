@@ -43,7 +43,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
         dispose: httpyac.store.userSessionStore.onSessionChanged(() => {
           vscode.commands.executeCommand(
             'setContext',
-            'httpyacSessionEnabled',
+            'httpyac.sessionEnabled',
             httpyac.store.userSessionStore.userSessions.length > 0
           );
           this.documentStoreChangedEmitter.fire();

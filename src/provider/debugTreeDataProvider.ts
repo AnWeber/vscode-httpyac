@@ -14,20 +14,32 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
     this.#httpFileChangedEmitter = new vscode.EventEmitter<void>();
     this.onDidChangeTreeData = this.#httpFileChangedEmitter.event;
     documentStore.documentStoreChanged(() => {
-      this.refreshHttpFileOpen(vscode.window.activeTextEditor);
+      this.refreshHttpFileOpen(vscode.window.activeTextEditor?.document);
     });
     this.subscriptions = [
       vscode.window.registerTreeDataProvider('httpyacDebug', this),
 
+      vscode.workspace.onDidOpenTextDocument(doc => {
+        this.refreshHttpFileOpen(doc);
+      }),
       vscode.window.onDidChangeActiveTextEditor(async editor => {
-        this.refreshHttpFileOpen(editor);
+        this.refreshHttpFileOpen(editor?.document);
       }),
     ];
   }
 
-  private refreshHttpFileOpen(editor: vscode.TextEditor | undefined) {
-    const isHttpFile = editor?.document && vscode.languages.match(allHttpDocumentSelector, editor.document);
-    vscode.commands.executeCommand('setContext', 'httpyacHttpFileOpen', isHttpFile);
+  private refreshHttpFileOpen(document: vscode.TextDocument | undefined) {
+    const isHttpFileOpen = (doc: vscode.TextDocument | undefined) =>
+      doc && vscode.languages.match(allHttpDocumentSelector, doc);
+    const isHttpFile = isHttpFileOpen(document);
+    vscode.commands.executeCommand('setContext', 'httpyac.httpFileOpen', isHttpFile);
+
+    vscode.commands.executeCommand(
+      'setContext',
+      'httpyac.anyHttpFileOpen',
+      isHttpFile || vscode.window.visibleTextEditors.some(edit => isHttpFileOpen(edit?.document))
+    );
+
     if (isHttpFile) {
       this.#httpFileChangedEmitter.fire();
     }
