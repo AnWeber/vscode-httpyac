@@ -3,6 +3,7 @@ import {
   getEnvironmentConfig,
   getResourceConfig,
   allHttpDocumentSelector,
+  outputDocumentSelector,
   watchConfigSettings,
 } from './config';
 import { DocumentStore as IDocumentStore } from './extensionApi';
@@ -122,11 +123,14 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     return this.documentStoreChangedEmitter.event;
   }
 
-  async getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile> {
-    const path = this.getDocumentPathLike(document);
+  async getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile | undefined> {
+    if (!vscode.languages.match(outputDocumentSelector, document)) {
+      const path = this.getDocumentPathLike(document);
 
-    const httpFile = this.getOrCreate(path, () => Promise.resolve(document.getText()), document.version);
-    return httpFile;
+      const httpFile = this.getOrCreate(path, () => Promise.resolve(document.getText()), document.version);
+      return httpFile;
+    }
+    return undefined;
   }
 
   async getOrCreate(
@@ -176,7 +180,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
         if (resourceConfig.logRequest) {
           const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
             (arg: string) => {
-              const requestChannel = getOutputChannel('Request');
+              const requestChannel = getOutputChannel('Request', 'http');
               requestChannel.appendLine(arg);
             },
             resourceConfig.logOutputChannelOptions || {

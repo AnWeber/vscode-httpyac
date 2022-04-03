@@ -75,9 +75,11 @@ export class RequestCommandsController extends DisposeProvider {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
-      await this.sendRequest({
-        httpFile,
-      });
+      if (httpFile) {
+        await this.sendRequest({
+          httpFile,
+        });
+      }
     }
   }
 
@@ -87,25 +89,27 @@ export class RequestCommandsController extends DisposeProvider {
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
 
-      const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
+      if (httpFile) {
+        const httpRegions = httpFile.httpRegions.filter(obj => !!obj.request);
 
-      const pickedObjs = await vscode.window.showQuickPick(
-        httpRegions.map(httpRegion => ({
-          label: httpRegion.symbol.name,
-          data: httpRegion,
-        })),
-        {
-          placeHolder: 'select requests',
-          canPickMany: true,
-          ignoreFocusOut: true,
+        const pickedObjs = await vscode.window.showQuickPick(
+          httpRegions.map(httpRegion => ({
+            label: httpRegion.symbol.name,
+            data: httpRegion,
+          })),
+          {
+            placeHolder: 'select requests',
+            canPickMany: true,
+            ignoreFocusOut: true,
+          }
+        );
+
+        if (pickedObjs) {
+          await this.sendRequest({
+            httpFile,
+            httpRegionPredicate: httpRegion => pickedObjs.some(obj => obj.data === httpRegion),
+          });
         }
-      );
-
-      if (pickedObjs) {
-        await this.sendRequest({
-          httpFile,
-          httpRegionPredicate: httpRegion => pickedObjs.some(obj => obj.data === httpRegion),
-        });
       }
     }
   }

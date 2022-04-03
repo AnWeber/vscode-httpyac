@@ -166,6 +166,7 @@ export const httpDocumentSelector: Array<vscode.DocumentFilter> = [{ language: '
 export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'markdown', scheme: '*' }];
 
 export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'asciidoc', scheme: '*' }];
+export const outputDocumentSelector: vscode.DocumentFilter = { scheme: 'output' };
 
 export const allHttpDocumentSelector: Array<vscode.DocumentFilter> = [
   ...httpDocumentSelector,

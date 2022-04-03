@@ -4,20 +4,19 @@ import * as vscode from 'vscode';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
 
-export function getOutputChannel(channel: string, show = false): vscode.OutputChannel {
+export function getOutputChannel(channel: string, languageId: string | undefined = undefined): vscode.OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`);
-    if (show) {
-      outputChannel.show(true);
-    }
+    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, languageId);
     outputChannels[channel] = outputChannel;
   }
   return outputChannel;
 }
 
 export async function logStream(type: string, response: HttpResponse & StreamResponse): Promise<void> {
-  const outputChannel = getOutputChannel(response.protocol, true);
+  const outputChannel = getOutputChannel(response.protocol);
+  outputChannel.show(true);
+
   appendToOutputChannel(
     outputChannel,
     [response.message || response.body],

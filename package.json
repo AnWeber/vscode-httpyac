@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT, RabbitMQ and WebSocket requests directly within Visual Studio Code",
-  "version": "5.2.3",
+  "version": "5.3.0",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   "qna": "https://github.com/AnWeber/vscode-httpyac/discussions",
   "icon": "icon.png",
   "engines": {
-    "vscode": "^1.61.0"
+    "vscode": "^1.66.0"
   },
   "categories": [
     "Other",
@@ -1293,28 +1293,31 @@
       "prettier --parser=typescript --write"
     ]
   },
+  "resolutions": {
+    "keyv": "^4.1.1"
+  },
   "devDependencies": {
-    "@types/lodash": "^4.14.180",
+    "@types/lodash": "^4.14.181",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^17.0.21",
+    "@types/node": "^17.0.23",
     "@types/uuid": "^8.3.4",
-    "@types/vscode": "1.61.0",
-    "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "@typescript-eslint/parser": "^5.15.0",
-    "esbuild": "^0.14.27",
-    "eslint": "^8.11.0",
+    "@types/vscode": "1.66.0",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "esbuild": "^0.14.30",
+    "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",
     "husky": "^7.0.4",
-    "lint-staged": "^12.3.6",
+    "lint-staged": "^12.3.7",
     "lockfile-lint": "^4.7.4",
-    "prettier": "^2.6.0",
-    "typescript": "^4.6.2"
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
   },
   "dependencies": {
     "filesize": "^8.0.7",
     "httpsnippet": "^2.0.0",
-    "httpyac": "^5.2.3",
+    "httpyac": "^5.3.0",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "uuid": "^8.3.2"
