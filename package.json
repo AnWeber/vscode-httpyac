@@ -1293,9 +1293,6 @@
       "prettier --parser=typescript --write"
     ]
   },
-  "resolutions": {
-    "keyv": "^4.1.1"
-  },
   "devDependencies": {
     "@types/lodash": "^4.14.181",
     "@types/mime-types": "^2.1.1",
