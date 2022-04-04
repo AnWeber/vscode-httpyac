@@ -1,3 +1,9 @@
+## UNRELEASED
+
+#### Fix
+
+- ignore current state of metaData.disabled in code lens for send (#119)
+
 ## 5.3.0 (2022-04-03)
 
 #### Breaking Changes
