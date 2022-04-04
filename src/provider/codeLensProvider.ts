@@ -67,7 +67,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document.uri, requestLine];
 
-        if (!httpyac.utils.isGlobalHttpRegion(httpRegion) && !httpRegion.metaData.disabled) {
+        if (!httpyac.utils.isGlobalHttpRegion(httpRegion)) {
           if (config?.codelens?.send) {
             let title = 'send';
             if (!httpRegion.request) {
