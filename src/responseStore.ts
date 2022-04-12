@@ -118,7 +118,14 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   }
 
   private shrinkResponseItem(response: httpyac.HttpResponse) {
-    delete response.request?.body;
+    if (response.request?.body) {
+      const maxBodySize = getConfigSetting().responseViewRequestBodySize;
+      if (!httpyac.utils.isString(response.request.body) || typeof maxBodySize === 'undefined') {
+        delete response.request.body;
+      } else {
+        response.request.body = httpyac.utils.getPartOfBody(response.request.body, maxBodySize);
+      }
+    }
     delete response.parsedBody;
     delete response.body;
     delete response.rawHeaders;

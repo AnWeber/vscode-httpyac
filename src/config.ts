@@ -56,6 +56,7 @@ export interface AppConfig {
   responseViewPreferredFilename?: 'metaData' | 'statusCodeAndUrl' | 'responseCount';
   responseViewMode?: 'preview' | 'reuse' | 'open' | 'none';
   responseViewPrettyPrint?: boolean;
+  responseViewRequestBodySize?: number;
   responseViewPreserveFocus?: boolean;
   responseViewLanguageMap?: Record<string, string>;
   responseViewColumn?: string;

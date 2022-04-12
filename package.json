@@ -498,6 +498,12 @@
           "scope": "resource",
           "description": "response view pretty prints content. Pretty print is only working, if editor receives focus (vscode limitation)"
         },
+        "httpyac.responseViewRequestBodySize": {
+          "type": "number",
+          "default": -1,
+          "scope": "resource",
+          "description": "max body size of request in response view"
+        },
         "httpyac.responseViewPreserveFocus": {
           "type": "boolean",
           "default": true,
