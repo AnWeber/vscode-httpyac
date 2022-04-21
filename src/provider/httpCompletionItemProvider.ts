@@ -794,7 +794,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
       const result: Array<HttpCompletionItem> = [];
 
       const toHttpCompletionItem = (httpRegion: httpyac.HttpRegion) => ({
-        name: httpRegion.metaData.name || '',
+        name: httpRegion && httpyac.utils.isString(httpRegion.metaData.name) ? httpRegion.metaData.name : '',
         description: 'httpRegion name',
         kind: vscode.CompletionItemKind.Reference,
       });

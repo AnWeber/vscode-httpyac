@@ -49,7 +49,7 @@ export class ResponseItem implements IResponseItem {
 }
 
 function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string | undefined {
-  if (httpRegion?.metaData?.openWith) {
+  if (httpRegion && httpyac.utils.isString(httpRegion?.metaData?.openWith)) {
     return httpRegion.metaData.openWith;
   }
   if (httpyac.utils.isMimeTypeImage(response.contentType)) {
@@ -67,7 +67,8 @@ let responseCount = 0;
 function getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
   const config = getConfigSetting();
 
-  const getMetaDataName: GetNameAction = (_response, httpRegion) => httpRegion?.metaData?.name;
+  const getMetaDataName: GetNameAction = (_response, httpRegion) =>
+    httpyac.utils.isString(httpRegion?.metaData.name) ? httpRegion?.metaData?.name : undefined;
   const getResponseName: GetNameAction = response => response.name;
   const getResponseCountName: GetNameAction = () => `response_${++responseCount}`;
 
@@ -113,7 +114,7 @@ function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpR
 type ExtensionRecognition = (response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) => string | false;
 
 function getExtensionByMetaData(_response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
-  if (httpRegion?.metaData?.extension) {
+  if (httpRegion && httpyac.utils.isString(httpRegion?.metaData?.extension)) {
     return httpRegion.metaData.extension;
   }
   return false;
