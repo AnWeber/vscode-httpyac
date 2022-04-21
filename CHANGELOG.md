@@ -1,7 +1,16 @@
-## UNRELEASED
+## 5.4.0 (2022-04-21)
 
-#### Fix
+#### Features
 
+- add `dayjs` and `uuid` to require
+- `# @disabled` allows evalExpression which is evaluated on each step in execution (AnWeber/httpyac#246)
+
+#### Fixes
+
+- throw error on javascript error (AnWeber/httpyac#245)
+- correct order of output using `# @ref` (AnWeber/httpyac#245)
+- correct order of output using `# @loop` (AnWeber/httpyac#243)
+- right request count using `# @loop` (AnWeber/httpyac#242)
 - ignore current state of metaData.disabled in code lens for send (#119)
 
 ## 5.3.0 (2022-04-03)
