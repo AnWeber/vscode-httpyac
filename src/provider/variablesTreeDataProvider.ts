@@ -24,8 +24,11 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
     ];
   }
 
-  private copyToClipboard(value: string) {
-    vscode.env.clipboard.writeText(value);
+  private copyToClipboard(value: unknown) {
+    const result = httpyac.utils.toString(value);
+    if (result) {
+      vscode.env.clipboard.writeText(result);
+    }
   }
 
   getTreeItem(element: ObjectItem): vscode.TreeItem {
