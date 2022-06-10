@@ -1,3 +1,9 @@
+## Unreleased
+
+#### Fixes
+
+- copy of value in TreeDataProvider works only with string values (#131)
+
 ## 5.4.2 (2022-05-28)
 
 #### Fixes
