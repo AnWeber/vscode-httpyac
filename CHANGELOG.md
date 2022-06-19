@@ -1,7 +1,13 @@
-## Unreleased
+## 5.5.0 (2022-06-19)
+
+#### Features
+
+- log redirect responses (HTTP 302)
+- add Hover Provider to view variables and OAuth2 Header
 
 #### Fixes
 
+- grpc requests allows output redirection (AnWeber/httpyac#297)
 - copy of value in TreeDataProvider works only with string values (#131)
 
 ## 5.4.2 (2022-05-28)
