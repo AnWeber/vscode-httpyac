@@ -21,7 +21,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
     const range = new vscode.Range(symbol.startLine, symbol.startOffset, symbol.endLine, symbol.endOffset);
     const result = new vscode.DocumentSymbol(
       symbol.name,
-      symbol.description,
+      `${symbol.description} ${symbol.startOffset} ${symbol.endOffset}`,
       this.toDocumentSymbolKind(symbol.kind),
       range,
       range
@@ -55,6 +55,8 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
         return vscode.SymbolKind.Function;
       case HttpSymbolKind.requestHeader:
         return vscode.SymbolKind.Key;
+      case HttpSymbolKind.variableDefinition:
+        return vscode.SymbolKind.Variable;
       case HttpSymbolKind.variable:
         return vscode.SymbolKind.Variable;
       case HttpSymbolKind.text:

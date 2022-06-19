@@ -10,5 +10,6 @@ export * from './httpDocumentSymbolProvider';
 export * from './requestCommandsController';
 export * from './responseDocumentController';
 export * from './storeController';
+export * from './variablesHoverProvider';
 export * from './variablesTreeDataProvider';
 export * from './userSessionTreeDataProvider';
