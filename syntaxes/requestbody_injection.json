@@ -1,0 +1,176 @@
+{
+  "scopeName": "http.requestbody.injection",
+  "injectionSelector": "L:http.request.body",
+  "patterns": [
+    {
+      "include": "#http-handlebars"
+    }
+  ],
+  "repository": {
+    "http-handlebars": {
+      "patterns": [
+        {
+          "match": "({{)(\\$(guid|uuid))(}})",
+          "name": "http.handlebars.uuid meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "4": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$timestamp)\\s*(-?\\d+)?(\\s+(y|Q|M|w|d|h|m|s|ms))?(}})",
+          "name": "http.handlebars.timestamp meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "3": {
+              "name": "variable.parameter.http"
+            },
+            "5": {
+              "name": "keyword.other.http"
+            },
+            "6": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$(localD|d)atetime)\\s(('.+'|\".+\")|(rfc1123|iso8601))(\\s(?<offset>-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?(}})",
+          "name": "http.handlebars.datetime meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "5": {
+              "name": "string.quoted.http variable.parameter.http"
+            },
+            "6": {
+              "name": "variable.parameter.http"
+            },
+            "8": {
+              "name": "variable.parameter.http"
+            },
+            "9": {
+              "name": "keyword.other.http"
+            },
+            "10": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$randomInt)\\s*(-?\\d+)?\\s*(-?\\d+)?(}})",
+          "name": "http.handlebars.randomint meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "3": {
+              "name": "variable.parameter.http"
+            },
+            "4": {
+              "name": "variable.parameter.http"
+            },
+            "5": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$prompt|\\$input|\\$password)\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
+          "name": "http.handlebars.input meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "3": {
+              "name": "variable.parameter.http"
+            },
+            "4": {
+              "name": "keyword.control.http"
+            },
+            "5": {
+              "name": "variable.parameter.http"
+            },
+            "6": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$pick)\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
+          "name": "http.handlebars.pick meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "3": {
+              "name": "variable.parameter.http"
+            },
+            "4": {
+              "name": "keyword.control.http"
+            },
+            "5": {
+              "name": "variable.parameter.http"
+            },
+            "6": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)([^}}]+)(}})",
+          "name": "http.handlebars.javascript meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.js keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "meta.embedded.block.javascript",
+              "patterns": [
+                {
+                  "include": "source.js"
+                }
+              ]
+            },
+            "3": {
+              "name": "punctuation.definition.string.end.js keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "(\\\\{\\\\{.+\\\\}\\\\})",
+          "name": "http.handlebars.escape meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "string.other.http"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

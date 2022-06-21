@@ -82,14 +82,21 @@
     ],
     "grammars": [
       {
+        "path": "./syntaxes/requestbody_injection.json",
+        "scopeName": "http.requestbody.injection",
+        "injectTo": [
+          "source.http"
+        ]
+      },
+      {
         "language": "http",
         "scopeName": "source.http",
         "path": "./syntaxes/http.tmLanguage.json",
         "embeddedLanguages": {
-          "source.json": "json",
-          "source.js": "javascript",
-          "text.xml": "xml",
-          "source.graphql": "graphql"
+          "meta.embedded.block.json": "json",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.html": "html",
+          "meta.embedded.block.graphql": "graphql"
         }
       }
     ],
