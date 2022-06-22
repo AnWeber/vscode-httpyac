@@ -1,3 +1,9 @@
+## 5.5.1 (2022-06-22)
+
+#### Fixes
+
+- fixed several Syntax Language Issues with Handlebars (#123)
+
 ## 5.5.0 (2022-06-19)
 
 #### Features
