@@ -8,6 +8,9 @@
       "include": "#javascript-block"
     },
     {
+      "include": "#intellij-block"
+    },
+    {
       "include": "#request-body"
     },
     {
@@ -36,55 +39,77 @@
     "metadata": {
       "patterns": [
         {
-          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+(for)\\s+(.*)\\s+(of)\\s+(.*)\\s*?$",
+          "match": "^\\s*#+\\s*(@[^\\s]*)\\s+(for)\\s+(.*)\\s+(of)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "3": {
-              "name": "entity.name.type.http"
+              "name": "entity.name.http"
             },
             "4": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "5": {
-              "name": "entity.name.type.http"
+              "name": "entity.name.http"
             }
           },
           "name": "comment.line.sharp.forof.http"
         },
         {
-          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(for)\\s+.*\\s*?$",
+          "match": "^\\s*#+\\s*(@[^\\s]*)\\s*(for)\\s+.*\\s*?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "3": {
-              "name": "entity.name.type.http"
+              "name": "entity.name.http"
             }
           },
           "name": "comment.line.sharp.for.http"
         },
         {
-          "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(while)\\s+(.*)\\s*?$",
+          "match": "^\\s*#+\\s*(@[^\\s]*)\\s*(while)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "3": {
-              "name": "entity.name.type.http"
+              "name": "meta.embedded.block.javascript",
+              "patterns": [
+                {
+                  "include": "source.js"
+                }
+              ]
             }
           },
           "name": "comment.line.sharp.while.http"
+        },
+        {
+          "match": "^\\s*#+\\s*(@sleep)\\s+(.*)\\s*?$",
+          "captures": {
+            "1": {
+              "name": "keyword.name.http"
+            },
+            "2": {
+              "name": "meta.embedded.block.javascript",
+              "patterns": [
+                {
+                  "include": "source.js"
+                }
+              ]
+            }
+          },
+          "name": "comment.line.sharp.sleep.http"
         },
         {
           "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(slot(:)?\\s*(?<slot>[^\\s]+))?\\s*(minIdleTime(:)?\\s*(?<minIdleTime>\\d*))?\\s*(max(:)?\\s*(?<max>\\d*))?\\s*(expire(:)?\\s*(?<expire>\\d*))?\\s*?$",
@@ -93,37 +118,37 @@
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "3": {
-              "name": "keyword.control.http"
+              "name": "entity.name.http"
             },
             "4": {
               "name": "entity.name.type.http"
             },
             "5": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "6": {
-              "name": "keyword.control.http"
+              "name": "entity.name.http"
             },
             "7": {
               "name": "entity.name.type.http"
             },
             "8": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "9": {
-              "name": "keyword.control.http"
+              "name": "entity.name.http"
             },
             "10": {
               "name": "entity.name.type.http"
             },
             "11": {
-              "name": "keyword.control.http"
+              "name": "support.constant.http"
             },
             "12": {
-              "name": "keyword.control.http"
+              "name": "entity.name.http"
             },
             "13": {
               "name": "entity.name.type.http"
@@ -138,7 +163,7 @@
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "entity.name.type.http"
+              "name": "entity.name.http"
             }
           },
           "name": "comment.line.sharp.http"
@@ -410,15 +435,18 @@
     "variable": {
       "patterns": [
         {
-          "match": "^\\s*(@[^(\\s=)]*)\\s*(=)\\s*(.*)$",
+          "match": "^\\s*(@)([^(\\s=:)]*)\\s*(:?=)\\s*(.*)$",
           "captures": {
             "1": {
               "name": "keyword.name.http"
             },
             "2": {
-              "name": "keyword.control.http"
+              "name": "entity.name.http"
             },
             "3": {
+              "name": "keyword.control.http"
+            },
+            "4": {
               "name": "string.other.http",
               "patterns": [
                 {
@@ -472,7 +500,7 @@
           "name": "keyword.control.http"
         },
         "2": {
-          "name": "const.language.http",
+          "name": "entity.name.http",
           "patterns": [
             {
               "include": "#http-handlebars"
@@ -535,77 +563,110 @@
               "include": "source.graphql"
             }
           ]
+        },
+        {
+          "captures": {
+            "1": {
+              "name": "keyword.control.http"
+            },
+            "2": {
+              "name": "keyword.control.http"
+            },
+            "3": {
+              "name": "support.constant.http"
+            },
+            "4": {
+              "name": "entity.name.http"
+            }
+          },
+          "match": "^(<)(?:(@)(\\w+)?)?\\s+(.+?)\\s*$",
+          "name": "http.request-body.import"
         }
       ]
     },
     "response-line": {
-      "captures": {
-        "1": {
-          "patterns": [
-            {
-              "include": "#protocol"
-            }
-          ]
-        },
-        "2": {
-          "name": "constant.numeric.http"
-        },
-        "3": {
-          "name": "string.other.http"
-        }
-      },
-      "match": "(?i)^\\s*(HTTP\\/\\S+)\\s*([1-5][0-9][0-9])\\s*(.*)$",
-      "name": "http.response.statusline"
-    },
-    "javascript-block": {
-      "pattern": [
+      "patterns": [
         {
-          "begin": "(?i)^\\s*{{2}(@js\\s+)?((\\+|@)?request|streaming|response|after|responseLogging)?\\s*",
-          "name": "http.block.javascript",
-          "end": "\\s*}}\\s*",
-          "contentName": "meta.embedded.block.javascript",
-          "beginCaptures": {
-            "0": {
-              "name": "comment.line.http"
-            },
+          "captures": {
             "1": {
-              "name": "entity.name.type.http"
+              "patterns": [
+                {
+                  "include": "#protocol"
+                }
+              ]
             },
             "2": {
-              "name": "entity.name.type.http"
+              "name": "constant.numeric.http"
+            },
+            "3": {
+              "name": "string.other.http"
             }
           },
-          "endCaptures": {
-            "0": {
-              "name": "comment.line.http"
-            }
-          },
-          "patterns": [
-            {
-              "include": "source.js"
-            }
-          ]
+          "match": "(?i)^\\s*(HTTP\\/\\S+)\\s*([1-5][0-9][0-9])\\s*(.*)$",
+          "name": "http.response.statusline"
         },
         {
-          "begin": "^\\s*>\\s{1}{%?\\s*",
-          "name": "http.block.javascript",
-          "contentName": "meta.embedded.block.javascript",
-          "end": "^\\s*%}\\s*",
-          "beginCaptures": {
-            "0": {
-              "name": "comment.line.http"
+          "captures": {
+            "1": {
+              "name": "keyword.control.http"
+            },
+            "2": {
+              "name": "keyword.control.http"
+            },
+            "4": {
+              "name": "entity.name.http"
             }
           },
-          "endCaptures": {
-            "0": {
-              "name": "comment.line.http"
-            }
-          },
-          "patterns": [
-            {
-              "include": "source.js"
-            }
-          ]
+          "match": "^\\s*(>>)(!)?\\s+(.+)\\s*$",
+          "name": "http.response.statusline"
+        }
+      ]
+    },
+    "javascript-block": {
+      "begin": "(?i)^\\s*{{2}(@js\\s+)?((\\+|@)?request|streaming|response|after|responseLogging)?\\s*",
+      "name": "http.block.javascript",
+      "end": "\\s*}}\\s*",
+      "contentName": "meta.embedded.block.javascript",
+      "beginCaptures": {
+        "0": {
+          "name": "comment.line.http"
+        },
+        "1": {
+          "name": "entity.name.type.http"
+        },
+        "2": {
+          "name": "entity.name.type.http"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "comment.line.http"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    "intellij-block": {
+      "begin": "^\\s*>\\s{1}{%?\\s*",
+      "name": "http.block.javascript",
+      "contentName": "meta.embedded.block.javascript",
+      "end": "^\\s*%}\\s*",
+      "beginCaptures": {
+        "0": {
+          "name": "comment.line.http"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "comment.line.http"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.js"
         }
       ]
     },
