@@ -1,3 +1,13 @@
+## 5.5.1 (2022-06-23)
+
+#### Fixes
+
+- support Request Body in AWS Signature (Anweber/httpyac#299)
+- fix Filesystem Error with `vscode-notebook-cell` Scheme (Anweber/httpbook#60)
+- fixed Syntax Language Issues with Headers highlighted in request body
+- fixed several Syntax Language Issues with Handlebars
+- fixed missing Response Header highlighting
+
 ## 5.5.1 (2022-06-22)
 
 #### Fixes
