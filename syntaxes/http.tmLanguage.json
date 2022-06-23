@@ -17,9 +17,6 @@
       "include": "#file-import"
     },
     {
-      "include": "#headers"
-    },
-    {
       "include": "#metadata"
     },
     {
@@ -181,14 +178,19 @@
               "name": "variable.other.http"
             },
             "3": {
-              "name": "string.other.http"
+              "name": "string.other.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
             }
           },
           "match": "^\\s*(\\?|&)([^=\\s]+)=(.*)$",
           "name": "http.request.url http.request.query"
         },
         {
-          "match": "(?i)^\\s*(authorization)\\s*(\\:)\\s*(basic)\\s+(?<user>.*)(:)?(?<password>.*)\\s*$",
+          "match": "(?i)^\\s*(authorization)\\s*(\\:)\\s*(.*)\\s*$",
           "captures": {
             "1": {
               "name": "entity.name.tag.http"
@@ -197,112 +199,168 @@
               "name": "keyword.other.http"
             },
             "3": {
-              "name": "keyword.control.http"
-            },
-            "4": {
               "name": "string.other.http",
               "patterns": [
                 {
-                  "include": "#http-handlebars"
-                }
-              ]
-            },
-            "5": {
-              "name": "keyword.control.http"
-            },
-            "6": {
-              "name": "string.other.http",
-              "patterns": [
+                  "match": "(?i)(basic)\\s+(.*)(:)?(.*)",
+                  "captures": {
+                    "1": {
+                      "name": "support.constant.http"
+                    },
+                    "2": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "3": {
+                      "name": "keyword.control.http"
+                    },
+                    "4": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    }
+                  }
+                },
                 {
-                  "include": "#http-handlebars"
+                  "match": "(?i)(digest)\\s+(?<user>.*)(:)?(?<password>.*)",
+                  "captures": {
+                    "1": {
+                      "name": "support.constant.http"
+                    },
+                    "2": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "3": {
+                      "name": "keyword.control.http"
+                    },
+                    "4": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "match": "(?<type>openid|oauth2)(\\s+(?<flow>client(_credentials)?|(authorization_)?code|device(_code)?|password|implicit|hybrid))?(\\s+(?<variablePrefix>[^\\s]*))?\\s*(token_exchange\\s+(?<tokenExchangePrefix>[^\\s]*))?",
+                  "captures": {
+                    "1": {
+                      "name": "support.constant.http"
+                    },
+                    "2": {
+                      "name": "keyword.control.http"
+                    },
+                    "3": {
+                      "name": "keyword.control.http"
+                    },
+                    "4": {
+                      "name": "keyword.control.http"
+                    },
+                    "5": {
+                      "name": "keyword.control.http"
+                    },
+                    "6": {
+                      "name": "keyword.control.http"
+                    },
+                    "7": {
+                      "name": "keyword.control.http"
+                    },
+                    "8": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "9": {
+                      "name": "keyword.control.http"
+                    },
+                    "10": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "match": "(?i)(aws)\\s+(?<accessKeyId>[^\\s]*)\\s+(?<secretAccessKey>[^\\s]*)\\s*(token:\\s*(?<token>[^\\s]*))?\\s*(region:\\s*(?<region>[^\\s]*))?\\s*(service:\\s*(?<service>[^\\s]*))?",
+                  "captures": {
+                    "1": {
+                      "name": "support.constant.http"
+                    },
+                    "2": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "3": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "4": {
+                      "name": "keyword.control.http"
+                    },
+                    "5": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "6": {
+                      "name": "keyword.control.http"
+                    },
+                    "7": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    },
+                    "8": {
+                      "name": "keyword.control.http"
+                    },
+                    "9": {
+                      "name": "string.other.http",
+                      "patterns": [
+                        {
+                          "include": "#http-handlebars"
+                        }
+                      ]
+                    }
+                  }
                 }
               ]
             }
           },
-          "name": "http.request.header http.request.header.authorization.basic"
-        },
-        {
-          "match": "(?i)^\\s*(authorization)\\s*(\\:)\\s*(digest)\\s+(?<user>.*)(:)?(?<password>.*)\\s*$",
-          "captures": {
-            "1": {
-              "name": "entity.name.tag.http"
-            },
-            "2": {
-              "name": "keyword.other.http"
-            },
-            "3": {
-              "name": "keyword.control.http"
-            },
-            "4": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            },
-            "5": {
-              "name": "keyword.control.http"
-            },
-            "6": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            }
-          },
-          "name": "http.request.header  http.request.header.authorization.digest"
-        },
-        {
-          "match": "(?i)^\\s*(authorization)\\s*(\\:)\\s*(aws)\\s+(?<accessKeyId>[^\\s]*)\\s+(?<secretAccessKey>[^\\s]*)\\s*(token:\\s*(?<token>[^\\s]*))?\\s*(region:\\s*(?<region>[^\\s]*))?\\s*(service:\\s*(?<service>[^\\s]*))?\\s*$",
-          "captures": {
-            "1": {
-              "name": "entity.name.tag.http"
-            },
-            "2": {
-              "name": "keyword.other.http"
-            },
-            "3": {
-              "name": "keyword.control.http"
-            },
-            "4": {
-              "name": "string.other.http"
-            },
-            "5": {
-              "name": "string.other.http"
-            },
-            "6": {
-              "name": "keyword.control.http"
-            },
-            "7": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            },
-            "8": {
-              "name": "keyword.control.http"
-            },
-            "9": {
-              "name": "string.other.http"
-            },
-            "10": {
-              "name": "keyword.control.http"
-            },
-            "11": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            }
-          },
-          "name": "http.request.header  http.request.header.authorization.aws"
+          "name": "http.request.header http.request.header.authorization"
         },
         {
           "match": "(?i)^\\s*((x-)?clientcert)\\s*(\\:)\\s*(cert:\\s*(?<cert>[^\\s]*)\\s*)?(key:\\s*(?<key>[^\\s]*)\\s*)?(pfx:\\s*(?<pfx>[^\\s]*)\\s*)?(passphrase:\\s*(?<passphrase>[^\\s]*)\\s*)?\\s*$",
@@ -357,58 +415,6 @@
             }
           },
           "name": "http.request.header  http.request.header.authorization.clientcert"
-        },
-        {
-          "match": "(?i)^\\s*(authorization)\\s*(\\:)\\s*(?<type>openid|oauth2)(\\s+(?<flow>client(_credentials)?|(authorization_)?code|device(_code)?|password|implicit|hybrid))?(\\s+(?<variablePrefix>[^\\s]*))?\\s*(token_exchange\\s+(?<tokenExchangePrefix>[^\\s]*))?\\s*$",
-          "captures": {
-            "1": {
-              "name": "entity.name.tag.http"
-            },
-            "2": {
-              "name": "keyword.other.http"
-            },
-            "3": {
-              "name": "keyword.control.http"
-            },
-            "4": {
-              "name": "keyword.control.http"
-            },
-            "5": {
-              "name": "keyword.control.http"
-            },
-            "6": {
-              "name": "keyword.control.http"
-            },
-            "7": {
-              "name": "keyword.control.http"
-            },
-            "8": {
-              "name": "keyword.control.http"
-            },
-            "9": {
-              "name": "keyword.control.http"
-            },
-            "10": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            },
-            "11": {
-              "name": "keyword.control.http"
-            },
-            "12": {
-              "name": "string.other.http",
-              "patterns": [
-                {
-                  "include": "#http-handlebars"
-                }
-              ]
-            }
-          },
-          "name": "http.request.header  http.request.header.authorization.oauth2"
         },
         {
           "captures": {
@@ -495,7 +501,7 @@
       ]
     },
     "request-line": {
-      "captures": {
+      "beginCaptures": {
         "1": {
           "name": "keyword.control.http"
         },
@@ -515,8 +521,14 @@
           ]
         }
       },
-      "match": "(?i)^\\s*(?:(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
-      "name": "http.request.url"
+      "begin": "(?i)^\\s*(?:(SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
+      "end": "^(?!((\\s*(\\?|&)([^=\\s]+)=(.*))|(\\s*([!#$%&'*+\\-.^_`|~0-9A-Za-z]+)\\s*(\\:)\\s*(.*?)\\s*)))",
+      "name": "http.request.url",
+      "patterns": [
+        {
+          "include": "#headers"
+        }
+      ]
     },
     "request-body": {
       "patterns": [
@@ -576,7 +588,12 @@
               "name": "support.constant.http"
             },
             "4": {
-              "name": "entity.name.http"
+              "name": "entity.name.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
             }
           },
           "match": "^(<)(?:(@)(\\w+)?)?\\s+(.+?)\\s*$",
@@ -587,23 +604,32 @@
     "response-line": {
       "patterns": [
         {
-          "captures": {
+          "beginCaptures": {
             "1": {
+              "name": "http.response.statusline"
+            },
+            "2": {
               "patterns": [
                 {
                   "include": "#protocol"
                 }
               ]
             },
-            "2": {
+            "3": {
               "name": "constant.numeric.http"
             },
-            "3": {
+            "4": {
               "name": "string.other.http"
             }
           },
-          "match": "(?i)^\\s*(HTTP\\/\\S+)\\s*([1-5][0-9][0-9])\\s*(.*)$",
-          "name": "http.response.statusline"
+          "name": "http.response.block",
+          "begin": "(?i)^(\\s*(HTTP\\/\\S+)\\s*([1-5][0-9][0-9])\\s*(.*))$",
+          "end": "^(?!((\\s*([!#$%&'*+\\-.^_`|~0-9A-Za-z]+)\\s*(\\:)\\s*(.*?)\\s*)))",
+          "patterns": [
+            {
+              "include": "#headers"
+            }
+          ]
         },
         {
           "captures": {
@@ -614,11 +640,16 @@
               "name": "keyword.control.http"
             },
             "4": {
-              "name": "entity.name.http"
+              "name": "entity.name.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
             }
           },
           "match": "^\\s*(>>)(!)?\\s+(.+)\\s*$",
-          "name": "http.response.statusline"
+          "name": "http.response.outputredirection"
         }
       ]
     },
@@ -700,7 +731,12 @@
               "name": "keyword.control.http"
             },
             "4": {
-              "name": "string.other.http"
+              "name": "string.other.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
             }
           },
           "match": "(?i)^(gql|proto)\\s+(.*)\\s*(<)\\s+(.*)\\s*$",
