@@ -27,16 +27,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     super();
     this.documentStoreChangedEmitter = new vscode.EventEmitter<void>();
     this.httpFileStore = new httpyac.store.HttpFileStore();
-    this.getDocumentPathLike = document => {
-      if (utils.isNotebook(document)) {
-        return {
-          uri: document.uri,
-          fileUri: document.notebook.uri,
-          toString: () => document.uri.toString(),
-        };
-      }
-      return document.uri;
-    };
+    this.getDocumentPathLike = document => document.uri;
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
 
     this.subscriptions = [

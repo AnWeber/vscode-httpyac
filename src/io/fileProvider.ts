@@ -15,19 +15,24 @@ export function initFileProvider(): void {
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
     if (uri) {
-      if (uri.scheme === 'untitled') {
-        const editor = window.visibleTextEditors.find(obj =>
-          languages.match({ language: 'http', scheme: 'file' }, obj.document)
-        );
-        if (editor) {
-          return Uri.joinPath(editor.document.uri, '..');
+      try {
+        if (uri.scheme === 'untitled') {
+          const editor = window.visibleTextEditors.find(obj =>
+            languages.match({ language: 'http', scheme: 'file' }, obj.document)
+          );
+          if (editor) {
+            return io.fileProvider.joinPath(editor.document.uri, '..');
+          }
+          if (workspace.workspaceFolders && workspace.workspaceFolders?.length > 0) {
+            return workspace.workspaceFolders[0].uri;
+          }
+          return undefined;
         }
-        if (workspace.workspaceFolders && workspace.workspaceFolders?.length > 0) {
-          return workspace.workspaceFolders[0].uri;
-        }
-        return undefined;
+      } catch (err) {
+        io.log.error(`Error dirname ${io.fileProvider.toString(fileName)}`);
+        throw err;
       }
-      return Uri.joinPath(uri, '..');
+      return io.fileProvider.joinPath(uri, '..');
     }
     throw new Error('No valid uri');
   };
@@ -48,9 +53,14 @@ export function initFileProvider(): void {
   };
 
   io.fileProvider.joinPath = (fileName: PathLike, path: string): PathLike => {
-    const uri = toUri(fileName);
-    if (uri) {
-      return Uri.joinPath(uri, path);
+    try {
+      const uri = toUri(fileName);
+      if (uri && uri.scheme === 'file') {
+        return Uri.joinPath(uri, path);
+      }
+    } catch (err) {
+      io.log.error(`Error joinPath ${io.fileProvider.toString(fileName)}`);
+      throw err;
     }
     throw new Error('No valid uri');
   };
@@ -70,23 +80,38 @@ export function initFileProvider(): void {
   io.fileProvider.readFile = async (fileName: PathLike, encoding: FileEncoding): Promise<string> => {
     const uri = toUri(fileName);
     if (uri) {
-      const file = await workspace.fs.readFile(uri);
-      return Buffer.from(file).toString(encoding);
+      try {
+        const file = await workspace.fs.readFile(uri);
+        return Buffer.from(file).toString(encoding);
+      } catch (err) {
+        io.log.error(`Error readFile ${io.fileProvider.toString(fileName)}`);
+        throw err;
+      }
     }
     throw new Error('No valid uri');
   };
   io.fileProvider.readBuffer = async (fileName: PathLike) => {
     const uri = toUri(fileName);
     if (uri) {
-      const file = await workspace.fs.readFile(uri);
-      return Buffer.from(file);
+      try {
+        const file = await workspace.fs.readFile(uri);
+        return Buffer.from(file);
+      } catch (err) {
+        io.log.error(`Error readBuffer ${io.fileProvider.toString(fileName)}`);
+        throw err;
+      }
     }
     throw new Error('No valid uri');
   };
   io.fileProvider.writeBuffer = async (fileName: PathLike, buffer: Buffer) => {
     const uri = toUri(fileName);
     if (uri) {
-      await workspace.fs.writeFile(uri, buffer);
+      try {
+        await workspace.fs.writeFile(uri, buffer);
+      } catch (err) {
+        io.log.error(`Error writeBuffer ${io.fileProvider.toString(fileName)}`);
+        throw err;
+      }
     } else {
       throw new Error('No valid uri');
     }
@@ -95,13 +120,18 @@ export function initFileProvider(): void {
   io.fileProvider.readdir = async (dirname: PathLike): Promise<string[]> => {
     const uri = toUri(dirname);
     if (uri) {
-      const fileStat = await workspace.fs.stat(uri);
-      if (fileStat.type === FileType.Directory) {
-        const result = await workspace.fs.readDirectory(uri);
-        return result.map(([file]) => file);
+      try {
+        const fileStat = await workspace.fs.stat(uri);
+        if (fileStat.type === FileType.Directory) {
+          const result = await workspace.fs.readDirectory(uri);
+          return result.map(([file]) => file);
+        }
+        io.log.trace(`${uri.toString()} is no directory`);
+        return [];
+      } catch (err) {
+        io.log.error(`Error readDir ${io.fileProvider.toString(dirname)}`);
+        throw err;
       }
-      io.log.trace(`${uri.toString()} is no directory`);
-      return [];
     }
     throw new Error('No valid uri');
   };
@@ -119,20 +149,15 @@ export function initFileProvider(): void {
   };
 }
 
-interface VirtualDocument {
-  uri: Uri;
-  fileUri: Uri;
-  toString(): string;
-}
-
 export function toUri(pathLike: PathLike): Uri | false {
   let result: Uri | false = false;
   if (typeof pathLike === 'string') {
     result = Uri.file(pathLike);
   } else if (pathLike instanceof Uri) {
     result = pathLike;
-  } else if (isVirtualDocument(pathLike)) {
-    result = pathLike.fileUri || pathLike.uri;
+    if (result && result.scheme === 'vscode-notebook-cell') {
+      return Uri.file(result.fsPath);
+    }
   }
   if (result && !workspace.isTrusted) {
     if (!workspace.getWorkspaceFolder(result)) {
@@ -143,11 +168,6 @@ export function toUri(pathLike: PathLike): Uri | false {
     }
   }
   return result;
-}
-
-function isVirtualDocument(pathLike: PathLike): pathLike is VirtualDocument {
-  const virtualDocument = pathLike as VirtualDocument;
-  return !!virtualDocument.uri;
 }
 
 function isUriLanguageId(uri: Uri, languageId: string) {
