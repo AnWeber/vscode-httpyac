@@ -1,4 +1,11 @@
-## 5.5.1 (2022-06-23)
+## 5.5.3 (2022-07-05)
+
+#### Fixes
+
+- use correct request for HTTP302 logging (#137)
+- prevent excessive ref calls if response body is falsy (#136)
+
+## 5.5.2 (2022-06-23)
 
 #### Fixes
 
