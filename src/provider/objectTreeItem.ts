@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { default as filesize } from 'filesize';
+import { inspect } from 'util';
 
 export interface ObjectItem {
   key: string;
@@ -29,7 +30,7 @@ export function toObjectItems(val: unknown): Array<ObjectItem> | undefined {
 export class ObjectTreeItem extends vscode.TreeItem {
   constructor(element: ObjectItem) {
     super(element.key);
-    this.tooltip = JSON.stringify(element.value, null, 2);
+    this.tooltip = inspect(element.value);
     const type = typeof element.value;
     this.description = type;
     this.command = {
