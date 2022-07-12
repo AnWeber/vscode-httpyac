@@ -34,7 +34,7 @@ export function initFileProvider(): void {
       }
       return io.fileProvider.joinPath(uri, '..');
     }
-    throw new Error('No valid uri');
+    throw new Error(`No valid uri: ${fileName}`);
   };
   io.fileProvider.hasExtension = (fileName: PathLike, ...extensions: Array<string>) => {
     const uri = toUri(fileName);
@@ -62,7 +62,8 @@ export function initFileProvider(): void {
       io.log.error(`Error joinPath ${io.fileProvider.toString(fileName)}`);
       throw err;
     }
-    throw new Error('No valid uri');
+    io.log.error(`joinPath failed for ${fileName}`, fileName);
+    throw new Error(`No valid uri: ${fileName}`);
   };
 
   io.fileProvider.exists = async (fileName: PathLike): Promise<boolean> => {
@@ -88,7 +89,8 @@ export function initFileProvider(): void {
         throw err;
       }
     }
-    throw new Error('No valid uri');
+    io.log.error(`readFile failed for ${fileName}`, fileName);
+    throw new Error(`No valid uri: ${fileName}`);
   };
   io.fileProvider.readBuffer = async (fileName: PathLike) => {
     const uri = toUri(fileName);
@@ -101,7 +103,8 @@ export function initFileProvider(): void {
         throw err;
       }
     }
-    throw new Error('No valid uri');
+    io.log.error(`readBuffer failed for ${fileName}`, fileName);
+    throw new Error(`No valid uri: ${fileName}`);
   };
   io.fileProvider.writeBuffer = async (fileName: PathLike, buffer: Buffer) => {
     const uri = toUri(fileName);
@@ -113,7 +116,8 @@ export function initFileProvider(): void {
         throw err;
       }
     } else {
-      throw new Error('No valid uri');
+      io.log.error(`writeBuffer failed for ${fileName}`, fileName);
+      throw new Error(`No valid uri: ${fileName}`);
     }
   };
 
@@ -133,7 +137,8 @@ export function initFileProvider(): void {
         throw err;
       }
     }
-    throw new Error('No valid uri');
+    io.log.error(`readdir failed for ${dirname}`, dirname);
+    throw new Error(`No valid uri: ${dirname}`);
   };
 
   io.fileProvider.fsPath = (fileName: PathLike) => {
@@ -156,7 +161,7 @@ export function toUri(pathLike: PathLike): Uri | false {
   } else if (pathLike instanceof Uri) {
     result = pathLike;
     if (result && result.scheme === 'vscode-notebook-cell') {
-      return Uri.file(result.fsPath);
+      result = Uri.file(result.fsPath);
     }
   }
   if (result && !workspace.isTrusted) {
@@ -166,6 +171,9 @@ export function toUri(pathLike: PathLike): Uri | false {
       io.log.warn(message);
       result = false;
     }
+  }
+  if (!result) {
+    io.log.error(`toUri failed for ${pathLike}`, pathLike);
   }
   return result;
 }
