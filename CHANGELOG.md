@@ -1,3 +1,9 @@
+## 5.5.5 (2022-07-12)
+
+#### Fixes
+
+- better logging for invalid uri (httpyac/httpyac.github.io#51)
+
 ## 5.5.4 (2022-07-11)
 
 #### Fixes
