@@ -259,7 +259,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
         canPickMany: true,
         ignoreFocusOut: true,
         onDidSelectItem: (item: vscode.QuickPickItem & { data: httpyac.UserSession }) => {
-          httpyac.io.log.info(JSON.stringify(item.data, null, 2));
+          httpyac.io.log.info(httpyac.utils.toString(item.data));
         },
       }
     );

@@ -102,7 +102,7 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
           result.push(response.body);
         }
       } else {
-        result.push(JSON.stringify(response.body, null, 2));
+        result.push(httpyac.utils.stringifySafe(response.body, 2));
       }
     }
   }

@@ -179,7 +179,10 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   private async openVariablesInEditor(variables: httpyac.Variables) {
-    const uri = await this.storageProvider.writeFile(Buffer.from(JSON.stringify(variables, null, 2)), 'variables.json');
+    const uri = await this.storageProvider.writeFile(
+      Buffer.from(httpyac.utils.stringifySafe(variables, 2)),
+      'variables.json'
+    );
     if (uri) {
       await utils.showTextEditor(uri);
     }

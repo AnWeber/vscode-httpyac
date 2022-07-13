@@ -53,17 +53,13 @@ function appendToOutputChannel(outputChannel: vscode.OutputChannel, messages: un
       if (prefix) {
         outputChannel.append(prefix);
       }
-      if (typeof param === 'string') {
-        outputChannel.appendLine(param);
-      } else if (Buffer.isBuffer(param)) {
-        outputChannel.appendLine(param.toString('utf-8'));
-      } else if (utils.isError(param)) {
+      if (utils.isError(param)) {
         outputChannel.appendLine(`${param.name} - ${param.message}`);
         if (param.stack) {
           outputChannel.appendLine(param.stack);
         }
       } else {
-        outputChannel.appendLine(`${JSON.stringify(param, null, 2)}`);
+        outputChannel.appendLine(utils.toString(param) || `${param}`);
       }
     }
   }

@@ -1,3 +1,11 @@
+## 5.5.6 (2022-07-12)
+
+#### Fixes
+
+- prevent circular JSON.stringify with fallback (AnWeber/vscode-httpyac#139)
+- output header key in test.header (AnWeber/httpyac#304)
+- support scheme `vscode-userdata` (httpyac/httpyac.github.io#51)
+
 ## 5.5.5 (2022-07-12)
 
 #### Fixes

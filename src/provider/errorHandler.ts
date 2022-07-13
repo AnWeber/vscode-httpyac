@@ -42,10 +42,8 @@ async function handleError(_target: unknown, _propertyKey: string | symbol, err:
         message = `${err.name} - ${err.message} => ${quickFix}`;
       }
       await window.showErrorMessage(message);
-    } else if (utils.isString(err)) {
-      await window.showErrorMessage(err);
     } else {
-      await window.showErrorMessage(JSON.stringify(err, null, 2));
+      await window.showErrorMessage(utils.toString(err) || `${err}`);
     }
   }
 }
