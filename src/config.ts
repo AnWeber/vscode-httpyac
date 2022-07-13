@@ -104,7 +104,7 @@ export function getConfigSetting(): AppConfig {
 export function getResourceConfig(fileName: httpyac.PathLike): ResourceConfig {
   const result: ResourceConfig = {};
 
-  Object.assign(result, vscode.workspace.getConfiguration(APP_NAME), toUri(fileName) || undefined);
+  Object.assign(result, vscode.workspace.getConfiguration(APP_NAME, toUri(fileName)));
   return result;
 }
 

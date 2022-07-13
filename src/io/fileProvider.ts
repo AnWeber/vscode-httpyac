@@ -10,7 +10,7 @@ export function initFileProvider(): void {
       return isAbsolute(fileName);
     }
     const uri = toUri(fileName);
-    return uri && (await io.fileProvider.exists(uri));
+    return !!uri && (await io.fileProvider.exists(uri));
   };
   io.fileProvider.dirname = (fileName: string) => {
     const uri = toUri(fileName);
@@ -55,7 +55,7 @@ export function initFileProvider(): void {
   io.fileProvider.joinPath = (fileName: PathLike, path: string): PathLike => {
     try {
       const uri = toUri(fileName);
-      if (uri && uri.scheme === 'file') {
+      if (uri) {
         return Uri.joinPath(uri, path);
       }
     } catch (err) {
@@ -143,19 +143,17 @@ export function initFileProvider(): void {
 
   io.fileProvider.fsPath = (fileName: PathLike) => {
     const uri = toUri(fileName);
-    if (uri && uri.scheme === 'file') {
-      try {
-        return uri.fsPath;
-      } catch (err) {
-        io.log.debug(err);
-      }
+    try {
+      return uri?.fsPath;
+    } catch (err) {
+      io.log.debug(err);
     }
     return undefined;
   };
 }
 
-export function toUri(pathLike: PathLike): Uri | false {
-  let result: Uri | false = false;
+export function toUri(pathLike: PathLike): Uri | undefined {
+  let result: Uri | undefined;
   if (typeof pathLike === 'string') {
     result = Uri.file(pathLike);
   } else if (pathLike instanceof Uri) {
@@ -169,7 +167,7 @@ export function toUri(pathLike: PathLike): Uri | false {
       const message = `Not Trusted Workspace cannot access uri outside of workspace.`;
       io.userInteractionProvider.showWarnMessage?.(message);
       io.log.warn(message);
-      result = false;
+      result = undefined;
     }
   }
   if (!result) {
