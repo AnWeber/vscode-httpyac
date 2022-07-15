@@ -162,11 +162,17 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vs
   });
 }
 
-export const httpDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'http', scheme: '*' }];
+export const httpDocumentSelector: Array<vscode.DocumentFilter> = [
+  { language: 'http', scheme: '*', pattern: '**/*.http' },
+];
 
-export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'markdown', scheme: '*' }];
+export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [
+  { language: 'markdown', scheme: '*', pattern: '**/*.md' },
+];
 
-export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'asciidoc', scheme: '*' }];
+export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [
+  { language: 'asciidoc', scheme: '*', pattern: '**/*.adoc' },
+];
 export const outputDocumentSelector: vscode.DocumentFilter = { scheme: 'output' };
 
 export const allHttpDocumentSelector: Array<vscode.DocumentFilter> = [

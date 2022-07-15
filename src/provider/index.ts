@@ -13,3 +13,4 @@ export * from './storeController';
 export * from './variablesHoverProvider';
 export * from './variablesTreeDataProvider';
 export * from './userSessionTreeDataProvider';
+export * from './testController';

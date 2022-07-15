@@ -31,6 +31,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       new provider.EnvironmentTreeDataProvider(documentStore, storeController.environmentChanged),
       new provider.VariablesHoverProvider(documentStore, storeController.environmentChanged),
       new provider.VariablesTreeDataProvider(documentStore, storeController.environmentChanged),
+      new provider.TestController(documentStore),
       vscode.languages.registerDocumentSymbolProvider(
         config.allHttpDocumentSelector,
         new provider.HttpDocumentSymbolProvider(documentStore)
