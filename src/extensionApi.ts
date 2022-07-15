@@ -33,6 +33,7 @@ export interface DocumentStore {
   remove(document: vscode.TextDocument): void;
   send: (context: httpyac.HttpFileSendContext | httpyac.HttpRegionsSendContext) => Promise<boolean>;
   clear(): void;
+  loadAllHttpFilesInWorkspace(): Promise<void>;
 }
 
 export interface ResponseStore {

@@ -152,6 +152,27 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     return this.httpFileStore.getAll();
   }
 
+  get(fileName: httpyac.PathLike): httpyac.HttpFile | undefined {
+    return this.httpFileStore.get(fileName);
+  }
+
+  async loadAllHttpFilesInWorkspace(): Promise<void> {
+    if (vscode.workspace.workspaceFolders) {
+      for (const folder of vscode.workspace.workspaceFolders) {
+        for (const fileType of allHttpDocumentSelector) {
+          if (fileType.pattern) {
+            const pattern = new vscode.RelativePattern(folder, fileType.pattern?.toString());
+
+            for (const file of await vscode.workspace.findFiles(pattern)) {
+              const document = await vscode.workspace.openTextDocument(file.path);
+              await this.getHttpFile(document);
+            }
+          }
+        }
+      }
+    }
+  }
+
   remove(document: vscode.TextDocument): void {
     const path = this.getDocumentPathLike(document);
     this.httpFileStore.remove(path);
