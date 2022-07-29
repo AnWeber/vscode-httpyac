@@ -507,9 +507,9 @@
         },
         "httpyac.responseViewRequestBodySize": {
           "type": "number",
-          "default": -1,
+          "default": 0,
           "scope": "resource",
-          "description": "max body size of request in response view"
+          "description": "max body size of request in response view (-1 will remove body)"
         },
         "httpyac.responseViewPreserveFocus": {
           "type": "boolean",
