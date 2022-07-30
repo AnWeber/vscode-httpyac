@@ -1,7 +1,5 @@
-import { Disposable } from 'vscode';
-
 export abstract class DisposeProvider {
-  subscriptions: Array<Disposable>;
+  subscriptions: Array<{ dispose: () => void }>;
   constructor() {
     this.subscriptions = [];
   }

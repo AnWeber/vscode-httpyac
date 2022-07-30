@@ -44,7 +44,8 @@
     "onLanguage:http",
     "onLanguage:markdown",
     "onLanguage:asciidoc",
-    "onView:httpyacHistory"
+    "onView:httpyacHistory",
+    "onView:test"
   ],
   "main": "./dist/extension.js",
   "capabilities": {

@@ -1,15 +1,17 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"target": "es6",
+		"target": "ES6",
 		"outDir": "dist",
 		"lib": [
 			"es2019"
 		],
 		"sourceMap": true,
-		"rootDirs": ["src"],
+		"rootDirs": [
+			"src"
+		],
 		"strict": true,
-	  "noImplicitReturns": true,
+		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
@@ -19,6 +21,7 @@
 		"esModuleInterop": true
 	},
 	"exclude": [
-		"node_modules", "dist"
+		"node_modules",
+		"dist"
 	]
 }

@@ -156,23 +156,6 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     return this.httpFileStore.get(fileName);
   }
 
-  async loadAllHttpFilesInWorkspace(): Promise<void> {
-    if (vscode.workspace.workspaceFolders) {
-      for (const folder of vscode.workspace.workspaceFolders) {
-        for (const fileType of allHttpDocumentSelector) {
-          if (fileType.pattern) {
-            const pattern = new vscode.RelativePattern(folder, fileType.pattern?.toString());
-
-            for (const file of await vscode.workspace.findFiles(pattern)) {
-              const document = await vscode.workspace.openTextDocument(file.path);
-              await this.getHttpFile(document);
-            }
-          }
-        }
-      }
-    }
-  }
-
   remove(document: vscode.TextDocument): void {
     const path = this.getDocumentPathLike(document);
     this.httpFileStore.remove(path);
@@ -188,7 +171,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
             logMethod: logToOutputChannelFactory('Console'),
           });
         }
-        const resourceConfig = getResourceConfig(context.httpFile.fileName);
+        const resourceConfig = getResourceConfig(context.httpFile);
         if (resourceConfig.logRequest) {
           const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
             (arg: string) => {
