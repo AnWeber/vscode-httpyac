@@ -1,3 +1,10 @@
+## UNRELEASED
+
+#### Fixes
+
+- notebook detection was broken after VSCode breaking change
+- request body is not deleted with default settings
+
 ## 5.5.6 (2022-07-12)
 
 #### Fixes
