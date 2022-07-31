@@ -163,7 +163,7 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vs
 }
 
 export const httpDocumentSelector: Array<vscode.DocumentFilter> = [
-  { language: 'http', scheme: '*', pattern: '**/*.http' },
+  { language: 'http', scheme: '*', pattern: '**/*.{http,rest}' },
 ];
 
 export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [
