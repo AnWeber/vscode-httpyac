@@ -18,12 +18,16 @@ export class TestController extends utils.DisposeProvider {
     this.testController.resolveHandler = this.resolveHandler.bind(this);
 
     const testRunner = new TestRunner(this.documentStore, this.responseStore);
-    this.testController.createRunProfile('Run', vscode.TestRunProfileKind.Run, (request: vscode.TestRunRequest, token: vscode.CancellationToken) {
-    const testItems: Array<vscode.TestItem> = await this.getRequestedTestItems(request);
-    const testRun = this.testController.createTestRun(request);
-    await testRunner.run(testRun, testItems, token);
-    testRun.end();
-  });
+    this.testController.createRunProfile(
+      'Run',
+      vscode.TestRunProfileKind.Run,
+      async (request: vscode.TestRunRequest, token: vscode.CancellationToken) => {
+        const testItems: Array<vscode.TestItem> = await this.getRequestedTestItems(request);
+        const testRun = this.testController.createTestRun(request);
+        await testRunner.run(testRun, testItems, token);
+        testRun.end();
+      }
+    );
 
     this.subscriptions = [
       vscode.workspace.onDidDeleteFiles(async event => {
