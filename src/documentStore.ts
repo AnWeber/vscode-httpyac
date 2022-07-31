@@ -171,7 +171,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
             logMethod: logToOutputChannelFactory('Console'),
           });
         }
-        const resourceConfig = getResourceConfig(context.httpFile);
+        const resourceConfig = getResourceConfig(context.httpFile.fileName);
         if (resourceConfig.logRequest) {
           const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
             (arg: string) => {
