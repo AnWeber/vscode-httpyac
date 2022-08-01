@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { DocumentStore } from '../../documentStore';
 import { getConfigSetting } from '../../config';
+import { TestItemResolver } from './testItemResolver';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -12,13 +13,19 @@ interface TestRunContext {
 }
 
 export class TestRunner {
-  constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {}
+  constructor(
+    private readonly testController: vscode.TestController,
+    private readonly testItemResolver: TestItemResolver,
+    private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore
+  ) {}
 
   public async run(
-    testRun: vscode.TestRun,
+    request: vscode.TestRunRequest,
     testItems: Array<vscode.TestItem>,
     token: vscode.CancellationToken
   ): Promise<void> {
+    const testRun = this.testController.createTestRun(request);
     for (const testItem of testItems) {
       if (!token.isCancellationRequested) {
         await this.runTestItem(testItem, {
@@ -30,6 +37,7 @@ export class TestRunner {
         testRun.skipped(testItem);
       }
     }
+    testRun.end();
   }
 
   private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<TestResult> {
@@ -49,6 +57,7 @@ export class TestRunner {
         return await this.runTestItemHttpRegion(testItem, duration, testRunContext);
       }
     } catch (err) {
+      httpyac.io.log.error(err);
       testRunContext.testRun.errored(
         testItem,
         new vscode.TestMessage(httpyac.utils.toString(err) || `${err}`),
@@ -62,6 +71,7 @@ export class TestRunner {
 
   private async runTestItemFile(testItem: vscode.TestItem, duration: () => number, testRunContext: TestRunContext) {
     const testResults: Array<Promise<TestResult>> = [];
+    this.testItemResolver.resolveTestItemChildren(testItem);
     testItem.children.forEach(async childTestItem => {
       testResults.push(this.runTestItem(childTestItem, testRunContext));
     });

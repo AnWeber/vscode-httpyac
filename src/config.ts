@@ -166,13 +166,9 @@ export const httpDocumentSelector: Array<vscode.DocumentFilter> = [
   { language: 'http', scheme: '*', pattern: '**/*.{http,rest}' },
 ];
 
-export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [
-  { language: 'markdown', scheme: '*', pattern: '**/*.md' },
-];
+export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'markdown', scheme: '*' }];
 
-export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [
-  { language: 'asciidoc', scheme: '*', pattern: '**/*.adoc' },
-];
+export const asciiDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'asciidoc', scheme: '*' }];
 export const outputDocumentSelector: vscode.DocumentFilter = { scheme: 'output' };
 
 export const allHttpDocumentSelector: Array<vscode.DocumentFilter> = [
