@@ -1,6 +1,6 @@
 import { DisposeProvider } from '../../utils';
 import * as vscode from 'vscode';
-import { DocumentStore, HttpFileChangedEventType } from '../../documentStore';
+import { DocumentStore } from '../../documentStore';
 import * as httpyac from 'httpyac';
 import { basename } from 'path';
 import { getConfigSetting } from '../../config';
@@ -215,18 +215,6 @@ export class TestItemResolver extends DisposeProvider {
       return `${kind}|${label}`;
     }
     return `${kind}|${uri ? uri.toString() : label}`;
-  }
-
-  private deleteTestItem(testItem: vscode.TestItem) {
-    if (testItem.parent) {
-      testItem.parent.children.delete(testItem.id);
-    } else {
-      this.testController.items.delete(testItem.id);
-    }
-    const index = this.items.indexOf(testItem);
-    if (index > 0) {
-      this.items.splice(index, 1);
-    }
   }
 
   private parseId(id: string) {
