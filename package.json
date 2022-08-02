@@ -339,6 +339,9 @@
         },
         "httpyac.requestBodyInjectVariablesExtensions": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "scope": "resource",
           "description": "always inject variables in request body for these extensions"
         },
@@ -456,6 +459,9 @@
         },
         "httpyac.environmentSelectedOnStart": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "scope": "window",
           "description": "list of default environment on startup"
         },
@@ -492,6 +498,9 @@
         },
         "httpyac.responseViewHeader": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "default": [
             "timings.total",
             "content-type",
@@ -844,11 +853,17 @@
         },
         "httpyac.environmentStatusBarItemErrorEnvs": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "scope": "window",
           "description": "use statusbarItem.errorBackgroundColor for envs"
         },
         "httpyac.environmentStatusBarItemWarningEnvs": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "scope": "window",
           "description": "use statusbarItem.warningBackgroundColor for envs"
         },
@@ -876,6 +891,18 @@
           "default": "notification",
           "scope": "window",
           "description": "The location at which progress should show."
+        },
+        "httpyac.testItemExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "http",
+            "rest"
+          ],
+          "scope": "window",
+          "description": "file extensions used in test explorer for http files"
         }
       }
     },

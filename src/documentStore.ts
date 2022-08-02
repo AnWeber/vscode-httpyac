@@ -12,6 +12,28 @@ import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 
+export enum HttpFileChangedEventType {
+  CHANGED,
+  DELETED,
+  RENAMED,
+}
+
+export type HttpFileChangedEvent =
+  | {
+      type: HttpFileChangedEventType.CHANGED;
+      uri: vscode.Uri;
+      httpFile: httpyac.HttpFile;
+    }
+  | {
+      type: HttpFileChangedEventType.DELETED;
+      oldUri: vscode.Uri;
+    }
+  | {
+      type: HttpFileChangedEventType.RENAMED;
+      oldUri: vscode.Uri;
+      uri: vscode.Uri;
+    };
+
 export class DocumentStore extends utils.DisposeProvider implements IDocumentStore {
   activeEnvironment: Array<string> | undefined;
 
@@ -22,10 +44,12 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
   variables: httpyac.Variables | undefined;
 
   documentStoreChangedEmitter: vscode.EventEmitter<void>;
+  private httpFileChangedEmitter: vscode.EventEmitter<HttpFileChangedEvent>;
 
   constructor() {
     super();
     this.documentStoreChangedEmitter = new vscode.EventEmitter<void>();
+    this.httpFileChangedEmitter = new vscode.EventEmitter<HttpFileChangedEvent>();
     this.httpFileStore = new httpyac.store.HttpFileStore();
     this.getDocumentPathLike = document => document.uri;
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
@@ -54,16 +78,26 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
       }),
       vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
         if (vscode.languages.match(allHttpDocumentSelector, document)) {
-          await this.getHttpFile(document);
+          const httpFile = await this.getHttpFile(document);
           this.documentStoreChangedEmitter.fire();
+          if (httpFile) {
+            this.httpFileChangedEmitter.fire({ type: HttpFileChangedEventType.CHANGED, httpFile, uri: document.uri });
+          }
         }
       }),
       vscode.workspace.onDidChangeTextDocument(async event => {
         if (event.contentChanges.length > 0) {
           if (vscode.languages.match(allHttpDocumentSelector, event.document)) {
-            await this.getHttpFile(event.document);
+            const httpFile = await this.getHttpFile(event.document);
             delete this.variables;
             this.documentStoreChangedEmitter.fire();
+            if (httpFile) {
+              this.httpFileChangedEmitter.fire({
+                type: HttpFileChangedEventType.CHANGED,
+                httpFile,
+                uri: event.document.uri,
+              });
+            }
           } else if (
             vscode.languages.match(
               [
@@ -105,6 +139,23 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
       vscode.workspace.onDidRenameFiles(fileRenameEvent => {
         fileRenameEvent.files.forEach(file => {
           this.httpFileStore.rename(file.oldUri, file.newUri);
+
+          this.httpFileChangedEmitter.fire({
+            type: HttpFileChangedEventType.RENAMED,
+            oldUri: file.oldUri,
+            uri: file.newUri,
+          });
+        });
+      }),
+
+      vscode.workspace.onDidDeleteFiles(async event => {
+        event.files.forEach(async uri => {
+          if (this.httpFileStore.remove(uri)) {
+            this.httpFileChangedEmitter.fire({
+              type: HttpFileChangedEventType.DELETED,
+              oldUri: uri,
+            });
+          }
         });
       }),
     ];
@@ -112,6 +163,10 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
 
   get documentStoreChanged(): vscode.Event<void> {
     return this.documentStoreChangedEmitter.event;
+  }
+
+  get httpFileChanged(): vscode.Event<HttpFileChangedEvent> {
+    return this.httpFileChangedEmitter.event;
   }
 
   async getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile | undefined> {

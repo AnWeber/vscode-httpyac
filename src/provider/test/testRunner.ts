@@ -50,12 +50,10 @@ export class TestRunner {
     testRunContext.testRun.started(testItem);
 
     try {
-      if (testItem.canResolveChildren) {
-        return await this.runTestItemFile(testItem, duration, testRunContext);
-      }
-      if (testItem.uri) {
+      if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
         return await this.runTestItemHttpRegion(testItem, duration, testRunContext);
       }
+      return await this.runTestItemFile(testItem, duration, testRunContext);
     } catch (err) {
       httpyac.io.log.error(err);
       testRunContext.testRun.errored(
@@ -65,13 +63,11 @@ export class TestRunner {
       );
       return TestResult.ERROR;
     }
-    testRunContext.testRun.skipped(testItem);
-    return TestResult.SKIPPED;
   }
 
   private async runTestItemFile(testItem: vscode.TestItem, duration: () => number, testRunContext: TestRunContext) {
     const testResults: Array<Promise<TestResult>> = [];
-    this.testItemResolver.resolveTestItemChildren(testItem);
+    await this.testItemResolver.resolveTestItemChildren(testItem);
     testItem.children.forEach(async childTestItem => {
       testResults.push(this.runTestItem(childTestItem, testRunContext));
     });

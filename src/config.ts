@@ -93,6 +93,7 @@ export interface AppConfig {
     validateVariables: false;
   };
   progressDefaultLocation?: 'notification' | 'window';
+  testItemExtensions?: Array<string>;
 }
 
 export function getConfigSetting(): AppConfig {
@@ -162,9 +163,7 @@ export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vs
   });
 }
 
-export const httpDocumentSelector: Array<vscode.DocumentFilter> = [
-  { language: 'http', scheme: '*', pattern: '**/*.{http,rest}' },
-];
+export const httpDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'http', scheme: '*' }];
 
 export const markdownDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'markdown', scheme: '*' }];
 
