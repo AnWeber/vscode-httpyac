@@ -1,15 +1,21 @@
-## UNRELEASED
+## 5.6.0 (2022-08-04)
+
+#### Features
+
+- add [VSCode Test Controller](https://code.visualstudio.com/updates/v1_59#_testing-apis) support for http files (#140)
+- add OAuth2 config setting to change server.listener port (AnWeber/httpyac#315)
 
 #### Fixes
 
 - notebook detection was broken after VSCode breaking change
 - request body is not deleted with default settings
+- no exception after cancel while OAuth2 Authorization Code flow
 
 ## 5.5.6 (2022-07-12)
 
 #### Fixes
 
-- prevent circular JSON.stringify with fallback (AnWeber/vscode-httpyac#139)
+- prevent circular JSON.stringify with fallback (#139)
 - output header key in test.header (AnWeber/httpyac#304)
 - support scheme `vscode-userdata` (httpyac/httpyac.github.io#51)
 
