@@ -106,7 +106,8 @@ export class TestRunner {
     if (
       sendContext &&
       httpyac.utils.isHttpRegionSendContext(sendContext) &&
-      !sendContext.httpRegion.metaData.disabled
+      !sendContext.httpRegion.metaData.disabled &&
+      !sendContext.httpRegion.metaData.testDisabled
     ) {
       const tmpLogResponse = sendContext.logResponse;
       let hasTestResponse = false;
