@@ -45,7 +45,13 @@
     "onLanguage:markdown",
     "onLanguage:asciidoc",
     "onView:httpyacHistory",
-    "onView:test"
+    "workspaceContains:**/*.http",
+    "workspaceContains:**/*.rest",
+    "workspaceContains:.httpyac.js",
+    "workspaceContains:.httpyac.config.js",
+    "workspaceContains:httpyac.config.js",
+    "workspaceContains:.httpyac.config.json",
+    "workspaceContains:httpyac.config.json"
   ],
   "main": "./dist/extension.js",
   "capabilities": {
