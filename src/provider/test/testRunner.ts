@@ -66,12 +66,12 @@ export class TestRunner {
   }
 
   private async runTestItemFile(testItem: vscode.TestItem, duration: () => number, testRunContext: TestRunContext) {
-    const testResults: Array<Promise<TestResult>> = [];
-    await this.testItemResolver.resolveTestItemChildren(testItem);
-    testItem.children.forEach(async childTestItem => {
-      testResults.push(this.runTestItem(childTestItem, testRunContext));
-    });
-    const result = this.mergeTestResults(await Promise.all(testResults));
+    const testResults: Array<TestResult> = [];
+    for (const childTestItem of await this.testItemResolver.resolveTestItemChildren(testItem)) {
+      testResults.push(await this.runTestItem(childTestItem, testRunContext));
+    }
+
+    const result = this.mergeTestResults(testResults);
     if (result === TestResult.ERROR) {
       testRunContext.testRun.errored(testItem, new vscode.TestMessage('test errored'), duration());
     } else if (result === TestResult.FAILED) {

@@ -113,6 +113,7 @@ export class TestItemResolver extends DisposeProvider {
         this.createHttpFileTestItem(httpFile, testItem);
       }
     }
+    return this.getChildren(testItem);
   }
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
@@ -196,7 +197,7 @@ export class TestItemResolver extends DisposeProvider {
     return await vscode.workspace.findFiles(pattern, `{${exclude}}`);
   }
 
-  findFileTestItem(uri: vscode.Uri) {
+  private findFileTestItem(uri: vscode.Uri) {
     return this.items.find(obj => obj.canResolveChildren && obj.uri?.toString() === uri.toString());
   }
 
@@ -239,7 +240,16 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   public isHttpRegionTestItem(testItem: vscode.TestItem): boolean {
-    const obj = this.parseId(testItem.id);
-    return obj.kind === TestItemKind.httpRegion;
+    return testItem.id.startsWith(`${TestItemKind.httpRegion}|`);
+  }
+
+  public isFileTestItem(testItem: vscode.TestItem): boolean {
+    return testItem.id.startsWith(`${TestItemKind.file}|`);
+  }
+
+  private getChildren(testItem: vscode.TestItem): Array<vscode.TestItem> {
+    const children: Array<vscode.TestItem> = [];
+    testItem.children.forEach(child => children.push(child));
+    return children;
   }
 }
