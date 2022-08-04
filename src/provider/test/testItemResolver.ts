@@ -132,7 +132,7 @@ export class TestItemResolver extends DisposeProvider {
     const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
     const workspaceTestItem = this.createTestItem(
       TestItemKind.workspace,
-      `${workspaceRoot.name} (http)`,
+      `${workspaceRoot.name} (httpYac)`,
       workspaceRoot.uri
     );
     this.testController.items.add(workspaceTestItem);
