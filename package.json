@@ -898,6 +898,24 @@
           "scope": "window",
           "description": "The location at which progress should show."
         },
+        "httpyac.testExplorerSupport": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "http",
+            "rest"
+          ],
+          "scope": "window",
+          "description": "file extensions used in test explorer for http files"
+        },
+        "httpyac.testControllerEnabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "enable test controller support"
+        },
         "httpyac.testItemExtensions": {
           "type": "array",
           "items": {

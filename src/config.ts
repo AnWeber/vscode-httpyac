@@ -93,6 +93,7 @@ export interface AppConfig {
     validateVariables: false;
   };
   progressDefaultLocation?: 'notification' | 'window';
+  testControllerEnabled?: boolean;
   testItemExtensions?: Array<string>;
 }
 
