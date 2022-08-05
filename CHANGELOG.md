@@ -1,3 +1,10 @@
+## 5.6.1 (2022-08-05)
+
+#### Fixes
+
+- prevent override of httpYac Script Keywords (AnWeber/vscode-httpyac#144)
+- output failed tests and not success message (AnWeber/vscode-httpyac#143)
+
 ## 5.6.0 (2022-08-04)
 
 #### Features
