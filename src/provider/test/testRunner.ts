@@ -40,68 +40,33 @@ export class TestRunner {
     testRun.end();
   }
 
-  private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<TestResult> {
+  private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<void> {
     if (testRunContext.token.isCancellationRequested) {
-      return TestResult.SKIPPED;
+      return;
     }
     const testStartTime = Date.now();
     const duration = () => Date.now() - testStartTime;
     testRunContext.testRun.enqueued(testItem);
     testRunContext.testRun.started(testItem);
 
-    try {
-      if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
-        return await this.runTestItemHttpRegion(testItem, duration, testRunContext);
-      }
-      return await this.runTestItemFile(testItem, duration, testRunContext);
-    } catch (err) {
-      httpyac.io.log.error(err);
-      testRunContext.testRun.errored(
-        testItem,
-        new vscode.TestMessage(httpyac.utils.toString(err) || `${err}`),
-        duration()
-      );
-      return TestResult.ERROR;
-    }
-  }
-
-  private async runTestItemFile(testItem: vscode.TestItem, duration: () => number, testRunContext: TestRunContext) {
-    const testResults: Array<TestResult> = [];
-    for (const childTestItem of await this.testItemResolver.resolveTestItemChildren(testItem)) {
-      testResults.push(await this.runTestItem(childTestItem, testRunContext));
-    }
-
-    const result = this.mergeTestResults(testResults);
-    if (result === TestResult.ERROR) {
-      testRunContext.testRun.errored(testItem, new vscode.TestMessage('test errored'), duration());
-    } else if (result === TestResult.FAILED) {
-      testRunContext.testRun.failed(testItem, new vscode.TestMessage('test failed'), duration());
-    } else if (result === TestResult.PASSED) {
-      testRunContext.testRun.passed(testItem, duration());
+    if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
+      await this.runTestItemHttpRegion(testItem, duration, testRunContext);
     } else {
-      testRunContext.testRun.skipped(testItem);
+      await this.runTestItemFile(testItem, testRunContext);
     }
-    return result;
   }
 
-  private mergeTestResults(results: Array<TestResult>) {
-    if (results.some(obj => obj === TestResult.ERROR)) {
-      return TestResult.ERROR;
+  private async runTestItemFile(testItem: vscode.TestItem, testRunContext: TestRunContext) {
+    for (const childTestItem of await this.testItemResolver.resolveTestItemChildren(testItem)) {
+      await this.runTestItem(childTestItem, testRunContext);
     }
-    if (results.some(obj => obj === TestResult.FAILED)) {
-      return TestResult.FAILED;
-    }
-    if (results.some(obj => obj === TestResult.PASSED)) {
-      return TestResult.PASSED;
-    }
-    return TestResult.PASSED;
   }
 
   private async runTestItemHttpRegion(
     testItem: vscode.TestItem,
     duration: () => number,
     testRunContext: TestRunContext
-  ): Promise<TestResult> {
+  ): Promise<void> {
     const sendContext = await this.getSendContext(testItem, testRunContext);
     if (
       sendContext &&
@@ -115,36 +80,42 @@ export class TestRunner {
         await tmpLogResponse?.(response, httpRegion);
         hasTestResponse = true;
       };
-      await this.documentStore.send(sendContext);
-      const testResults = sendContext.httpRegion?.testResults;
+      try {
+        await this.documentStore.send(sendContext);
+        const testResults = sendContext.httpRegion?.testResults;
 
-      if ((!testResults && hasTestResponse) || (testResults && testResults.every(obj => !obj.error))) {
-        testRunContext.testRun.passed(testItem, duration());
-        return TestResult.PASSED;
+        if ((!testResults && hasTestResponse) || (testResults && testResults.every(obj => !obj.error))) {
+          testRunContext.testRun.passed(testItem, duration());
+        } else if (sendContext.httpRegion.metaData.disabled) {
+          testRunContext.testRun.skipped(testItem);
+        } else {
+          testRunContext.testRun.failed(
+            testItem,
+            testResults
+              ? testResults.reduce((prev, obj) => {
+                  if (obj.result) {
+                    prev.push(new vscode.TestMessage(obj.message));
+                    if (obj.error) {
+                      prev.push(new vscode.TestMessage(obj.error.displayMessage));
+                    }
+                  }
+                  return prev;
+                }, [] as Array<vscode.TestMessage>)
+              : new vscode.TestMessage('no response received'),
+            duration()
+          );
+        }
+      } catch (err) {
+        httpyac.io.log.error(err);
+        testRunContext.testRun.errored(
+          testItem,
+          new vscode.TestMessage(httpyac.utils.toString(err) || `${err}`),
+          duration()
+        );
       }
-      if (sendContext.httpRegion.metaData.disabled) {
-        testRunContext.testRun.skipped(testItem);
-        return TestResult.SKIPPED;
-      }
-      testRunContext.testRun.failed(
-        testItem,
-        testResults
-          ? testResults.reduce((prev, obj) => {
-              if (obj.result) {
-                prev.push(new vscode.TestMessage(obj.message));
-                if (obj.error) {
-                  prev.push(new vscode.TestMessage(obj.error.displayMessage));
-                }
-              }
-              return prev;
-            }, [] as Array<vscode.TestMessage>)
-          : new vscode.TestMessage('no response received'),
-        duration()
-      );
-      return TestResult.FAILED;
+    } else {
+      testRunContext.testRun.skipped(testItem);
     }
-    testRunContext.testRun.skipped(testItem);
-    return TestResult.SKIPPED;
   }
 
   private async getSendContext(
