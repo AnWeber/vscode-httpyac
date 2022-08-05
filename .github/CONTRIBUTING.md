@@ -5,8 +5,8 @@ From opening a bug report to creating a pull request: every contribution is appr
 ## Issues
 
 If you just want some help or a detail question, please post
-a question to [Disucssions](https://github.com/AnWeber/vscode-httpyac/discussions/new). Questions
-that include an example and/ or the full error message are more likely to receive responses.
+a question to [Discussions](https://github.com/AnWeber/vscode-httpyac/discussions/new). Questions
+that include an example and/or the full error message are more likely to receive responses.
 
 **If you have discovered a bug or have a feature suggestion, please [create an issue on GitHub](https://github.com/AnWeber/vscode-httpyac/issues/new).**
 **Please note that httpyac provides a [plugin interface.](https://httpyac.github.io/plugins/#getting-started)**
