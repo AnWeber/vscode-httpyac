@@ -93,7 +93,7 @@ export class TestRunner {
             testItem,
             testResults
               ? testResults.reduce((prev, obj) => {
-                  if (obj.result) {
+                  if (!obj.result) {
                     prev.push(new vscode.TestMessage(obj.message));
                     if (obj.error) {
                       prev.push(new vscode.TestMessage(obj.error.displayMessage));
