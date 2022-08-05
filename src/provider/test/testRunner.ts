@@ -1,5 +1,4 @@
 import { ResponseStore } from '../../responseStore';
-import { TestResult } from './testResult';
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { DocumentStore } from '../../documentStore';
