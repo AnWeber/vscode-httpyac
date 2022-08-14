@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       new provider.CodeLensProvider(documentStore, responseStore),
       new provider.HistoryController(documentStore, responseStore),
       new provider.ResponseDocumentController(responseStore),
-      new provider.HarCommandsController(documentStore),
+      new provider.CodeGenerationController(documentStore),
       new provider.RequestCommandsController(documentStore, responseStore, storageProvider),
       new provider.DecorationProvider(documentStore),
       new provider.HttpCompletionItemProvider(documentStore),
