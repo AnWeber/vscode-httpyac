@@ -1,3 +1,14 @@
+## 5.6.2 (2022-08-14)
+
+#### Features
+
+- generate http file with inlined variables (httpyac/httpyac.github.io#54)
+
+#### Fixes
+
+- all test items are enqueued at start of test run to get better progress
+- respect timeout in GRPC, MQTT and Websocket Requests (AnWeber/httpyac#320)
+
 ## 5.6.1 (2022-08-05)
 
 #### Fixes
