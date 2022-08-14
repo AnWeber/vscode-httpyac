@@ -25,8 +25,9 @@ export class TestRunner {
     token: vscode.CancellationToken
   ): Promise<void> {
     const testRun = this.testController.createTestRun(request);
-    for (const testItem of testItems) {
-      if (!token.isCancellationRequested) {
+
+    for (const testItem of await this.enqueuedTestItems(testItems, testRun)) {
+      if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(testItem)) {
         await this.runTestItem(testItem, {
           testRun,
           testItems,
@@ -39,33 +40,28 @@ export class TestRunner {
     testRun.end();
   }
 
-  private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<void> {
-    if (testRunContext.token.isCancellationRequested) {
-      return;
+  private async enqueuedTestItems(
+    testItems: Array<vscode.TestItem>,
+    testRun: vscode.TestRun
+  ): Promise<Array<vscode.TestItem>> {
+    const result: Array<vscode.TestItem> = [];
+    for (const testItem of testItems) {
+      if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
+        testRun.enqueued(testItem);
+        result.push(testItem);
+      } else {
+        result.push(
+          ...(await this.enqueuedTestItems(await this.testItemResolver.resolveTestItemChildren(testItem), testRun))
+        );
+      }
     }
+    return result;
+  }
+
+  private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<void> {
     const testStartTime = Date.now();
     const duration = () => Date.now() - testStartTime;
-    testRunContext.testRun.enqueued(testItem);
     testRunContext.testRun.started(testItem);
-
-    if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
-      await this.runTestItemHttpRegion(testItem, duration, testRunContext);
-    } else {
-      await this.runTestItemFile(testItem, testRunContext);
-    }
-  }
-
-  private async runTestItemFile(testItem: vscode.TestItem, testRunContext: TestRunContext) {
-    for (const childTestItem of await this.testItemResolver.resolveTestItemChildren(testItem)) {
-      await this.runTestItem(childTestItem, testRunContext);
-    }
-  }
-
-  private async runTestItemHttpRegion(
-    testItem: vscode.TestItem,
-    duration: () => number,
-    testRunContext: TestRunContext
-  ): Promise<void> {
     const sendContext = await this.getSendContext(testItem, testRunContext);
     if (
       sendContext &&
