@@ -39,6 +39,7 @@ async function generateHttpSnippetCodeRequest(
     },
     async (progress, token) => {
       context.progress = {
+        divider: 1,
         isCanceled: () => token.isCancellationRequested,
         register: (event: () => void) => {
           const dispose = token.onCancellationRequested(event);
@@ -48,6 +49,7 @@ async function generateHttpSnippetCodeRequest(
       };
 
       const interceptor = {
+        id: 'httpSnippet',
         async afterLoop(ctx: { args: [httpyac.Request<string>, httpyac.ProcessorContext] }) {
           const harRequest: Request = getHarRequest(ctx.args[0]);
           const snippet = new HttpSnippet(harRequest);
@@ -59,7 +61,7 @@ async function generateHttpSnippetCodeRequest(
       try {
         await httpyac.send(context);
       } finally {
-        context.httpRegion.hooks.onRequest.removeInterceptor(interceptor);
+        context.httpRegion.hooks.onRequest.removeInterceptor(interceptor.id);
       }
     }
   );

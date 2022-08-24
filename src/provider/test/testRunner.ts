@@ -133,6 +133,7 @@ export class TestRunner {
         httpRegion,
       };
       context.progress = {
+        divider: 1,
         isCanceled: () => testRunContext.token.isCancellationRequested,
         register: (event: () => void) => {
           const dispose = testRunContext.token.onCancellationRequested(event);

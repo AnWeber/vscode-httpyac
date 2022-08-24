@@ -35,6 +35,7 @@ async function getHttpFileSource(context: httpyac.HttpRegionSendContext) {
     },
     async (progress, token) => {
       context.progress = {
+        divider: 1,
         isCanceled: () => token.isCancellationRequested,
         register: (event: () => void) => {
           const dispose = token.onCancellationRequested(event);
@@ -44,6 +45,7 @@ async function getHttpFileSource(context: httpyac.HttpRegionSendContext) {
       };
       context.processedHttpRegions = [];
       const interceptor = {
+        id: 'abort',
         async afterLoop() {
           return false;
         },
@@ -63,7 +65,7 @@ async function getHttpFileSource(context: httpyac.HttpRegionSendContext) {
           lines.push('###');
         }
       } finally {
-        context.httpRegion.hooks.onRequest.removeInterceptor(interceptor);
+        context.httpRegion.hooks.onRequest.removeInterceptor(interceptor.id);
       }
     }
   );

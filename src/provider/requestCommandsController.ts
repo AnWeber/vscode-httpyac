@@ -128,6 +128,7 @@ export class RequestCommandsController extends DisposeProvider {
         },
         async (progress, token) => {
           context.progress = {
+            divider: 1,
             isCanceled: () => token.isCancellationRequested,
             register: (event: () => void) => {
               const dispose = token.onCancellationRequested(event);
@@ -193,6 +194,7 @@ export class RequestCommandsController extends DisposeProvider {
     const result = await utils.getHttpRegionFromLine(document, line, this.documentStore);
     if (result) {
       const abortInterceptor = {
+        id: 'abort',
         afterLoop: async () => false,
       };
       const variables: Record<string, unknown> = {};
@@ -211,7 +213,7 @@ export class RequestCommandsController extends DisposeProvider {
         if (httpyac.utils.isProcessorContext(result)) {
           Object.assign(variables, result.variables);
         }
-        result.httpFile.hooks.onRequest.removeInterceptor(abortInterceptor);
+        result.httpFile.hooks.onRequest.removeInterceptor(abortInterceptor.id);
         await this.openVariablesInEditor(variables);
       }
     }
