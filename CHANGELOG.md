@@ -2,12 +2,12 @@
 
 #### Features
 
-- add response tags to allow better filtering in responseLogging Hook (#322)
+- add response tags to allow better filtering in responseLogging Hook (AnWeber/httpyac#322)
 
 #### Fixes
 
 - update dependency hookpoint@2.0.1
-- modify usage because of Variadic option (#326)
+- modify usage because of Variadic option (AnWeber/httpyac#326)
 
 ## 5.6.2 (2022-08-14)
 
