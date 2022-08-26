@@ -1,149 +1,169 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/EnvironmentConfig",
-    "definitions": {
-        "EnvironmentConfig": {
-            "type": "object",
-            "properties": {
-                "cookieJarEnabled": {
-                    "type": "boolean"
-                },
-                "log": {
-                    "type": "object",
-                    "properties": {
-                        "level": {
-                            "$ref": "#/definitions/LogLevel"
-                        },
-                        "supportAnsiColors": {
-                            "type": "boolean"
-                        }
-                    },
-                    "additionalProperties": false
-                },
-                "request": {
-                    "type": "object",
-                    "properties": {
-                        "decompress": {
-                            "type": "boolean"
-                        },
-                        "timeout": {
-                            "type": "number"
-                        },
-                        "prefixUrl": {
-                            "type": "string"
-                        },
-                        "followRedirect": {
-                            "type": "boolean"
-                        },
-                        "maxRedirects": {
-                            "type": "number"
-                        },
-                        "throwHttpErrors": {
-                            "type": "boolean"
-                        },
-                        "username": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
-                        },
-                        "http2": {
-                            "type": "boolean"
-                        },
-                        "retry": {
-                            "type": "boolean"
-                        },
-                        "rejectUnauthorized": {
-                            "type": "boolean"
-                        },
-                        "ignoreInvalidCookies": {
-                            "type": "boolean"
-                        },
-                        "https": {
-                            "type": "object",
-                            "properties": {
-                                "cert": {
-                                    "type": "string"
-                                },
-                                "key": {
-                                    "type": "string"
-                                },
-                                "pfx": {
-                                    "type": "string"
-                                },
-                                "passphrase": {
-                                    "type": "string"
-                                },
-                                "rejectUnauthorized": {
-                                    "type": "boolean"
-                                }
-                            },
-                            "additionalProperties": false
-                        }
-                    },
-                    "additionalProperties": true
-                },
-                "requestBodyInjectVariablesExtensions": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "defaultHeaders": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "environments": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/Variables"
-                    }
-                },
-                "clientCertificates": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/ClientCertificateOptions"
-                    }
-                },
-                "envDirName": {
-                    "type": "string"
-                }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/EnvironmentConfig",
+  "definitions": {
+    "EnvironmentConfig": {
+      "type": "object",
+      "properties": {
+        "cookieJarEnabled": {
+          "anyOf": [
+            {
+              "type": "boolean"
             },
-            "additionalProperties": false
+            {
+              "type": "object",
+              "properties": {
+                "allowSpecialUseDomain": {
+                  "type": "boolean",
+                  "description": "accepts special-use domain suffixes, such as local. Useful for testing purposes. This is not in the standard, but is used sometimes on the web and is accepted by most browsers."
+                },
+                "looseMode": {
+                  "type": "boolean",
+                  "description": "accept malformed cookies like bar and =bar, which have an implied empty name"
+                },
+                "rejectPublicSuffixes": {
+                  "type": "boolean",
+                  "description": "reject cookies with domains like 'com' and 'co.uk'"
+                },
+                "prefixSecurity": {
+                  "type": "string",
+                  "description": "set to 'unsafe-disabled', 'silent', or 'strict'"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         },
-        "LogLevel": {
-            "type": "number",
-            "enum": [
-                0,
-                2,
-                5,
-                10,
-                100
-            ]
+        "log": {
+          "type": "object",
+          "properties": {
+            "level": {
+              "$ref": "#/definitions/LogLevel"
+            },
+            "supportAnsiColors": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
         },
-        "Variables": {
-            "type": "object",
-            "additionalProperties": {}
-        },
-        "ClientCertificateOptions": {
-            "type": "object",
-            "properties": {
+        "request": {
+          "type": "object",
+          "properties": {
+            "decompress": {
+              "type": "boolean"
+            },
+            "timeout": {
+              "type": "number"
+            },
+            "prefixUrl": {
+              "type": "string"
+            },
+            "followRedirect": {
+              "type": "boolean"
+            },
+            "maxRedirects": {
+              "type": "number"
+            },
+            "throwHttpErrors": {
+              "type": "boolean"
+            },
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "http2": {
+              "type": "boolean"
+            },
+            "retry": {
+              "type": "boolean"
+            },
+            "rejectUnauthorized": {
+              "type": "boolean"
+            },
+            "ignoreInvalidCookies": {
+              "type": "boolean"
+            },
+            "https": {
+              "type": "object",
+              "properties": {
                 "cert": {
-                    "type": "string"
+                  "type": "string"
                 },
                 "key": {
-                    "type": "string"
+                  "type": "string"
                 },
                 "pfx": {
-                    "type": "string"
+                  "type": "string"
                 },
                 "passphrase": {
-                    "type": "string"
+                  "type": "string"
+                },
+                "rejectUnauthorized": {
+                  "type": "boolean"
                 }
-            },
-            "additionalProperties": false
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "requestBodyInjectVariablesExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defaultHeaders": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "environments": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Variables"
+          }
+        },
+        "clientCertificates": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/ClientCertificateOptions"
+          }
+        },
+        "envDirName": {
+          "type": "string"
         }
+      },
+      "additionalProperties": false
+    },
+    "LogLevel": {
+      "type": "number",
+      "enum": [0, 2, 5, 10, 100]
+    },
+    "Variables": {
+      "type": "object",
+      "additionalProperties": {}
+    },
+    "ClientCertificateOptions": {
+      "type": "object",
+      "properties": {
+        "cert": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "pfx": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
+  }
 }

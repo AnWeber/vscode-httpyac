@@ -417,7 +417,33 @@
           "description": "got options used as default"
         },
         "httpyac.cookieJarEnabled": {
-          "type": "boolean",
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "allowSpecialUseDomain": {
+                  "type": "boolean",
+                  "description": "accepts special-use domain suffixes, such as local. Useful for testing purposes. This is not in the standard, but is used sometimes on the web and is accepted by most browsers."
+                },
+                "looseMode": {
+                  "type": "boolean",
+                  "description": "accept malformed cookies like bar and =bar, which have an implied empty name"
+                },
+                "rejectPublicSuffixes": {
+                  "type": "boolean",
+                  "description": "reject cookies with domains like 'com' and 'co.uk'"
+                },
+                "prefixSecurity": {
+                  "type": "string",
+                  "description": "set to 'unsafe-disabled', 'silent', or 'strict'"
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
           "default": true,
           "scope": "resource",
           "description": "is cookie jar support enabled"

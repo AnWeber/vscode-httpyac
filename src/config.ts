@@ -31,7 +31,14 @@ export interface ResourceConfig {
   requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>;
   requestGotOptions?: Record<string, unknown>;
-  cookieJarEnabled?: boolean;
+  cookieJarEnabled?:
+    | boolean
+    | {
+        allowSpecialUseDomain?: boolean | undefined;
+        looseMode?: boolean | undefined;
+        rejectPublicSuffixes?: boolean | undefined;
+        prefixSecurity?: string | undefined;
+      };
   clientCertificates?: Record<string, httpyac.ClientCertificateOptions>;
   environmentVariables?: Record<string, httpyac.Variables>;
   envDirName?: string;
