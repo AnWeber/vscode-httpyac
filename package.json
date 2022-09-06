@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT, RabbitMQ and WebSocket requests directly within Visual Studio Code",
-  "version": "5.6.4",
+  "version": "5.7.0",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -1387,27 +1387,27 @@
   "devDependencies": {
     "@types/lodash": "^4.14.184",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^18.7.13",
+    "@types/node": "^18.7.15",
     "@types/uuid": "^8.3.4",
     "@types/vscode": "1.68.0",
-    "@typescript-eslint/eslint-plugin": "5.33.0",
-    "@typescript-eslint/parser": "5.33.0",
-    "esbuild": "^0.15.5",
-    "eslint": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
+    "esbuild": "^0.15.7",
+    "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "lockfile-lint": "^4.8.0",
     "prettier": "^2.7.1",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.2"
   },
   "dependencies": {
     "filesize": "^9.0.11",
     "httpsnippet": "^2.0.0",
-    "httpyac": "^5.6.5",
+    "httpyac": "^5.7.0",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.0"
   }
 }
