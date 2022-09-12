@@ -96,6 +96,13 @@
         ]
       },
       {
+        "path": "./syntaxes/markdown_injection.json",
+        "scopeName": "http.markdown.injection",
+        "injectTo": [
+          "text.html.markdown"
+        ]
+      },
+      {
         "language": "http",
         "scopeName": "source.http",
         "path": "./syntaxes/http.tmLanguage.json",
