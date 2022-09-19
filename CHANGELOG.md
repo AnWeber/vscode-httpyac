@@ -1,3 +1,10 @@
+## 5.7.2 (2022-09-19)
+
+#### Fixes
+
+- TestController use FileSystemWatcher to watch changes outside of VSCode API
+- trim filename in `@import` (#150)
+
 ## 5.7.1 (2022-09-12)
 
 #### Features

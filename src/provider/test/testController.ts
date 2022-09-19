@@ -31,6 +31,7 @@ export class TestController extends utils.DisposeProvider {
     this.testController = vscode.tests.createTestController('httpYacTests', 'httpYac Tests');
     this.testItemResolver = new TestItemResolver(this.testController, this.documentStore);
     this.testController.resolveHandler = this.testItemResolver.resolveTestItems.bind(this.testItemResolver);
+    this.testController.refreshHandler = this.testItemResolver.refreshTestItems.bind(this.testItemResolver);
 
     this.testController.createRunProfile(
       'Run',

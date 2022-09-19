@@ -18,44 +18,15 @@ export class TestItemResolver extends DisposeProvider {
   constructor(private readonly testController: vscode.TestController, private readonly documentStore: DocumentStore) {
     super();
 
+    this.initOpenEditors();
+
     this.subscriptions = [
-      vscode.workspace.onDidChangeTextDocument(async evt => {
-        if (evt.contentChanges.length > 0) {
-          const testItemExtensions = this.getTestItemExtensions();
-          const uri = toUri(evt.document.uri);
-          if (uri && testItemExtensions.some(ext => uri.path.endsWith(`.${ext}`))) {
-            const testItem = this.findFileTestItem(evt.document.uri);
-            if (testItem) {
-              const httpFile = await this.documentStore.getHttpFile(evt.document);
-              testItem.children.replace([]);
-              this.createFileTestItem(uri, httpFile);
-            }
-          }
-        }
-      }),
-      vscode.workspace.onDidCreateFiles(async evt => {
-        for (const file of evt.files) {
-          const testItemExtensions = this.getTestItemExtensions();
-          if (testItemExtensions.some(ext => file.path.endsWith(`.${ext}`))) {
-            await this.refreshTestItems();
-            break;
-          }
-        }
+      this.initFilesystemWatcher(),
+      vscode.workspace.onDidOpenTextDocument(async (document: vscode.TextDocument) => {
+        await this.createDocumentTestItem(document);
       }),
       vscode.workspace.onDidChangeWorkspaceFolders(async () => {
         await this.refreshTestItems();
-      }),
-      vscode.workspace.onDidDeleteFiles(async evt => {
-        for (const file of evt.files) {
-          const deletedFile = file.toString();
-          const testItems = this.items.filter(
-            obj => obj.canResolveChildren && obj.uri?.toString().startsWith(deletedFile)
-          );
-          if (testItems.length > 0) {
-            await this.refreshTestItems();
-            break;
-          }
-        }
       }),
       vscode.workspace.onDidRenameFiles(async evt => {
         for (const fileMove of evt.files) {
@@ -70,6 +41,63 @@ export class TestItemResolver extends DisposeProvider {
         }
       }),
     ];
+  }
+
+  private async initOpenEditors() {
+    for (const editor of vscode.window.visibleTextEditors) {
+      this.createDocumentTestItem(editor.document);
+    }
+  }
+  private async createDocumentTestItem(document: vscode.TextDocument) {
+    if (this.hasTestItemExtension(document)) {
+      const httpFile = await this.documentStore.getHttpFile(document);
+      this.createFileTestItem(document.uri, httpFile);
+    }
+  }
+
+  private initFilesystemWatcher() {
+    const testItemExtensions = this.getTestItemExtensions();
+
+    const fsWatcher = vscode.workspace.createFileSystemWatcher(`**/*.{${testItemExtensions.join(',')}}`);
+    fsWatcher.onDidCreate(async uri => {
+      const httpFile = await this.documentStore.getOrCreate(
+        uri,
+        async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
+        0
+      );
+      this.createFileTestItem(uri, httpFile);
+    });
+    fsWatcher.onDidChange(async uri => {
+      const testItem = this.findFileTestItem(uri);
+      if (testItem) {
+        testItem.children.replace([]);
+        const httpFile = await this.documentStore.getOrCreate(
+          uri,
+          async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
+          0
+        );
+        this.createFileTestItem(uri, httpFile);
+      }
+    });
+    fsWatcher.onDidDelete(async uri => {
+      const testItems = this.items.filter(
+        obj => obj.canResolveChildren && obj.uri?.toString().startsWith(uri.toString())
+      );
+      if (testItems.length > 0) {
+        await this.refreshTestItems();
+      }
+    });
+    return fsWatcher;
+  }
+
+  private hasTestItemExtension(documentOrUri: vscode.TextDocument | vscode.Uri) {
+    let uri: vscode.Uri;
+    if (!(documentOrUri instanceof vscode.Uri)) {
+      uri = documentOrUri.uri;
+    } else {
+      uri = documentOrUri;
+    }
+    return this.getTestItemExtensions().some(ext => uri?.toString().endsWith(`.${ext}`));
   }
 
   private getTestItemExtensions() {
