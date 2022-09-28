@@ -1197,6 +1197,11 @@
           "command": "httpyac.generateCode",
           "when": "editorLangId in httpyac.supportedLanguages",
           "group": "httpyac@1"
+        },
+        {
+          "command": "httpyac.generateCodeSelectLanguage",
+          "when": "editorLangId in httpyac.supportedLanguages",
+          "group": "httpyac@1"
         }
       ],
       "editor/context": [
