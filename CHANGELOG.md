@@ -1,3 +1,9 @@
+## 5.7.2 (2022-09-28)
+
+#### Fixes
+
+- update hookpoint to prevent error with interceptor
+
 ## 5.7.2 (2022-09-19)
 
 #### Fixes
