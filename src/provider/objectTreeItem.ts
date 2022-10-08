@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { utils } from 'httpyac';
-import { default as filesize } from 'filesize';
+import { filesize } from 'filesize';
 
 export interface ObjectItem {
   key: string;
