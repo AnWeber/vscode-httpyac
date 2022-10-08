@@ -58,7 +58,8 @@ export class ObjectTreeItem extends vscode.TreeItem {
       case 'object':
         if (Buffer.isBuffer(element.value)) {
           this.iconPath = new vscode.ThemeIcon('file-binary');
-          this.tooltip = this.description = filesize(element.value.length);
+          const size = filesize(element.value.length);
+          this.tooltip = this.description = `${size}`;
           this.collapsibleState = vscode.TreeItemCollapsibleState.None;
         } else if (Array.isArray(element.value)) {
           if (element.value.length > 0) {
