@@ -1,3 +1,10 @@
+## 5.7.6 (2022-10-30)
+
+#### Fixes
+
+- support protocol with multiline urls (AnWeber/vscode-httpyac#159)
+- prevent issue with string.replace special replacement patterns (httpyac/httpyac.github.io#57)
+
 ## 5.7.5 (2022-10-21)
 
 #### Fixes
