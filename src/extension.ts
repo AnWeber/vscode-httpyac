@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
       new provider.DecorationProvider(documentStore),
       new provider.HttpCompletionItemProvider(documentStore),
       new provider.UserSessionTreeDataProvider(documentStore),
-      new provider.DebugTreeDataProvider(documentStore),
+      new provider.DebugTreeDataProvider(documentStore, responseStore),
       new provider.EnvironmentTreeDataProvider(documentStore, storeController.environmentChanged),
       new provider.VariablesHoverProvider(documentStore, storeController.environmentChanged),
       new provider.VariablesTreeDataProvider(documentStore, storeController.environmentChanged),

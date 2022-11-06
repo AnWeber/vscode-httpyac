@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
+import { store } from 'httpyac';
 import { DisposeProvider } from '../utils';
 import { DocumentStore } from '../documentStore';
 import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
 import { allHttpDocumentSelector } from '../config';
+import { ResponseStore } from '../responseStore';
 
 export class DebugTreeDataProvider extends DisposeProvider implements vscode.TreeDataProvider<ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   #httpFileChangedEmitter: vscode.EventEmitter<void>;
-  constructor(readonly documentStore: DocumentStore) {
+  constructor(readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
     super();
 
     this.#httpFileChangedEmitter = new vscode.EventEmitter<void>();
@@ -50,7 +52,13 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
   }
 
   async getChildren(element?: ObjectItem): Promise<ObjectItem[] | undefined> {
-    const val = element?.value || (await this.documentStore.getCurrentHttpFile());
+    const val = element?.value || {
+      httpFile: await this.documentStore.getCurrentHttpFile(),
+      documentStore: this.documentStore,
+      httpFileStore: this.documentStore.httpFileStore,
+      responseStore: this.responseStore,
+      userSessionStore: store.userSessionStore,
+    };
     if (val) {
       if (typeof val === 'object') {
         return Object.entries(val).map(([key, value]) => ({ key, value }));
