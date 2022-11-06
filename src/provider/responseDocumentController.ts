@@ -79,6 +79,8 @@ export class ResponseDocumentController
             })
             .filter(obj => obj.length > 0)
         );
+      } else {
+        httpyac.io.log.error(`document for ${document.uri?.toString()} not found in cache`);
       }
       result.push(
         ...lenses.map(
