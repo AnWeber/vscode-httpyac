@@ -1,3 +1,16 @@
+## 5.8.0 (2022-11-06)
+
+#### Features
+
+- add docker image for httpyac CLI
+- some debug improvements
+
+#### Fixes
+
+- Cookie Header support variable replacment (AnWeber/httpyac#352)
+- Parsing Issue with non HTTP responses
+- add response to cache before showing editor
+
 ## 5.7.6 (2022-10-30)
 
 #### Fixes
