@@ -57,11 +57,11 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     if (show) {
       await this.show(responseItem);
     }
+    httpyac.io.log.debug(`add response ${responseItem.id} to cache`);
     await this.shrink(responseItem);
   }
 
   private addToCache(responseItem: view.ResponseItem) {
-    httpyac.io.log.debug(`add response ${responseItem.documentUri?.toString()} to cache`);
     const config = getConfigSetting();
     this.responseCache.splice(0, 0, responseItem);
     this.responseCache.length = Math.min(this.responseCache.length, config.maxHistoryItems || 50);
