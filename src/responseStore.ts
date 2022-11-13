@@ -116,6 +116,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
         await this.remove(responseItem);
       }
     }
+    this.refreshHistory.fire();
   }
 
   private shrinkResponseItem(response: httpyac.HttpResponse) {
