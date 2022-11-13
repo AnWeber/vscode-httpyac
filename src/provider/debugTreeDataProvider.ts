@@ -18,6 +18,9 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
     documentStore.documentStoreChanged(() => {
       this.refreshHttpFileOpen(vscode.window.activeTextEditor?.document);
     });
+    responseStore.historyChanged(() => {
+      this.refreshHttpFileOpen(vscode.window.activeTextEditor?.document);
+    });
     this.subscriptions = [
       vscode.window.registerTreeDataProvider('httpyacDebug', this),
 
@@ -58,6 +61,7 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
       httpFileStore: this.documentStore.httpFileStore,
       responseStore: this.responseStore,
       userSessionStore: store.userSessionStore,
+      activeTextEditor: vscode.window.activeTextEditor,
     };
     if (val) {
       if (typeof val === 'object') {

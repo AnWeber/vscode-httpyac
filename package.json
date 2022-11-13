@@ -1367,7 +1367,7 @@
           "id": "httpyacDebug",
           "name": "Debug",
           "visibility": "hidden",
-          "when": "httpyac.httpFileOpen"
+          "when": "httpyac.anyHttpFileOpen"
         }
       ]
     }
