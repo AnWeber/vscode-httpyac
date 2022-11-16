@@ -1,3 +1,9 @@
+## [unreleased]
+
+#### Fixes
+
+- response code lens support if user-data-dir is used (#161)
+
 ## 5.8.1 (2022-11-13)
 
 #### Fixes

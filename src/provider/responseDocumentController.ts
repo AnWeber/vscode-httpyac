@@ -13,7 +13,6 @@ export class ResponseDocumentController
 
     const documentFilter = [
       {
-        scheme: 'file',
         pattern: '**/_httpyac_/**',
       },
     ];
