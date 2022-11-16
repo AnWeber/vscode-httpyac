@@ -241,7 +241,7 @@ export class TestItemResolver extends DisposeProvider {
 
   private createId(kind: TestItemKind, label: string, uri?: vscode.Uri) {
     if (kind === TestItemKind.httpRegion) {
-      return `${kind}|${label}`;
+      return `${kind}|${label}|${uri?.toString() || ''}`;
     }
     return `${kind}|${uri ? uri.toString() : label}`;
   }

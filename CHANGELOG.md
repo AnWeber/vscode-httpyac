@@ -3,6 +3,7 @@
 #### Fixes
 
 - response code lens support if user-data-dir is used (#161)
+- generate unique id for httpRegion (httpyac/httpyac.github.io#60)
 
 ## 5.8.1 (2022-11-13)
 
