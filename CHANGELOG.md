@@ -1,7 +1,8 @@
-## [unreleased]
+## 5.8.2 (2022-11-16)
 
 #### Fixes
 
+- allow whitespace around variable definition (AnWeber/httpyac#354)
 - response code lens support if user-data-dir is used (#161)
 - generate unique id for httpRegion (httpyac/httpyac.github.io#60)
 
