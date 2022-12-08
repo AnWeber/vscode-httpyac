@@ -165,9 +165,10 @@ export class TestItemResolver extends DisposeProvider {
     );
     this.testController.items.add(workspaceTestItem);
 
-    const folder = vscode.Uri.joinPath(file, '..').toString().replace(workspaceRoot.uri.toString(), '');
+    const folderUri = vscode.Uri.joinPath(file, '..');
+    const folder = folderUri.toString().replace(workspaceRoot.uri.toString(), '');
     if (folder) {
-      const folderTestItem = this.createTestItem(TestItemKind.folder, folder);
+      const folderTestItem = this.createTestItem(TestItemKind.folder, folder, folderUri);
       workspaceTestItem.children.add(folderTestItem);
       return folderTestItem;
     }
@@ -210,7 +211,6 @@ export class TestItemResolver extends DisposeProvider {
     const uris: Array<vscode.Uri> = [];
     const testItemExtensions = this.getTestItemExtensions();
     for (const file of await this.findNonIgnoredFiles(`**/*.{${testItemExtensions.join(',')}}`)) {
-      httpyac.io.log.info(file.scheme);
       uris.push(file);
     }
     return uris;
@@ -226,12 +226,17 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   private findFileTestItem(uri: vscode.Uri) {
-    return this.items.find(obj => obj.canResolveChildren && obj.uri?.toString() === uri.toString());
+    return this.items.find(obj => obj.canResolveChildren && httpyac.utils.equalsPath(obj.uri, uri));
   }
 
-  private createTestItem(kind: TestItemKind, label: string, uri?: vscode.Uri) {
+  private createTestItem(kind: TestItemKind, label: string, uri: vscode.Uri) {
     const id = this.createId(kind, label, uri);
     let item = this.items.find(obj => obj.id === id);
+
+    if (item && !httpyac.utils.equalsPath(item?.uri, uri)) {
+      httpyac.io.log.error(`item ${id} already exists with other url`);
+      httpyac.io.log.error(`${uri} <> ${item.uri}`);
+    }
     if (!item) {
       item = this.testController.createTestItem(id, label, uri);
       this.items.push(item);
@@ -239,11 +244,12 @@ export class TestItemResolver extends DisposeProvider {
     return item;
   }
 
-  private createId(kind: TestItemKind, label: string, uri?: vscode.Uri) {
+  private createId(kind: TestItemKind, label: string, uri: vscode.Uri) {
+    const safeUri = httpyac.utils.replaceInvalidChars(uri?.toString());
     if (kind === TestItemKind.httpRegion) {
-      return `${kind}|${label}|${uri?.toString() || ''}`;
+      return `${kind}|${safeUri}|${httpyac.utils.replaceInvalidChars(label)}`;
     }
-    return `${kind}|${uri ? uri.toString() : label}`;
+    return `${kind}|${safeUri}`;
   }
 
   private parseId(id: string) {
