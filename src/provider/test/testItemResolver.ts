@@ -146,7 +146,7 @@ export class TestItemResolver extends DisposeProvider {
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
     const parent = this.getParentTestItem(file);
-    const testItem = this.createTestItem(TestItemKind.file, basename(file.toString()), file);
+    const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
     parent.children.add(testItem);
 
@@ -166,7 +166,7 @@ export class TestItemResolver extends DisposeProvider {
     this.testController.items.add(workspaceTestItem);
 
     const folderUri = vscode.Uri.joinPath(file, '..');
-    const folder = folderUri.toString().replace(workspaceRoot.uri.toString(), '');
+    const folder = folderUri.toString(true).replace(workspaceRoot.uri.toString(true), '');
     if (folder) {
       const folderTestItem = this.createTestItem(TestItemKind.folder, folder, folderUri);
       workspaceTestItem.children.add(folderTestItem);
