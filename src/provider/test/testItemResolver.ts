@@ -168,8 +168,11 @@ export class TestItemResolver extends DisposeProvider {
     const folderUri = vscode.Uri.joinPath(file, '..');
     const folder = folderUri.toString(true).replace(workspaceRoot.uri.toString(true), '');
     if (folder) {
-      const folderTestItem = this.createTestItem(TestItemKind.folder, folder, folderUri);
-      workspaceTestItem.children.add(folderTestItem);
+      const parent = this.getParentTestItem(folderUri);
+      const prefixRe = new RegExp(`^/${parent.label}`, 'u');
+      const label = folder.replace(prefixRe, '').replace(/^\//u, '');
+      const folderTestItem = this.createTestItem(TestItemKind.folder, label, folderUri);
+      parent.children.add(folderTestItem);
       return folderTestItem;
     }
     return workspaceTestItem;
