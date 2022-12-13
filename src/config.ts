@@ -102,6 +102,7 @@ export interface AppConfig {
   progressDefaultLocation?: 'notification' | 'window';
   testControllerEnabled?: boolean;
   testItemExtensions?: Array<string>;
+  testNestedHiearchy?: boolean;
 }
 
 export function getConfigSetting(): AppConfig {

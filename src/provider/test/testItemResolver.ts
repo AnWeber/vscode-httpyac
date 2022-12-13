@@ -145,8 +145,10 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
-    const parent = this.getParentTestItemRecursively(file);
-    // const parent = this.getParentTestItem(file);
+    const parent =
+      getConfigSetting().testNestedHiearchy === true
+        ? this.getParentTestItemRecursively(file)
+        : this.getParentTestItem(file);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
     parent.children.add(testItem);

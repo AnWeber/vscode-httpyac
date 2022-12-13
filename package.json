@@ -960,6 +960,12 @@
           ],
           "scope": "window",
           "description": "file extensions used in test explorer for http files"
+        },
+        "httpyac.testNestedHiearchy": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "use nested heiarchy for tests (mirros filesystem structure)"
         }
       }
     },
