@@ -65,7 +65,11 @@ export class TestItemResolver extends DisposeProvider {
         async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
         0
       );
-      this.createFileTestItem(uri, httpFile);
+      if (this.isFlattendedTestHiearchy()) {
+        await this.refreshTestItems();
+      } else {
+        this.createFileTestItem(uri, httpFile);
+      }
     });
     fsWatcher.onDidChange(async uri => {
       const testItem = this.findFileTestItem(uri);
@@ -119,6 +123,7 @@ export class TestItemResolver extends DisposeProvider {
         for (const file of await this.loadAllHttpFilesInWorkspace()) {
           this.createFileTestItem(file);
         }
+        this.checkForFlattendFileSystem();
       }
     } catch (err) {
       httpyac.io.log.error(err);
@@ -145,10 +150,14 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
-    const parent =
-      getConfigSetting().testHiearchy === 'filesystem'
-        ? this.getParentTestItemNested(file)
-        : this.getParentTestItemFlat(file);
+    const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
+    const workspaceTestItem = this.createTestItem(
+      TestItemKind.workspace,
+      `${workspaceRoot.name} (httpYac)`,
+      workspaceRoot.uri
+    );
+    this.testController.items.add(workspaceTestItem);
+    const parent = this.getParentTestItem(file, workspaceTestItem);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
     parent.children.add(testItem);
@@ -158,44 +167,61 @@ export class TestItemResolver extends DisposeProvider {
       this.createHttpFileTestItem(httpFileParsed, testItem);
     }
   }
-  private getParentTestItemNested(entry: vscode.Uri) {
-    const folder = vscode.Uri.joinPath(entry, '..');
 
-    if (folder.path === '/' || folder.path === vscode.workspace.getWorkspaceFolder(folder)?.uri.path) {
-      const workspaceRoot = vscode.workspace.getWorkspaceFolder(folder) || { name: 'httpyac Tests', uri: folder };
-      const workspaceTestItem = this.createTestItem(
-        TestItemKind.workspace,
-        `${workspaceRoot.name} (httpYac)`,
-        workspaceRoot.uri
-      );
-      this.testController.items.add(workspaceTestItem);
+  private getFoldersUntilRoot(current: vscode.Uri, rootUri: vscode.Uri | undefined): Array<vscode.Uri> {
+    const next = vscode.Uri.joinPath(current, '..');
+    if (!httpyac.utils.equalsPath(next, rootUri) && !httpyac.utils.equalsPath(next, current)) {
+      return [...this.getFoldersUntilRoot(next, rootUri), next];
+    }
+
+    return [];
+  }
+  private getParentTestItem(entry: vscode.Uri, workspaceTestItem: vscode.TestItem) {
+    const folders = this.getFoldersUntilRoot(entry, workspaceTestItem.uri);
+    if (folders.length === 0) {
       return workspaceTestItem;
     }
-
-    const parent = this.getParentTestItemNested(folder);
-    const label = folder.path.slice(folder.path.lastIndexOf('/') + 1);
-    const testItem = this.createTestItem(TestItemKind.folder, label, folder);
-    parent.children.add(testItem);
-    return testItem;
-  }
-
-  private getParentTestItemFlat(file: vscode.Uri) {
-    const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
-    const workspaceTestItem = this.createTestItem(
-      TestItemKind.workspace,
-      `${workspaceRoot.name} (httpYac)`,
-      workspaceRoot.uri
-    );
-    this.testController.items.add(workspaceTestItem);
-
-    const folderUri = vscode.Uri.joinPath(file, '..');
-    const folder = folderUri.toString(true).replace(workspaceRoot.uri.toString(true), '');
-    if (folder) {
-      const folderTestItem = this.createTestItem(TestItemKind.folder, folder, folderUri);
-      workspaceTestItem.children.add(folderTestItem);
-      return folderTestItem;
+    if (getConfigSetting().testHiearchy === 'flat') {
+      const folderUri = folders[folders.length - 1];
+      if (folderUri) {
+        const folderTestItem = this.createTestItem(
+          TestItemKind.folder,
+          folders.map(folderUri => basename(folderUri.path)).join('/'),
+          folderUri
+        );
+        workspaceTestItem.children.add(folderTestItem);
+        return folderTestItem;
+      }
+    } else {
+      let parentFolder: vscode.TestItem = workspaceTestItem;
+      for (const folderUri of folders) {
+        const folderTestItem = this.createTestItem(TestItemKind.folder, basename(folderUri.path), folderUri);
+        parentFolder.children.add(folderTestItem);
+        parentFolder = folderTestItem;
+      }
+      return parentFolder;
     }
     return workspaceTestItem;
+  }
+
+  private checkForFlattendFileSystem() {
+    if (this.isFlattendedTestHiearchy()) {
+      const folderTestItems = this.items.filter(item => this.isFolderTestItem(item));
+      for (const folder of folderTestItems) {
+        if (folder.children.size === 1 && folder.parent) {
+          const parent = folder.parent;
+          folder.children.forEach(child => {
+            child.label = `${folder.label}/${child.label}`;
+            parent.children.add(child);
+          });
+          parent.children.delete(folder.id);
+        }
+      }
+    }
+  }
+
+  private isFlattendedTestHiearchy() {
+    return getConfigSetting().testHiearchy === 'flattened';
   }
 
   private createHttpFileTestItem(httpFile: httpyac.HttpFile, parent: vscode.TestItem) {
@@ -300,8 +326,8 @@ export class TestItemResolver extends DisposeProvider {
     return testItem.id.startsWith(`${TestItemKind.httpRegion}|`);
   }
 
-  public isFileTestItem(testItem: vscode.TestItem): boolean {
-    return testItem.id.startsWith(`${TestItemKind.file}|`);
+  private isFolderTestItem(testItem: vscode.TestItem): boolean {
+    return testItem.id.startsWith(`${TestItemKind.folder}|`);
   }
 
   private getChildren(testItem: vscode.TestItem): Array<vscode.TestItem> {

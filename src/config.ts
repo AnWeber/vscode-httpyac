@@ -102,7 +102,7 @@ export interface AppConfig {
   progressDefaultLocation?: 'notification' | 'window';
   testControllerEnabled?: boolean;
   testItemExtensions?: Array<string>;
-  testHiearchy?: 'filesystem' | 'flattened';
+  testHiearchy?: 'filesystem' | 'flattened' | 'flat';
 }
 
 export function getConfigSetting(): AppConfig {

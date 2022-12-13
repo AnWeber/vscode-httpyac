@@ -964,12 +964,14 @@
         "httpyac.testHiearchy": {
           "type": "string",
           "enum": [
+            "flat",
             "flattened",
             "filesystem"
           ],
           "markdownEnumDescriptions": [
-            "flatten directories",
-            "use filesystem structure"
+            "use flat folders name",
+            "use flattened filesystem structure",
+            "use exact filesystem structure"
           ],
           "default": "filesystem",
           "scope": "window",
