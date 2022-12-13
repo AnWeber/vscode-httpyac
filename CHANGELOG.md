@@ -1,3 +1,9 @@
+## (unreleased)
+
+#### Features
+
+- nesting of testItems support filesystem structure (#163)
+
 ## 5.8.2 (2022-11-16)
 
 #### Fixes

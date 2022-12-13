@@ -146,7 +146,7 @@ export class TestItemResolver extends DisposeProvider {
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
     const parent =
-      getConfigSetting().testNestedHiearchy === true
+      getConfigSetting().testHiearchy === 'filesystem'
         ? this.getParentTestItemNested(file)
         : this.getParentTestItemFlat(file);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);

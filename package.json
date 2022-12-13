@@ -961,11 +961,19 @@
           "scope": "window",
           "description": "file extensions used in test explorer for http files"
         },
-        "httpyac.testNestedHiearchy": {
-          "type": "boolean",
-          "default": true,
+        "httpyac.testHiearchy": {
+          "type": "string",
+          "enum": [
+            "flattened",
+            "filesystem"
+          ],
+          "markdownEnumDescriptions": [
+            "flatten directories",
+            "use filesystem structure"
+          ],
+          "default": "filesystem",
           "scope": "window",
-          "description": "use nested hierarchy for tests (mirrors filesystem structure)"
+          "description": "hierarchy used for tests"
         }
       }
     },
