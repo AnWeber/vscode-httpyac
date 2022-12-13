@@ -147,8 +147,8 @@ export class TestItemResolver extends DisposeProvider {
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
     const parent =
       getConfigSetting().testNestedHiearchy === true
-        ? this.getParentTestItemRecursively(file)
-        : this.getParentTestItem(file);
+        ? this.getParentTestItemNested(file)
+        : this.getParentTestItemFlat(file);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
     parent.children.add(testItem);
@@ -158,7 +158,7 @@ export class TestItemResolver extends DisposeProvider {
       this.createHttpFileTestItem(httpFileParsed, testItem);
     }
   }
-  private getParentTestItemRecursively(entry: vscode.Uri) {
+  private getParentTestItemNested(entry: vscode.Uri) {
     const folder = vscode.Uri.joinPath(entry, '..');
 
     if (folder.path === '/' || folder.path === vscode.workspace.getWorkspaceFolder(folder)?.uri.path) {
@@ -172,14 +172,14 @@ export class TestItemResolver extends DisposeProvider {
       return workspaceTestItem;
     }
 
-    const parent = this.getParentTestItemRecursively(folder);
+    const parent = this.getParentTestItemNested(folder);
     const label = folder.path.slice(folder.path.lastIndexOf('/') + 1);
     const testItem = this.createTestItem(TestItemKind.folder, label, folder);
     parent.children.add(testItem);
     return testItem;
   }
 
-  private getParentTestItem(file: vscode.Uri) {
+  private getParentTestItemFlat(file: vscode.Uri) {
     const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
     const workspaceTestItem = this.createTestItem(
       TestItemKind.workspace,
