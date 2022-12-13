@@ -145,7 +145,8 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
-    const parent = this.getParentTestItem(file);
+    const parent = this.getParentTestItemRecursively(file);
+    // const parent = this.getParentTestItem(file);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
     parent.children.add(testItem);
@@ -154,6 +155,26 @@ export class TestItemResolver extends DisposeProvider {
     if (httpFileParsed) {
       this.createHttpFileTestItem(httpFileParsed, testItem);
     }
+  }
+  private getParentTestItemRecursively(entry: vscode.Uri) {
+    const folder = vscode.Uri.joinPath(entry, '..');
+
+    if (folder.path === '/' || folder.path === vscode.workspace.getWorkspaceFolder(folder)?.uri.path) {
+      const workspaceRoot = vscode.workspace.getWorkspaceFolder(folder) || { name: 'httpyac Tests', uri: folder };
+      const workspaceTestItem = this.createTestItem(
+        TestItemKind.workspace,
+        `${workspaceRoot.name} (httpYac)`,
+        workspaceRoot.uri
+      );
+      this.testController.items.add(workspaceTestItem);
+      return workspaceTestItem;
+    }
+
+    const parent = this.getParentTestItemRecursively(folder);
+    const label = folder.path.slice(folder.path.lastIndexOf('/') + 1);
+    const testItem = this.createTestItem(TestItemKind.folder, label, folder);
+    parent.children.add(testItem);
+    return testItem;
   }
 
   private getParentTestItem(file: vscode.Uri) {
@@ -168,11 +189,8 @@ export class TestItemResolver extends DisposeProvider {
     const folderUri = vscode.Uri.joinPath(file, '..');
     const folder = folderUri.toString(true).replace(workspaceRoot.uri.toString(true), '');
     if (folder) {
-      const parent = this.getParentTestItem(folderUri);
-      const prefixRe = new RegExp(`^/${parent.label}`, 'u');
-      const label = folder.replace(prefixRe, '').replace(/^\//u, '');
-      const folderTestItem = this.createTestItem(TestItemKind.folder, label, folderUri);
-      parent.children.add(folderTestItem);
+      const folderTestItem = this.createTestItem(TestItemKind.folder, folder, folderUri);
+      workspaceTestItem.children.add(folderTestItem);
       return folderTestItem;
     }
     return workspaceTestItem;
