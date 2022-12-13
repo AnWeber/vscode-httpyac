@@ -965,7 +965,7 @@
           "type": "boolean",
           "default": true,
           "scope": "window",
-          "description": "use nested heiarchy for tests (mirros filesystem structure)"
+          "description": "use nested hierarchy for tests (mirrors filesystem structure)"
         }
       }
     },
