@@ -110,8 +110,6 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   public async refreshTestItems() {
-    this.testController.items.replace([]);
-    this.items.length = 0;
     await this.resolveTestItems();
   }
 
@@ -120,7 +118,10 @@ export class TestItemResolver extends DisposeProvider {
       if (testItem) {
         await this.resolveTestItemChildren(testItem);
       } else {
-        for (const file of await this.loadAllHttpFilesInWorkspace()) {
+        const files = await this.loadAllHttpFilesInWorkspace();
+        this.testController.items.replace([]);
+        this.items.length = 0;
+        for (const file of files) {
           this.createFileTestItem(file);
         }
         this.checkForFlattendFileSystem();
