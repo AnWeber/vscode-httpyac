@@ -6,6 +6,8 @@ import { getEnvironmentConfig } from '../config';
 import { ObjectItem, ObjectTreeItem } from './objectTreeItem';
 import { NoEnvironment } from './storeController';
 
+export const ProcessEnvironment = 'process.env';
+
 export class EnvironmentTreeDataProvider
   extends DisposeProvider
   implements vscode.TreeDataProvider<string | ObjectItem>
@@ -26,6 +28,9 @@ export class EnvironmentTreeDataProvider
 
   getTreeItem(element: string | ObjectItem): vscode.TreeItem {
     if (typeof element === 'string') {
+      if (element === ProcessEnvironment) {
+        return new ObjectTreeItem({ key: ProcessEnvironment, value: process.env });
+      }
       return new EnvironmentTreeItem(element);
     }
     return new ObjectTreeItem(element);
@@ -40,35 +45,45 @@ export class EnvironmentTreeDataProvider
           config: await getEnvironmentConfig(httpFile.fileName),
         });
         environments.push(NoEnvironment);
+        environments.push(ProcessEnvironment);
         return environments;
       }
     } else {
-      let val: unknown;
-      if (typeof element === 'string') {
-        const httpFile = await this.documentStore.getCurrentHttpFile();
-        if (httpFile) {
-          val = await httpyac.getVariables({
-            httpFile: {
-              ...httpFile,
-              activeEnvironment: element === NoEnvironment ? [] : [element],
-            },
-            config: await getEnvironmentConfig(httpFile.fileName),
-          });
+      const val = await this.getChildrenOfItem(element);
+      if (val) {
+        if (typeof val === 'object') {
+          return Object.entries(val).map(([key, value]) => ({ key, value }));
         }
-      } else {
-        val = element.value;
-      }
-      if (val && typeof val === 'object') {
-        return Object.entries(val).map(([key, value]) => ({ key, value }));
-      }
-      if (Array.isArray(val)) {
-        return val.map((value, index) => ({
-          key: `${index}`,
-          value,
-        }));
+        if (Array.isArray(val)) {
+          return val.map((value, index) => ({
+            key: `${index}`,
+            value,
+          }));
+        }
       }
     }
     return undefined;
+  }
+
+  private async getChildrenOfItem(element: string | ObjectItem) {
+    let val: unknown;
+    if (element === ProcessEnvironment) {
+      val = process.env;
+    } else if (typeof element === 'string') {
+      const httpFile = await this.documentStore.getCurrentHttpFile();
+      if (httpFile) {
+        val = await httpyac.getVariables({
+          httpFile: {
+            ...httpFile,
+            activeEnvironment: element === NoEnvironment ? [] : [element],
+          },
+          config: await getEnvironmentConfig(httpFile.fileName),
+        });
+      }
+    } else {
+      val = element.value;
+    }
+    return val;
   }
 }
 

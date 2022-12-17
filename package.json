@@ -1262,17 +1262,17 @@
       "view/item/context": [
         {
           "command": "httpyac.removeHistory",
-          "when": "view == httpyacHistory && viewItem == responseItem",
+          "when": "view == httpyacHistory && viewItem == 'responseItem'",
           "group": "inline"
         },
         {
           "command": "httpyac.removeSession",
-          "when": "view == httpyacSession && viewItem == session",
+          "when": "view == httpyacSession && viewItem == 'session'",
           "group": "inline"
         },
         {
           "command": "httpyac.select-env",
-          "when": "view == httpyacEnvironments && viewItem == env",
+          "when": "view == httpyacEnvironments && viewItem == 'env'",
           "group": "inline"
         }
       ]
