@@ -56,12 +56,13 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
 
   async getChildren(element?: ObjectItem): Promise<ObjectItem[] | undefined> {
     const val = element?.value || {
-      httpFile: await this.documentStore.getCurrentHttpFile(),
+      activeTextEditor: vscode.window.activeTextEditor,
       documentStore: this.documentStore,
+      httpFile: await this.documentStore.getCurrentHttpFile(),
       httpFileStore: this.documentStore.httpFileStore,
+      processEnv: process.env,
       responseStore: this.responseStore,
       userSessionStore: store.userSessionStore,
-      activeTextEditor: vscode.window.activeTextEditor,
     };
     if (val) {
       if (typeof val === 'object') {
