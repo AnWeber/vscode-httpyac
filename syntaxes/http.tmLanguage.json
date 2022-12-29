@@ -793,10 +793,10 @@
               "name": "support.constant.http"
             },
             "5": {
-              "name": "string.quoted.http variable.parameter.http"
+              "name": "variable.parameter.http string.http"
             },
             "6": {
-              "name": "variable.parameter.http"
+              "name": "variable.parameter.http string.http"
             },
             "8": {
               "name": "variable.parameter.http"
@@ -841,7 +841,7 @@
               "name": "support.constant.http"
             },
             "3": {
-              "name": "variable.parameter.http"
+              "name": "variable.parameter.http string.http"
             },
             "4": {
               "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
@@ -859,9 +859,33 @@
               "name": "support.constant.http"
             },
             "3": {
-              "name": "variable.parameter.http"
+              "name": "variable.parameter.http string.http"
             },
             "4": {
+              "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
+            }
+          }
+        },
+        {
+          "match": "({{)(\\$xpath)(:)?([^\\s]*)\\s*(.*)?(}})",
+          "name": "http.handlebars.dotenv meta.block.handlebars.http",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
+            },
+            "2": {
+              "name": "support.constant.http"
+            },
+            "3": {
+              "name": "keyword.other.http"
+            },
+            "4": {
+              "name": "entity.name.http"
+            },
+            "5": {
+              "name": "variable.parameter.http string.http"
+            },
+            "6": {
               "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
             }
           }
