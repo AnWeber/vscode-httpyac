@@ -1,3 +1,14 @@
+## 5.9.0 (2023-01-03)
+
+#### Features
+
+- provide Global Variable Cache (#358)
+- add XPath Variable Replacer (httpyac/httpyac.github.io#62)
+
+#### Fixes
+
+- replace header variables before body (httpyac/httpyac.github.io#63)
+
 ## 5.8.3 (2022-12-15)
 
 #### Features
