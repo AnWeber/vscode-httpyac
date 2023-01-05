@@ -762,7 +762,7 @@
           }
         },
         {
-          "match": "({{)(\\$(random.integer|random.float|random.alphabetic|random.hexadecimal))\\s*(\\()\\s*(.*)\\s*(,?)\\s*(.*)\\s*(\\))(}})",
+          "match": "({{)(\\$(random.integer|random.float|random.alphanumeric|random.alphabetic|random.hexadecimal))\\s*(\\()\\s*(.*)\\s*(,?)\\s*(.*)\\s*(\\))(}})",
           "name": "http.handlebars.uuid meta.block.handlebars.http",
           "captures": {
             "1": {
