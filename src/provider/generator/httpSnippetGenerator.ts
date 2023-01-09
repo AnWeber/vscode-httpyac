@@ -112,7 +112,12 @@ function getHarRequest(options: httpyac.Request): Request {
       }, initQueryString);
   }
 
-  if (httpyac.utils.isString(options.body)) {
+  if (
+    options.body &&
+    !httpyac.utils.isMimeTypePdf(options.contentType) &&
+    !httpyac.utils.isMimeTypePdf(options.contentType)
+  ) {
+    const body = httpyac.utils.toString(options.body) || '';
     let mimeType = 'application/json';
     const header = httpyac.utils.getHeader(options.headers || {}, 'content-type');
     if (httpyac.utils.isString(header)) {
@@ -121,7 +126,7 @@ function getHarRequest(options: httpyac.Request): Request {
     if (mimeType === 'application/x-www-form-urlencoded') {
       const initParams: Param[] = [];
       harRequest.postData = {
-        params: options.body.split('&').reduce((prev, current) => {
+        params: body.split('&').reduce((prev, current) => {
           const [name, value] = current.split('=');
           prev.push({ name, value });
           return prev;
@@ -130,7 +135,7 @@ function getHarRequest(options: httpyac.Request): Request {
       };
     } else {
       harRequest.postData = {
-        text: options.body,
+        text: body,
         mimeType,
       };
     }

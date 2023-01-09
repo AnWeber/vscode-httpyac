@@ -1,3 +1,9 @@
+## 5.10.1 (2023-01-09)
+
+#### Fix
+
+- generate code uses Buffer as valid body for harRequest (#166)
+
 ## 5.10.0 (2023-01-08)
 
 #### Features
