@@ -1,3 +1,9 @@
+## 5.10.3 (2023-01-21)
+
+#### Fix
+
+- xmldom warnings and errors are redirected to log.debug (#383)
+
 ## 5.10.2(2023-01-09)
 
 #### Fix
