@@ -535,7 +535,7 @@
         {
           "begin": "\\s*(?=(\\[|{[^{]))",
           "name": "http.request.body http.request.body.json",
-          "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
+          "end": "(?i)^\\s*(?=(\\#{3,}|===|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
           "contentName": "meta.embedded.block.json",
           "patterns": [
             {
@@ -546,7 +546,7 @@
         {
           "begin": "^\\s*(?=<\\S)",
           "name": "http.request.body http.request.body.xml",
-          "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
+          "end": "(?i)^\\s*(?=(\\#{3,}|===|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
           "contentName": "meta.embedded.block.html",
           "patterns": [
             {
@@ -557,7 +557,7 @@
         {
           "begin": "(?i)^\\s*(?=(query|mutation|fragment))",
           "name": "http.request.body http.request.body.graphql",
-          "end": "(?i)^\\s*(?=(\\#{3,}|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
+          "end": "(?i)^\\s*(?=(\\#{3,}|===|\\{{2}|\\s*(AMQP|SSE|EVENTSOURCE|WSS|WS|WEBSOCKET|GRPC|GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|PROPFIND|PROPPATCH|MKCOL|COPY|MOVE|LOCK|UNLOCK|CHECKOUT|CHECKIN|REPORT|MERGE|MKACTIVITY|MKWORKSPACE|VERSION-CONTROL|BASELINE-CONTROL|MKCALENDAR|ACL|SEARCH|GRAPHQL)\\s+.*))",
           "contentName": "meta.embedded.block.graphql",
           "patterns": [
             {
@@ -575,6 +575,18 @@
               "include": "source.graphql"
             }
           ]
+        },
+        {
+          "match": "^\\s*(===)\\s*(wait-for-server)?.*$",
+          "name": "http.request.body http.request.body.separator",
+          "captures": {
+            "1": {
+              "name": "keyword.control.http"
+            },
+            "2": {
+              "name": "entity.name.type.http"
+            }
+          }
         },
         {
           "captures": {
