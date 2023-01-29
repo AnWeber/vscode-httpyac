@@ -5,15 +5,15 @@ import { isAbsolute } from 'path';
 
 export function initFileProvider(): void {
   io.fileProvider.EOL = EOL;
-  io.fileProvider.isAbsolute = async (fileName: PathLike) => {
-    if (typeof fileName === 'string') {
-      return isAbsolute(fileName);
+  io.fileProvider.isAbsolute = async (path: PathLike) => {
+    if (typeof path === 'string') {
+      return isAbsolute(path);
     }
-    const uri = toUri(fileName);
+    const uri = toUri(path);
     return !!uri && (await io.fileProvider.exists(uri));
   };
-  io.fileProvider.dirname = (fileName: string) => {
-    const uri = toUri(fileName);
+  io.fileProvider.dirname = (path: string) => {
+    const uri = toUri(path);
     if (uri) {
       try {
         if (uri.scheme === 'untitled') {
@@ -29,12 +29,12 @@ export function initFileProvider(): void {
           return undefined;
         }
       } catch (err) {
-        io.log.error(`Error dirname ${io.fileProvider.toString(fileName)}`);
+        io.log.error(`Error dirname ${io.fileProvider.toString(path)}`);
         throw err;
       }
       return io.fileProvider.joinPath(uri, '..');
     }
-    throw new Error(`No valid uri: ${fileName}`);
+    throw new Error(`No valid uri: ${path}`);
   };
   io.fileProvider.hasExtension = (fileName: PathLike, ...extensions: Array<string>) => {
     const uri = toUri(fileName);
@@ -52,23 +52,23 @@ export function initFileProvider(): void {
     return false;
   };
 
-  io.fileProvider.joinPath = (fileName: PathLike, path: string): PathLike => {
+  io.fileProvider.joinPath = (path: PathLike, joinPath: string): PathLike => {
     try {
-      const uri = toUri(fileName);
+      const uri = toUri(path);
       if (uri) {
-        return Uri.joinPath(uri, path);
+        return Uri.joinPath(uri, joinPath);
       }
     } catch (err) {
-      io.log.error(`Error joinPath ${io.fileProvider.toString(fileName)}`);
+      io.log.error(`Error joinPath ${io.fileProvider.toString(path)}`);
       throw err;
     }
-    io.log.error(`joinPath failed for ${fileName}`, fileName);
-    throw new Error(`No valid uri: ${fileName}`);
+    io.log.error(`joinPath failed for ${path}`, path);
+    throw new Error(`No valid uri: ${path}`);
   };
 
-  io.fileProvider.exists = async (fileName: PathLike): Promise<boolean> => {
+  io.fileProvider.exists = async (path: PathLike): Promise<boolean> => {
     try {
-      const uri = toUri(fileName);
+      const uri = toUri(path);
       if (uri) {
         const stats = await workspace.fs.stat(uri);
         return !!stats;
@@ -141,8 +141,8 @@ export function initFileProvider(): void {
     throw new Error(`No valid uri: ${dirname}`);
   };
 
-  io.fileProvider.fsPath = (fileName: PathLike) => {
-    const uri = toUri(fileName);
+  io.fileProvider.fsPath = (path: PathLike) => {
+    const uri = toUri(path);
     try {
       return uri?.fsPath;
     } catch (err) {
