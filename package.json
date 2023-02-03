@@ -1101,6 +1101,12 @@
         "title": "remove all files in cache dir",
         "category": "httpYac",
         "icon": "$(trash)"
+      },
+      {
+        "command": "httpyac.copyToClipboard",
+        "title": "Copy Value",
+        "category": "httpYac",
+        "icon": "$(clippy)"
       }
     ],
     "menus": {
@@ -1175,6 +1181,10 @@
         },
         {
           "command": "httpyac.removeSession",
+          "when": "false"
+        },
+        {
+          "command": "httpyac.copyToClipboard",
           "when": "false"
         }
       ],
@@ -1273,6 +1283,16 @@
         {
           "command": "httpyac.select-env",
           "when": "view == httpyacEnvironments && viewItem == 'env'",
+          "group": "inline"
+        },
+        {
+          "command": "httpyac.copyToClipboard",
+          "when": "view == httpyacVariables",
+          "group": "inline"
+        },
+        {
+          "command": "httpyac.copyToClipboard",
+          "when": "view == httpyacEnvironments",
           "group": "inline"
         }
       ]

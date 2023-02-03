@@ -11,6 +11,7 @@
 #### Features
 
 - support Intellij Request Body separator
+- add icon indicator for copy value (#169)
 
 ## 5.10.3 (2023-01-21)
 
