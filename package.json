@@ -496,6 +496,14 @@
             ]
           }
         },
+        "httpyac.proxyExcludeList": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "description": "list of url which ignore proxy setting"
+        },
         "httpyac.environmentSelectedOnStart": {
           "type": "array",
           "items": {

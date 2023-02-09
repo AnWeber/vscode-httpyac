@@ -31,6 +31,7 @@ export interface ResourceConfig {
   requestBodyInjectVariablesExtensions?: string[];
   requestDefaultHeaders?: Record<string, string>;
   requestGotOptions?: Record<string, unknown>;
+  proxyExcludeList?: Array<string>;
   cookieJarEnabled?:
     | boolean
     | {
@@ -148,6 +149,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
     request: config.requestGotOptions,
     requestBodyInjectVariablesExtensions: config.requestBodyInjectVariablesExtensions,
     proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
+    proxyExcludeList: config.proxyExcludeList,
     defaultHeaders: config.requestDefaultHeaders,
     envDirName: config.envDirName || undefined,
     useRegionScopedVariables: config.useRegionScopedVariables,
