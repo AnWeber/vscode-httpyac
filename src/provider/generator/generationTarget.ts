@@ -5,5 +5,5 @@ export interface GenerationTarget {
   target: string;
   client: string;
   description: string;
-  generate: (context: httpyac.HttpRegionSendContext) => Promise<string | undefined>;
+  generate: (context: httpyac.HttpRegionSendContext, refName?: string) => Promise<string | undefined>;
 }

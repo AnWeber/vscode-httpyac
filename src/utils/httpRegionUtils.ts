@@ -29,7 +29,7 @@ export async function getHttpRegionFromLine(
   return undefined;
 }
 
-function getLine(line: LineArgument, editor: vscode.TextEditor): number {
+export function getLine(line: LineArgument, editor: vscode.TextEditor): number {
   if (Number.isInteger(line)) {
     return line as number;
   }

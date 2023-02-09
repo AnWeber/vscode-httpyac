@@ -13,8 +13,8 @@ export function getHttpSnippetTargets() {
       target: current.key,
       client: client.key,
       description: client.description,
-      generate: async (context: httpyac.HttpRegionSendContext) =>
-        await generateHttpSnippetCodeRequest(context, current.key, client.key),
+      generate: async (context: httpyac.HttpRegionSendContext, refName?: string) =>
+        await generateHttpSnippetCodeRequest(context, current.key, client.key, refName),
     }));
     prev.push(...clients);
     return prev;
@@ -24,7 +24,8 @@ export function getHttpSnippetTargets() {
 async function generateHttpSnippetCodeRequest(
   context: httpyac.HttpRegionSendContext,
   targetKey: string,
-  clientKey: string
+  clientKey: string,
+  refName?: string | undefined
 ) {
   let result: string | undefined;
   const config = getConfigSetting();
@@ -48,20 +49,38 @@ async function generateHttpSnippetCodeRequest(
         report: data => progress.report(data),
       };
 
-      const interceptor = {
-        id: 'httpSnippet',
-        async afterLoop(ctx: { args: [httpyac.Request<string>, httpyac.ProcessorContext] }) {
-          const harRequest: Request = getHarRequest(ctx.args[0]);
-          const snippet = new HttpSnippet(harRequest);
-          result = snippet.convert(targetKey, clientKey);
-          return false;
-        },
-      };
-      context.httpRegion.hooks.onRequest.addInterceptor(interceptor);
+      const id = 'httpSnippet';
+      if (context.httpRegion.request) {
+        const interceptor = {
+          id,
+          async afterLoop(ctx: { args: [httpyac.Request<string>, httpyac.ProcessorContext] }) {
+            const harRequest: Request = getHarRequest(ctx.args[0]);
+            const snippet = new HttpSnippet(harRequest);
+            result = snippet.convert(targetKey, clientKey);
+            return false;
+          },
+        };
+        context.httpRegion.hooks.onRequest.addInterceptor(interceptor);
+      } else if (refName) {
+        const interceptor = {
+          id,
+          async afterLoop(ctx: { args: [httpyac.ProcessorContext] }) {
+            const [context] = ctx.args;
+            const response = context.variables[`${refName}Response`];
+            if (response && httpyac.utils.isHttpResponse(response) && response.request) {
+              const harRequest: Request = getHarRequest(response.request);
+              const snippet = new HttpSnippet(harRequest);
+              result = snippet.convert(targetKey, clientKey);
+            }
+            return false;
+          },
+        };
+        context.httpRegion.hooks.execute.addInterceptor(interceptor);
+      }
       try {
         await httpyac.send(context);
       } finally {
-        context.httpRegion.hooks.onRequest.removeInterceptor(interceptor.id);
+        context.httpRegion.hooks.onRequest.removeInterceptor(id);
       }
     }
   );

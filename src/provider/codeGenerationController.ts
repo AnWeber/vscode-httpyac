@@ -2,7 +2,14 @@ import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { commands, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
-import { DocumentArgument, getHttpRegionFromLine, LineArgument, DisposeProvider } from '../utils';
+import {
+  DocumentArgument,
+  getHttpRegionFromLine,
+  LineArgument,
+  DisposeProvider,
+  getTextEditor,
+  getLine,
+} from '../utils';
 import { getHttpyacTargets, getHttpSnippetTargets, GenerationTarget } from './generator';
 import { DocumentStore } from '../documentStore';
 
@@ -20,6 +27,7 @@ export class CodeGenerationController extends DisposeProvider {
     const context = await getHttpRegionFromLine(document, line, this.documentStore);
     if (context) {
       const config = getConfigSetting();
+      const refName = this.getRefNameAtLine(document, line);
       if (config.generateCodeDefaultLanguage) {
         const target = this.getGenerationTargets().find(
           obj =>
@@ -27,27 +35,31 @@ export class CodeGenerationController extends DisposeProvider {
             obj.target === config.generateCodeDefaultLanguage?.target
         );
         if (target) {
-          await this.generateCodeRequest(context, target);
+          await this.generateCodeRequest(context, target, refName);
         }
       } else {
-        this.generateCodeSelectLanguage(document, line);
+        this.generateCodeSelectLanguage(document, line, refName);
       }
     }
   }
   @errorHandler()
-  private async generateCodeSelectLanguage(document?: DocumentArgument, line?: LineArgument) {
+  private async generateCodeSelectLanguage(document?: DocumentArgument, line?: LineArgument, refName?: string) {
     const context = await getHttpRegionFromLine(document, line, this.documentStore);
     if (context) {
       const codeTarget = await vscode.window.showQuickPick(this.getGenerationTargets(), { ignoreFocusOut: true });
       if (codeTarget) {
-        await this.generateCodeRequest(context, codeTarget);
+        await this.generateCodeRequest(context, codeTarget, refName);
       }
     }
   }
 
-  private async generateCodeRequest(context: httpyac.HttpRegionSendContext, target: GenerationTarget) {
+  private async generateCodeRequest(
+    context: httpyac.HttpRegionSendContext,
+    target: GenerationTarget,
+    refName?: string
+  ) {
     const config = getConfigSetting();
-    const content = await target.generate(context);
+    const content = await target.generate(context, refName);
     if (content) {
       if (config.generateCodeTargetOutput === 'clipboard') {
         await vscode.env.clipboard.writeText(content);
@@ -61,5 +73,20 @@ export class CodeGenerationController extends DisposeProvider {
   }
   private getGenerationTargets() {
     return [...getHttpSnippetTargets(), ...getHttpyacTargets()];
+  }
+
+  private getRefNameAtLine(document: DocumentArgument, line?: LineArgument) {
+    const editor = getTextEditor(document) || vscode.window.activeTextEditor;
+    const lineNumber = editor && getLine(line || editor.selection?.start?.line, editor);
+    if (lineNumber && editor) {
+      const text = editor.document
+        .getText(new vscode.Range(new vscode.Position(lineNumber, 0), new vscode.Position(lineNumber + 1, 0)))
+        .trim();
+      const match = /^\s*(#+|\/{2})\s*@(force)?ref\s*(?<name>.*)\s*$/u.exec(text);
+      if (match?.groups?.name) {
+        return match.groups.name;
+      }
+    }
+    return undefined;
   }
 }
