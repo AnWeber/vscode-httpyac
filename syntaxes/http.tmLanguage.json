@@ -11,6 +11,9 @@
       "include": "#intellij-block"
     },
     {
+      "include": "#assert"
+    },
+    {
       "include": "#request-body"
     },
     {
@@ -39,7 +42,7 @@
           "match": "^\\s*#+\\s*(@[^\\s]*)\\s+(for)\\s+(.*)\\s+(of)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "support.constant.http"
@@ -60,7 +63,7 @@
           "match": "^\\s*#+\\s*(@[^\\s]*)\\s*(for)\\s+.*\\s*?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "support.constant.http"
@@ -75,7 +78,7 @@
           "match": "^\\s*#+\\s*(@[^\\s]*)\\s*(while)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "support.constant.http"
@@ -95,7 +98,7 @@
           "match": "^\\s*#+\\s*(@sleep)\\s+(.*)\\s*?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "meta.embedded.block.javascript",
@@ -112,7 +115,7 @@
           "match": "^\\s*#+\\s+(@[^\\s]*)\\s+\\s*(slot(:)?\\s*(?<slot>[^\\s]+))?\\s*(minIdleTime(:)?\\s*(?<minIdleTime>\\d*))?\\s*(max(:)?\\s*(?<max>\\d*))?\\s*(expire(:)?\\s*(?<expire>\\d*))?\\s*?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "support.constant.http"
@@ -157,7 +160,7 @@
           "match": "^\\s*#+\\s+(@[^\\s]*)\\s+(.*)?$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "entity.name.http"
@@ -444,7 +447,7 @@
           "match": "^\\s*(@)([^(\\s=:)]*)\\s*(:?=)\\s*(.*)$",
           "captures": {
             "1": {
-              "name": "keyword.name.http"
+              "name": "keyword.other.http"
             },
             "2": {
               "name": "entity.name.http"
@@ -503,7 +506,7 @@
     "request-line": {
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.http"
+          "name": "keyword.other.http"
         },
         "2": {
           "name": "entity.name.http",
@@ -672,7 +675,7 @@
       "contentName": "meta.embedded.block.javascript",
       "beginCaptures": {
         "0": {
-          "name": "comment.line.http"
+          "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
         },
         "1": {
           "name": "entity.name.type.http"
@@ -683,7 +686,7 @@
       },
       "endCaptures": {
         "0": {
-          "name": "comment.line.http"
+          "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
         }
       },
       "patterns": [
@@ -699,17 +702,47 @@
       "end": "^\\s*%}\\s*",
       "beginCaptures": {
         "0": {
-          "name": "comment.line.http"
+          "name": "punctuation.definition.string.begin.http keyword.handlebars.begin.http"
         }
       },
       "endCaptures": {
         "0": {
-          "name": "comment.line.http"
+          "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
         }
       },
       "patterns": [
         {
           "include": "source.js"
+        }
+      ]
+    },
+    "assert": {
+      "patterns": [
+        {
+          "name": "assert",
+          "captures": {
+            "1": {
+              "name": "keyword.other.http"
+            },
+            "2": {
+              "name": "entity.name.http"
+            },
+            "4": {
+              "name": "string.other.http"
+            },
+            "6": {
+              "name": "keyword.other.http"
+            },
+            "7": {
+              "name": "string.other.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
+            }
+          },
+          "match": "^\\s*(\\?\\?)\\s*([^\\s]*)(\\s+(.*))?\\s+((endsWith|==|exists|>=|>|includes|isArray|isBoolean|isNumber|isString|<=|<|matches|!=|startsWith))\\s*(.*)\\s*$"
         }
       ]
     },
