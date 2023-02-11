@@ -742,7 +742,7 @@
               ]
             }
           },
-          "match": "^\\s*(\\?\\?)\\s*([^\\s]*)(\\s+(.*))?\\s+((endsWith|==|exists|>=|>|includes|isArray|isBoolean|isNumber|isString|<=|<|matches|!=|startsWith))\\s*(.*)\\s*$"
+          "match": "^\\s*(\\?\\?)\\s*([^\\s]*)(\\s+(.*))?\\s+((endsWith|==|===|equals|exists|isTrue|isFalse|>=|>|includes|isArray|isBoolean|isNumber|isString|<=|<|matches|!=|startsWith|md5|sha256|sha512))\\s*(.*)\\s*$"
         }
       ]
     },
