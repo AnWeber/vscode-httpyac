@@ -26,17 +26,18 @@ export class TestRunner {
   ): Promise<void> {
     const testRun = this.testController.createTestRun(request);
 
-    for (const testItem of await this.enqueuedTestItems(testItems, testRun)) {
-      if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(testItem)) {
-        await this.runTestItem(testItem, {
+    const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(item => async () => {
+      if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
+        await this.runTestItem(item, {
           testRun,
           testItems,
           token,
         });
       } else {
-        testRun.skipped(testItem);
+        testRun.skipped(item);
       }
-    }
+    });
+    await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
     testRun.end();
   }
 

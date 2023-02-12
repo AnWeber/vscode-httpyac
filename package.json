@@ -984,6 +984,12 @@
           "default": "filesystem",
           "scope": "window",
           "description": "hierarchy used for tests"
+        },
+        "httpyac.testMaxConcurrency": {
+          "type": "number",
+          "default": 1,
+          "scope": "window",
+          "description": "prevents test runner from executing more than the specified amount of tests at the same time."
         }
       }
     },
