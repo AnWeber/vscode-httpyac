@@ -15,9 +15,12 @@
 
 ## Example
 
-```html
-@user = doe @password = 12345678 GET https://httpbin.org/basic-auth/{{user}}/{{password}} Authorization: Basic {{user}}
-{{password}}
+```http
+@user = doe
+@password = 12345678
+
+GET https://httpbin.org/basic-auth/{{user}}/{{password}}
+Authorization: Basic {{user}}{{password}}
 ```
 
 more [examples](https://httpyac.github.io/guide/examples) and [guide](https://httpyac.github.io/guide/)
