@@ -19,22 +19,21 @@ export class TestRunner {
     private readonly responseStore: ResponseStore
   ) {}
 
-  public async run(
-    request: vscode.TestRunRequest,
-    testItems: Array<vscode.TestItem>,
-    token: vscode.CancellationToken
-  ): Promise<void> {
+  public async run(request: vscode.TestRunRequest, token: vscode.CancellationToken): Promise<void> {
     const testRun = this.testController.createTestRun(request);
+    const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
 
-    const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(item => async () => {
-      if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
-        await this.runTestItem(item, {
-          testRun,
-          testItems,
-          token,
-        });
-      } else {
-        testRun.skipped(item);
+    const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
+      for (const item of items) {
+        if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
+          await this.runTestItem(item, {
+            testRun,
+            testItems,
+            token,
+          });
+        } else {
+          testRun.skipped(item);
+        }
       }
     });
     await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
@@ -44,12 +43,18 @@ export class TestRunner {
   private async enqueuedTestItems(
     testItems: Array<vscode.TestItem>,
     testRun: vscode.TestRun
-  ): Promise<Array<vscode.TestItem>> {
-    const result: Array<vscode.TestItem> = [];
+  ): Promise<Array<Array<vscode.TestItem>>> {
+    const result: Array<Array<vscode.TestItem>> = [];
     for (const testItem of testItems) {
       if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
         testRun.enqueued(testItem);
-        result.push(testItem);
+        result.push([testItem]);
+      } else if (this.testItemResolver.isHttpFileItem(testItem)) {
+        const childTestItems = await this.testItemResolver.resolveTestItemChildren(testItem);
+        for (const childTestItem of childTestItems) {
+          testRun.enqueued(childTestItem);
+        }
+        result.push(childTestItems);
       } else {
         result.push(
           ...(await this.enqueuedTestItems(await this.testItemResolver.resolveTestItemChildren(testItem), testRun))

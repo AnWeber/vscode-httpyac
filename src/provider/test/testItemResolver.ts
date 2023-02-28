@@ -327,6 +327,10 @@ export class TestItemResolver extends DisposeProvider {
     return testItem.id.startsWith(`${TestItemKind.httpRegion}|`);
   }
 
+  public isHttpFileItem(testItem: vscode.TestItem): boolean {
+    return testItem.id.startsWith(`${TestItemKind.file}|`);
+  }
+
   private isFolderTestItem(testItem: vscode.TestItem): boolean {
     return testItem.id.startsWith(`${TestItemKind.folder}|`);
   }

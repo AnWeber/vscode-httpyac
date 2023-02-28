@@ -44,8 +44,8 @@ export class TestController extends utils.DisposeProvider {
             this.documentStore,
             this.responseStore
           );
-          const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
-          await testRunner.run(request, testItems, token);
+
+          await testRunner.run(request, token);
         }
       }
     );
