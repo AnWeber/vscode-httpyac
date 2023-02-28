@@ -71,33 +71,29 @@ export class TestRunner {
       !sendContext.httpRegion.metaData.testDisabled
     ) {
       const tmpLogResponse = sendContext.logResponse;
-      let hasTestResponse = false;
       sendContext.logResponse = async (response, httpRegion) => {
         await tmpLogResponse?.(response, httpRegion);
-        hasTestResponse = true;
       };
       try {
         await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
 
-        if ((!testResults && hasTestResponse) || (testResults && testResults.every(obj => !obj.error))) {
+        if (!testResults || testResults.every(obj => !obj.error)) {
           testRunContext.testRun.passed(testItem, duration());
         } else if (sendContext.httpRegion.metaData.disabled) {
           testRunContext.testRun.skipped(testItem);
         } else {
           testRunContext.testRun.failed(
             testItem,
-            testResults
-              ? testResults.reduce((prev, obj) => {
-                  if (!obj.result) {
-                    prev.push(new vscode.TestMessage(obj.message));
-                    if (obj.error) {
-                      prev.push(new vscode.TestMessage(obj.error.displayMessage));
-                    }
-                  }
-                  return prev;
-                }, [] as Array<vscode.TestMessage>)
-              : new vscode.TestMessage('no response received'),
+            testResults.reduce((prev, obj) => {
+              if (!obj.result) {
+                prev.push(new vscode.TestMessage(obj.message));
+                if (obj.error) {
+                  prev.push(new vscode.TestMessage(obj.error.displayMessage));
+                }
+              }
+              return prev;
+            }, [] as Array<vscode.TestMessage>),
             duration()
           );
         }
