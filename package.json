@@ -1468,7 +1468,7 @@
   "dependencies": {
     "filesize": "^10.0.6",
     "httpsnippet": "^2.0.0",
-    "httpyac": "^6.2.0",
+    "httpyac": "^6.2.1",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "uuid": "^9.0.0"
