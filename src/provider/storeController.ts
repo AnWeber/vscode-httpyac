@@ -57,7 +57,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       return result;
     }
     const httpFile = await this.documentStore.getHttpFile(document);
-    if (httpFile?.httpRegions.some(obj => !httpyac.utils.isGlobalHttpRegion(obj))) {
+    if (httpFile?.httpRegions.some(obj => !obj.isGlobal())) {
       const args = [document.uri];
 
       if (config.codelens?.pickEnvironment) {

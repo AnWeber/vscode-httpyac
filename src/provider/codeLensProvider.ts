@@ -23,7 +23,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
     if (!config?.useCodeLensInNotebook && utils.isNotebook(document)) {
       return result;
     }
-    if (httpFile?.httpRegions.some(obj => !httpyac.utils.isGlobalHttpRegion(obj))) {
+    if (httpFile?.httpRegions.some(obj => !obj.isGlobal())) {
       if (config?.codelens?.sendAll) {
         result.push(
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
@@ -67,7 +67,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
         const range = new vscode.Range(requestLine, 0, httpRegion.symbol.endLine, 0);
         const args = [document.uri, requestLine];
 
-        if (!httpyac.utils.isGlobalHttpRegion(httpRegion)) {
+        if (!httpRegion.isGlobal()) {
           if (config?.codelens?.send) {
             let title = 'send';
             if (!httpRegion.request) {

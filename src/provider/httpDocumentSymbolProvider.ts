@@ -9,7 +9,7 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
     const httpFile = await this.documentStore.getHttpFile(document);
 
     const symbols: Array<vscode.DocumentSymbol> = [];
-    if (httpFile && httpFile.httpRegions.some(obj => !utils.isGlobalHttpRegion(obj))) {
+    if (httpFile && httpFile.httpRegions.some(obj => !obj.isGlobal())) {
       for (const httpRegion of httpFile.httpRegions) {
         symbols.push(this.toDocumentSymbol(httpRegion.symbol));
       }

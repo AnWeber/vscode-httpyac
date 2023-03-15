@@ -229,7 +229,7 @@ export class TestItemResolver extends DisposeProvider {
     const fileUri = toUri(httpFile.fileName);
     if (fileUri) {
       for (const httpRegion of httpFile.httpRegions) {
-        if (!httpyac.utils.isGlobalHttpRegion(httpRegion)) {
+        if (!httpRegion.isGlobal()) {
           const testItem = this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri);
           const requestLine =
             httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine ||
