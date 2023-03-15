@@ -1,5 +1,5 @@
 import { DocumentStore } from '../documentStore';
-import { HttpSymbol, HttpSymbolKind, utils } from 'httpyac';
+import { HttpSymbol, HttpSymbolKind } from 'httpyac';
 import * as vscode from 'vscode';
 
 export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
