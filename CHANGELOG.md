@@ -1,3 +1,10 @@
+## 6.3.2 (2023-03-17)
+
+### Fixes
+
+- `# @import` imports variables of \*.http files (#184)
+- setSource uses correct startOffset (AnWeber/httpbook#82)
+
 ## 6.3.1 (2023-03-16)
 
 ### Fixes
