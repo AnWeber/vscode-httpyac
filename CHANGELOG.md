@@ -2,8 +2,8 @@
 
 ### Fixes
 
-- allow async/await syntax in code snippets (#398)
-- unable to use variable as graphql input (#421)
+- allow async/await syntax in code snippets (AnWeber/httpyac#398)
+- unable to use variable as graphql input (AnWeber/httpyac#421)
 
 ## 6.3.2 (2023-03-17)
 
