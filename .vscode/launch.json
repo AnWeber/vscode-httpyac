@@ -2,7 +2,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "launch",
+			"name": "debug",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
@@ -11,8 +11,9 @@
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
 			]
-		},{
-			"name": "launch with httpyac",
+		},
+		{
+			"name": "debug-deep",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [

@@ -1423,20 +1423,21 @@
     }
   },
   "scripts": {
-    "start": "npm run watch",
-    "format": "prettier --write --parser typescript \"src/**/*.ts?(x)\"",
-    "vscode:prepublish": "npm run compile",
-    "esbuild": "esbuild ./src/extension.ts --bundle --outdir=dist/ --sourcemap --platform=node --external:vscode --format=cjs",
-    "compile": "npm run esbuild -- --minify",
     "compile-web": "esbuild ./src/extension.ts --bundle --outfile=dist/browser.js --sourcemap --platform=browser --format=cjs --external:vscode",
+    "compile": "npm run esbuild -- --minify",
+    "esbuild": "esbuild ./src/extension.ts --bundle --outdir=dist/ --sourcemap --platform=node --external:vscode --format=cjs",
+    "eslint": "eslint src --ext ts",
+    "format": "prettier --write --parser typescript \"src/**/*.ts?(x)\"",
+    "lint": "npm run format && npm run eslint && npm run lockfile-lint && tsc --noEmit",
+    "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
+    "package": "npx vsce package",
+    "precommit": "npm run lint",
+    "prepare": "husky install",
+    "start": "npm run watch",
     "tsc-watch": "tsc --watch",
     "tsc": "tsc --b",
-    "watch": "npm run esbuild -- --watch",
-    "lockfile-lint": "lockfile-lint --path package-lock.json --validate-https --allowed-hosts npm --validate-checksum --validate-integrity",
-    "eslint": "eslint src --ext ts",
-    "lint": "npm run format && npm run eslint && npm run lockfile-lint && tsc --noEmit",
-    "prepare": "husky install",
-    "package": "npx vsce package"
+    "vscode:prepublish": "npm run compile",
+    "watch": "npm run esbuild -- --watch"
   },
   "lint-staged": {
     "*.js": [
@@ -1448,14 +1449,14 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "^4.14.192",
     "@types/mime-types": "^2.1.1",
-    "@types/node": "^18.15.5",
+    "@types/node": "^18.15.11",
     "@types/uuid": "^9.0.1",
     "@types/vscode": "1.68.0",
-    "@typescript-eslint/eslint-plugin": "5.56.0",
-    "@typescript-eslint/parser": "5.56.0",
-    "esbuild": "^0.17.12",
+    "@typescript-eslint/eslint-plugin": "5.57.0",
+    "@typescript-eslint/parser": "5.57.0",
+    "esbuild": "^0.17.14",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-node": "^11.1.0",
