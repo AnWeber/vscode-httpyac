@@ -1,3 +1,9 @@
+## 6.3.4 (2023-03-30)
+
+### Fixes
+
+- response is correctly parsed with HttpSymbolKind.Response
+
 ## 6.3.3 (2023-03-23)
 
 ### Fixes
