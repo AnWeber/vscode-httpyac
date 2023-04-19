@@ -1,3 +1,9 @@
+## [unreleased]
+
+### Fixes
+
+- Assertions ends JSON Block (#187)
+
 ## 6.3.4 (2023-03-30)
 
 ### Fixes
