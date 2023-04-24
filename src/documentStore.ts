@@ -11,6 +11,7 @@ import { getOutputChannel, logToOutputChannelFactory, logStream } from './io';
 import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
+import { registerVscodePlugins } from './plugin';
 
 export enum HttpFileChangedEventType {
   CHANGED,
@@ -50,7 +51,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     super();
     this.documentStoreChangedEmitter = new vscode.EventEmitter<void>();
     this.httpFileChangedEmitter = new vscode.EventEmitter<HttpFileChangedEvent>();
-    this.httpFileStore = new httpyac.store.HttpFileStore();
+    this.httpFileStore = new httpyac.store.HttpFileStore({ vscode: registerVscodePlugins });
     this.getDocumentPathLike = document => document.uri;
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
 

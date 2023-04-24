@@ -1,5 +1,9 @@
 ## [unreleased]
 
+### Features
+
+- add setting `testBailOnFailedTest` to stop execution on failed assertions (#186)
+
 ### Fixes
 
 - Assertions ends JSON Block (#187)

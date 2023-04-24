@@ -104,6 +104,7 @@ export interface AppConfig {
   testControllerEnabled?: boolean;
   testItemExtensions?: Array<string>;
   testHiearchy?: 'filesystem' | 'flattened' | 'flat';
+  testBailOnFailedTest?: 'no_bail' | 'error' | 'silent';
   testMaxConcurrency?: number;
 }
 

@@ -985,6 +985,22 @@
           "scope": "window",
           "description": "hierarchy used for tests"
         },
+        "httpyac.testBailOnFailedTest": {
+          "type": "string",
+          "enum": [
+            "no_bail",
+            "error",
+            "silent"
+          ],
+          "markdownEnumDescriptions": [
+            "no bail",
+            "throw error on test result error",
+            "cancel execution on test result error"
+          ],
+          "default": "no_bail",
+          "scope": "window",
+          "description": "bail on failed test results"
+        },
         "httpyac.testMaxConcurrency": {
           "type": "number",
           "default": 1,
