@@ -1,8 +1,14 @@
-## [unreleased]
+## 6.4.0 (2023-04-29)
 
 ### Features
 
 - add setting `testBailOnFailedTest` to stop execution on failed assertions (#186)
+- add support for custom plugins in httpFileStore initialization (AnWeber/vscode-httpyac#186)
+- add modifier `$input-askonce` to ask only once for $input (#436)
+
+### Fixes
+
+- ensure deletion of additional body properties (prettyPrintBody, parsedBody, rawBody), if `body` property is modified (AnWeber/httpbook#84)
 
 ### Fixes
 
