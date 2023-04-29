@@ -966,7 +966,7 @@
           }
         },
         {
-          "match": "({{)(\\$prompt|\\$input|\\$password)\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
+          "match": "({{)(\\$prompt|\\$input|\\$password)(-askonce)?\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
           "name": "http.handlebars.input meta.block.handlebars.http",
           "captures": {
             "1": {
@@ -976,21 +976,24 @@
               "name": "support.constant.http"
             },
             "3": {
-              "name": "variable.parameter.http"
+              "name": "support.constant.http"
             },
             "4": {
-              "name": "keyword.control.http"
-            },
-            "5": {
               "name": "variable.parameter.http"
             },
+            "5": {
+              "name": "keyword.control.http"
+            },
             "6": {
+              "name": "variable.parameter.http"
+            },
+            "7": {
               "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
             }
           }
         },
         {
-          "match": "({{)(\\$pick)\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
+          "match": "({{)(\\$pick)(-askonce)?\\s*([^$]*)(\\$value:)\\s*(.*)(}})",
           "name": "http.handlebars.pick meta.block.handlebars.http",
           "captures": {
             "1": {
@@ -1000,15 +1003,18 @@
               "name": "support.constant.http"
             },
             "3": {
-              "name": "variable.parameter.http"
+              "name": "support.constant.http"
             },
             "4": {
-              "name": "keyword.control.http"
-            },
-            "5": {
               "name": "variable.parameter.http"
             },
+            "5": {
+              "name": "keyword.control.http"
+            },
             "6": {
+              "name": "variable.parameter.http"
+            },
+            "7": {
               "name": "punctuation.definition.string.end.http keyword.handlebars.end.http"
             }
           }
