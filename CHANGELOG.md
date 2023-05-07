@@ -1,16 +1,22 @@
+## [6.4.2] (2023-05-07)
+
+### Fixes
+
+- reuse current NodeJS Context instead of creating custom Context to allow use of crypto in NodeJS@20 (AnWeber/httpyac#437)
+
 ## 6.4.1 (2023-05-01)
 
 ### Fixes
 
-- using askonce modifier is optional (AnWeber/vscode-httpyac#190)
+- using askonce modifier is optional (#190)
 
 ## 6.4.0 (2023-04-29)
 
 ### Features
 
 - add setting `testBailOnFailedTest` to stop execution on failed assertions (#186)
-- add support for custom plugins in httpFileStore initialization (AnWeber/vscode-httpyac#186)
-- add modifier `$input-askonce` to ask only once for $input (#436)
+- add support for custom plugins in httpFileStore initialization (#186)
+- add modifier `$input-askonce` to ask only once for $input (AnWeber/httpyac##436)
 
 ### Fixes
 
