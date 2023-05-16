@@ -1,3 +1,9 @@
+## [6.4.3] (2023-05-16)
+
+### Fixes
+
+- request method detection supports only uppercase character to prevent false positives (Anweber/httpyac#447)
+
 ## [6.4.2] (2023-05-07)
 
 ### Fixes
