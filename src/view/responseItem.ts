@@ -4,7 +4,6 @@ import * as httpyac from 'httpyac';
 import { extension } from 'mime-types';
 import { v4 as uuid } from 'uuid';
 import * as vscode from 'vscode';
-import { getLanguageId } from './editorResponseHandler';
 
 export class ResponseItem implements IResponseItem {
   readonly id: string;
