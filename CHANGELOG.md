@@ -1,3 +1,12 @@
+## [6.4.4] (2023-05-23)
+
+### Fixes
+
+- `# @jwt` metadata parsedBody matches body (Anweber/httpyac#454)
+- allow comment in last line of script (Anweber/httpyac#454)
+- ignore region names which are not valid Javascript Variables (Anweber/httpyac#455)
+- responseViewLanguageMap is also used in preview mode (#193)
+
 ## [6.4.3] (2023-05-16)
 
 ### Fixes

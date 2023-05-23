@@ -4,6 +4,7 @@ import * as httpyac from 'httpyac';
 import { extension } from 'mime-types';
 import { v4 as uuid } from 'uuid';
 import * as vscode from 'vscode';
+import { getLanguageId } from './editorResponseHandler';
 
 export class ResponseItem implements IResponseItem {
   readonly id: string;
@@ -91,7 +92,7 @@ function getName(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion
 }
 
 function getExtension(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string {
-  const extensionRecognitions: Array<ExtensionRecognition> = [getExtensionByMetaData];
+  const extensionRecognitions: Array<ExtensionRecognition> = [getExtensionByMetaData, getExtensionByLanguageId];
 
   const config = getConfigSetting();
   if (config.responseViewExtensionRecognition === 'mimetype') {
@@ -116,6 +117,29 @@ type ExtensionRecognition = (response: httpyac.HttpResponse, httpRegion?: httpya
 function getExtensionByMetaData(_response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
   if (httpRegion && httpyac.utils.isString(httpRegion?.metaData?.extension)) {
     return httpRegion.metaData.extension;
+  }
+  return false;
+}
+
+function getExtensionByLanguageId(response: httpyac.HttpResponse) {
+  if (response.contentType) {
+    const languageMap = getConfigSetting().responseViewLanguageMap;
+    if (languageMap && languageMap[response.contentType.mimeType]) {
+      const languageId = languageMap[response.contentType.mimeType];
+
+      if (['json', 'html', 'xml', 'css'].includes(languageId)) {
+        return languageId;
+      }
+      if (languageId === 'javascript') {
+        return 'js';
+      }
+      if (languageId === 'markdown') {
+        return 'md';
+      }
+      if (languageId === 'markdown') {
+        return 'md';
+      }
+    }
   }
   return false;
 }

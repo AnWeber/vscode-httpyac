@@ -37,6 +37,13 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider):
       if (uri) {
         responseItem.documentUri = uri;
         document = await vscode.workspace.openTextDocument(uri);
+        const languageMap = getConfigSetting().responseViewLanguageMap;
+        if (languageMap && response?.contentType && languageMap[response.contentType.mimeType]) {
+          const languageId = languageMap[response.contentType.mimeType];
+          if (document.languageId !== languageId) {
+            vscode.languages.setTextDocumentLanguage(document, languageId);
+          }
+        }
       } else {
         content = httpyac.utils.isString(content) ? content : getContent(response, responseViewContent);
         const language = getLanguageId(response.contentType, responseViewContent);
