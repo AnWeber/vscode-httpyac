@@ -146,15 +146,15 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
       level: toLogLevel(config.logLevel),
       supportAnsiColors: false,
     },
-    cookieJarEnabled: config.cookieJarEnabled,
-    clientCertificates: config.clientCertificates,
-    request: config.requestGotOptions,
-    requestBodyInjectVariablesExtensions: config.requestBodyInjectVariablesExtensions,
+    cookieJarEnabled: getValueOrUndefined(config.cookieJarEnabled),
+    clientCertificates: getValueOrUndefined(config.clientCertificates),
+    request: getValueOrUndefined(config.requestGotOptions),
+    requestBodyInjectVariablesExtensions: getValueOrUndefined(config.requestBodyInjectVariablesExtensions),
     proxy: httpyac.utils.isString(httpOptions.proxy) ? httpOptions.proxy : undefined,
-    proxyExcludeList: config.proxyExcludeList,
-    defaultHeaders: config.requestDefaultHeaders,
-    envDirName: config.envDirName || undefined,
-    useRegionScopedVariables: config.useRegionScopedVariables,
+    proxyExcludeList: getValueOrUndefined(config.proxyExcludeList),
+    defaultHeaders: getValueOrUndefined(config.requestDefaultHeaders),
+    envDirName: getValueOrUndefined(config.envDirName),
+    useRegionScopedVariables: getValueOrUndefined(config.useRegionScopedVariables),
   };
 
   const uri = toUri(fileName);
@@ -165,6 +165,13 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
     }
   }
   return environmentConfig;
+}
+
+function getValueOrUndefined<T>(val: T) {
+  if (val === null || val === undefined) {
+    return undefined;
+  }
+  return val;
 }
 
 export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vscode.Disposable {

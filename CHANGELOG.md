@@ -1,3 +1,9 @@
+## [unreleased]
+
+### Fixes
+
+- CookieJar can be disabled with file config (AnWeber/httpyac#457)
+
 ## [6.4.4] (2023-05-23)
 
 ### Fixes

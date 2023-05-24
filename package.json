@@ -451,7 +451,6 @@
               "additionalProperties": false
             }
           ],
-          "default": true,
           "scope": "resource",
           "description": "is cookie jar support enabled"
         },
@@ -464,7 +463,6 @@
             "anyOf": [
               {
                 "type": "object",
-                "default": {},
                 "description": "Certificate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
                 "properties": {
                   "cert": {
@@ -539,7 +537,6 @@
         },
         "httpyac.useRegionScopedVariables": {
           "type": "boolean",
-          "default": false,
           "scope": "resource",
           "description": "scope variables to region (needs @ref to import variables from other regions)"
         },
