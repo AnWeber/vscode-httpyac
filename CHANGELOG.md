@@ -3,6 +3,7 @@
 ### Fixes
 
 - CookieJar can be disabled with file config (AnWeber/httpyac#457)
+- output-failed did not work, if output none is used (Anweber/httpyac#460)
 
 ## [6.4.4] (2023-05-23)
 
