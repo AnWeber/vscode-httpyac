@@ -1,9 +1,12 @@
-## [unreleased]
+## [6.4.5]
 
 ### Fixes
 
-- CookieJar can be disabled with file config (AnWeber/httpyac#457)
 - output-failed did not work, if output none is used (Anweber/httpyac#460)
+- prefer httpyac config files for root determination (#194)
+- unresolved `# @ref` throws error (#197)
+- after script is not triggered too much while using `@loop` (Anweber/httpyac#463)
+- CookieJar can be disabled with file config (AnWeber/httpyac#457)
 
 ## [6.4.4] (2023-05-23)
 
