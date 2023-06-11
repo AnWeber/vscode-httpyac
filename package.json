@@ -711,6 +711,11 @@
               "default": true,
               "description": "log response headers"
             },
+            "timings": {
+              "type": "boolean",
+              "default": false,
+              "description": "log timings"
+            },
             "responseBodyPrettyPrint": {
               "type": "boolean",
               "default": false,
@@ -1358,6 +1363,10 @@
     "jsonValidation": [
       {
         "fileMatch": ".httpyac.json",
+        "url": "./schemas/httpyac-schema.json"
+      },
+      {
+        "fileMatch": "httpyac.config.json",
         "url": "./schemas/httpyac-schema.json"
       },
       {

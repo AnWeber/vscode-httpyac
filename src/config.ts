@@ -45,7 +45,7 @@ export interface ResourceConfig {
   envDirName?: string;
   rootDir?: string;
   logLevel?: string;
-  logOutputChannelOptions?: httpyac.utils.RequestLoggerFactoryOptions;
+  logOutputChannelOptions?: httpyac.RequestLoggerFactoryOptions;
   logRequest?: boolean;
   useRegionScopedVariables?: boolean;
 }

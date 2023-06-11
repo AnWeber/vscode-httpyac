@@ -1,13 +1,12 @@
 import {
   getConfigSetting,
   getEnvironmentConfig,
-  getResourceConfig,
   allHttpDocumentSelector,
   outputDocumentSelector,
   watchConfigSettings,
 } from './config';
 import { DocumentStore as IDocumentStore } from './extensionApi';
-import { getOutputChannel, logToOutputChannelFactory, logStream } from './io';
+import { logToOutputChannelFactory } from './io';
 import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
@@ -227,35 +226,6 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
             logMethod: logToOutputChannelFactory('Console'),
           });
         }
-        const resourceConfig = getResourceConfig(context.httpFile.fileName);
-        if (resourceConfig.logRequest) {
-          const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
-            (arg: string) => {
-              const requestChannel = getOutputChannel('Request', 'http');
-              requestChannel.appendLine(arg);
-            },
-            resourceConfig.logOutputChannelOptions || {
-              requestOutput: true,
-              requestHeaders: true,
-              requestBodyLength: 1024,
-              responseHeaders: true,
-              responseBodyLength: 1024,
-            }
-          );
-          const logContextStream = context.logStream;
-          context.logStream = async (type, message) => {
-            await logStream(type, message);
-            if (logContextStream) {
-              await logContextStream?.(type, message);
-            }
-          };
-          const logResponse = context.logResponse;
-          context.logResponse = async (response, httpRegion) => {
-            await outputChannelLogResponse(response, httpRegion);
-            await logResponse?.(response, httpRegion);
-          };
-        }
-
         if (!context.config) {
           context.config = config;
         }

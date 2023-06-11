@@ -42,6 +42,57 @@
             },
             "supportAnsiColors": {
               "type": "boolean"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "useShort": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "log only request line and status line"
+                },
+                "requestOutput": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "log request"
+                },
+                "requestHeaders": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "log request headers"
+                },
+                "requestBodyLength": {
+                  "type": "number",
+                  "default": 1024,
+                  "description": "log request body character length"
+                },
+                "responseHeaders": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "log response headers"
+                },
+                "timings": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "log timings"
+                },
+                "responseBodyPrettyPrint": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "use pretty print output if available"
+                },
+                "responseBodyLength": {
+                  "type": "number",
+                  "default": 1024,
+                  "description": "log response body character length"
+                },
+                "onlyFailed": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "log only requests with failed tests"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -141,7 +192,13 @@
     },
     "LogLevel": {
       "type": "number",
-      "enum": [0, 2, 5, 10, 100]
+      "enum": [
+        0,
+        2,
+        5,
+        10,
+        100
+      ]
     },
     "Variables": {
       "type": "object",

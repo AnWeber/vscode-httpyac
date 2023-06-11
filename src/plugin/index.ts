@@ -1,2 +1,3 @@
 export * from './bailOnFailedTestInterceptor';
-export * from './vscodeHttpyacPLugin';
+export * from './outputChannelProvider';
+export * from './vscodeHttpyacPlugin';

@@ -1,3 +1,14 @@
+## [unreleased]
+
+### Features
+
+- support configuration of output request logger options in .httpyac config (Anweber/httpyac#467)
+- calculate average of timings for repeat (httpyac/httpyac.github.io#69)
+
+### Fixes
+
+- use `env` as default env dirname (Anweber/vscode-httpyac#198)
+
 ## [6.4.6]  (2023-06-09)
 
 ### Fixes
