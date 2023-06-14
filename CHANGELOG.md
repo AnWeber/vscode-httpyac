@@ -1,3 +1,10 @@
+## [6.5.1]  (2023-06-13)
+
+### Fixes
+
+- `output=none` is respected in CLI (#477)
+- `$input-askonce` does not ask again for existing variables (#477)
+
 ## [6.5.0]  (2023-06-11)
 
 ### Features
