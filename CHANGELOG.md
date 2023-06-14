@@ -2,8 +2,8 @@
 
 ### Fixes
 
-- `output=none` is respected in CLI (#477)
-- `$input-askonce` does not ask again for existing variables (#477)
+- `output=none` is respected in CLI (Anweber/httpyac#477)
+- `$input-askonce` does not ask again for existing variables (Anweber/httpyac#477)
 
 ## [6.5.0]  (2023-06-11)
 
