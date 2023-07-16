@@ -444,6 +444,29 @@
     "variable": {
       "patterns": [
         {
+          "match": "^\\s*(@xpath_ns)\\s*([^(\\s=:)]*)\\s*(:?=)\\s*(.*)$",
+          "captures": {
+            "1": {
+              "name": "keyword.other.http"
+            },
+            "2": {
+              "name": "entity.name.http"
+            },
+            "3": {
+              "name": "keyword.control.http"
+            },
+            "4": {
+              "name": "string.other.http",
+              "patterns": [
+                {
+                  "include": "#http-handlebars"
+                }
+              ]
+            }
+          },
+          "name": "http.block.variable"
+        },
+        {
           "match": "^\\s*(@)([^(\\s=:)]*)\\s*(:?=)\\s*(.*)$",
           "captures": {
             "1": {
