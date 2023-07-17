@@ -152,7 +152,9 @@ export class TestRunner {
           context.progress?.report?.({
             message: 'show view',
           });
-          await this.responseStore.add(response, httpRegion);
+          if (response) {
+            await this.responseStore.add(response, httpRegion);
+          }
         };
       }
       return context;

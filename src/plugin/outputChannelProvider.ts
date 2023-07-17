@@ -2,9 +2,10 @@ import * as httpyac from 'httpyac';
 import { ResourceConfig, getResourceConfig } from '../config';
 import { getOutputChannel, logStream } from '../io';
 
-
-export async function provideOutputChannelLogger(_env: string[] | undefined, context: httpyac.VariableProviderContext): Promise<httpyac.Variables> {
-
+export async function provideOutputChannelLogger(
+  _env: string[] | undefined,
+  context: httpyac.VariableProviderContext
+): Promise<httpyac.Variables> {
   if (context.config && isProcessorContext(context)) {
     const resourceConfig = getResourceConfig(context.httpFile.fileName);
     if (resourceConfig.logRequest) {
@@ -27,7 +28,7 @@ export async function provideOutputChannelLogger(_env: string[] | undefined, con
     }
   }
 
-  return {}
+  return {};
 }
 
 function isProcessorContext(context: unknown): context is httpyac.ProcessorContext {

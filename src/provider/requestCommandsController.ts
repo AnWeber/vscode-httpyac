@@ -145,7 +145,9 @@ export class RequestCommandsController extends DisposeProvider {
             context.progress?.report?.({
               message: 'show view',
             });
-            await this.responseStore.add(response, httpRegion);
+            if (response) {
+              await this.responseStore.add(response, httpRegion);
+            }
           };
           await this.documentStore.send(context);
         }

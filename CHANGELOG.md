@@ -1,3 +1,16 @@
+## [6.6.0]  (2023-07-17)
+
+### Features
+
+- add method `$getOAuth2Response` to javascript context (Anweber/httpyac#499)
+- add `HttpClientProvider` and `JavascriptProvider` to httpyac API
+- allow global Asserts and `onRequest`/ `onResponse` hooks and import global Asserts from other Http Files (Anweber/httpyac#488) 
+- support xpath namespaces using `@xpath_ns` (Anweber/httpyac#493)
+
+### Fixes
+
+- always log current `httpRegion` and `response` on exception (Anweber/httpyac#275)
+
 ## [6.5.1]  (2023-06-13)
 
 ### Fixes
