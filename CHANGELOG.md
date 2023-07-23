@@ -1,3 +1,9 @@
+## [6.6.1]  (2023-07-23)
+
+### Fixes
+
+- improve stability of asserts using objects/arrays (Anweber/httpyac#503)
+
 ## [6.6.0]  (2023-07-17)
 
 ### Features
