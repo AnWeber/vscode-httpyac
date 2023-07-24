@@ -1,3 +1,11 @@
+## [6.6.2]  (2023-07-24)
+
+### Fixes
+
+- support OData Batch Processing (Anweber/httpyac#507)
+- update to httpsnippet@3.0.1
+
+
 ## [6.6.1]  (2023-07-23)
 
 ### Fixes

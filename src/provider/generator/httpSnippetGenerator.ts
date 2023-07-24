@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
 import { getConfigSetting } from '../../config';
-import { default as HttpSnippet, availableTargets } from 'httpsnippet';
+import { HTTPSnippet, HarRequest, availableTargets } from 'httpsnippet';
 
-import { Request, Header, Param, QueryString } from './harRequest';
 import { GenerationTarget } from './generationTarget';
+import type { TargetId } from 'httpsnippet/dist/targets/targets';
+import type { Header, Param, QueryString } from 'har-format';
 
 export function getHttpSnippetTargets() {
   return availableTargets().reduce((prev, current) => {
@@ -27,7 +28,7 @@ async function generateHttpSnippetCodeRequest(
   clientKey: string,
   refName?: string | undefined
 ) {
-  let result: string | undefined;
+  let result: string | undefined | string[];
   const config = getConfigSetting();
   await vscode.window.withProgress(
     {
@@ -54,9 +55,9 @@ async function generateHttpSnippetCodeRequest(
         const interceptor = {
           id,
           async afterLoop(ctx: { args: [httpyac.Request<string>, httpyac.ProcessorContext] }) {
-            const harRequest: Request = getHarRequest(ctx.args[0]);
-            const snippet = new HttpSnippet(harRequest);
-            result = snippet.convert(targetKey, clientKey);
+            const harRequest = getHarRequest(ctx.args[0]);
+            const snippet = new HTTPSnippet(harRequest);
+            result = snippet.convert(targetKey as TargetId, clientKey) || undefined;
             return false;
           },
         };
@@ -68,9 +69,9 @@ async function generateHttpSnippetCodeRequest(
             const [context] = ctx.args;
             const response = context.variables[`${refName}Response`];
             if (response && httpyac.utils.isHttpResponse(response) && response.request) {
-              const harRequest: Request = getHarRequest(response.request);
-              const snippet = new HttpSnippet(harRequest);
-              result = snippet.convert(targetKey, clientKey);
+              const harRequest = getHarRequest(response.request);
+              const snippet = new HTTPSnippet(harRequest);
+              result = snippet.convert(targetKey as TargetId, clientKey) || undefined;
             }
             return false;
           },
@@ -84,16 +85,19 @@ async function generateHttpSnippetCodeRequest(
       }
     }
   );
+  if (Array.isArray(result)) {
+    return httpyac.utils.toMultiLineString(result);
+  }
   return result;
 }
 
-function getHarRequest(options: httpyac.Request): Request {
+function getHarRequest(options: httpyac.Request): HarRequest {
   const initHeader: Header[] = [];
 
   const url: string = options.url ? `${options.url}` : '';
   const indexOfQuery = url.indexOf('?');
 
-  const harRequest: Request = {
+  const harRequest: Partial<HarRequest> = {
     method: options.method || 'GET',
     url,
     headers:
@@ -119,7 +123,7 @@ function getHarRequest(options: httpyac.Request): Request {
   };
 
   if (indexOfQuery > 0) {
-    harRequest.url = harRequest.url.slice(0, indexOfQuery);
+    harRequest.url = harRequest.url?.slice(0, indexOfQuery);
     const initQueryString: QueryString[] = [];
     harRequest.queryString = url
       .slice(url.indexOf('?') + 1)
@@ -159,5 +163,5 @@ function getHarRequest(options: httpyac.Request): Request {
       };
     }
   }
-  return harRequest;
+  return harRequest as HarRequest;
 }
