@@ -1,3 +1,9 @@
+## [6.6.3]  (2023-07-25)
+
+### Fixes
+
+- support multiple `# @import` of the same file from different httpFiles (Anweber/httpyac#508)
+
 ## [6.6.2]  (2023-07-24)
 
 ### Fixes
