@@ -15,7 +15,10 @@ enum TestItemKind {
 
 export class TestItemResolver extends DisposeProvider {
   private items: Array<vscode.TestItem> = [];
-  constructor(private readonly testController: vscode.TestController, private readonly documentStore: DocumentStore) {
+  constructor(
+    private readonly testController: vscode.TestController,
+    private readonly documentStore: DocumentStore
+  ) {
     super();
 
     this.initOpenEditors();

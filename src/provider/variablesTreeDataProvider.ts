@@ -9,7 +9,10 @@ export class VariablesTreeDataProvider extends DisposeProvider implements vscode
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   variablesChangedEmitter: vscode.EventEmitter<void>;
-  constructor(readonly documentStore: DocumentStore, environmentChanged: vscode.Event<string[] | undefined>) {
+  constructor(
+    readonly documentStore: DocumentStore,
+    environmentChanged: vscode.Event<string[] | undefined>
+  ) {
     super();
 
     this.variablesChangedEmitter = new vscode.EventEmitter<void>();

@@ -15,7 +15,10 @@ export class EnvironmentTreeDataProvider
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   #environmentChangedEmitter: vscode.EventEmitter<void>;
-  constructor(readonly documentStore: DocumentStore, environmentChanged: vscode.Event<string[] | undefined>) {
+  constructor(
+    readonly documentStore: DocumentStore,
+    environmentChanged: vscode.Event<string[] | undefined>
+  ) {
     super();
 
     this.#environmentChangedEmitter = new vscode.EventEmitter<void>();

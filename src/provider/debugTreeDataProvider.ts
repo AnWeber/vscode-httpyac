@@ -10,7 +10,10 @@ export class DebugTreeDataProvider extends DisposeProvider implements vscode.Tre
   readonly onDidChangeTreeData: vscode.Event<void>;
 
   #httpFileChangedEmitter: vscode.EventEmitter<void>;
-  constructor(readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
+  constructor(
+    readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore
+  ) {
     super();
 
     this.#httpFileChangedEmitter = new vscode.EventEmitter<void>();

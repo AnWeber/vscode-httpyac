@@ -26,7 +26,10 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
 
   private environmentChangedEmitter: vscode.EventEmitter<string[] | undefined>;
 
-  constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
+  constructor(
+    private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore
+  ) {
     super();
     this.envStatusBarItem = vscode.window.createStatusBarItem('vscode_httpyac_env', vscode.StatusBarAlignment.Right);
     this.envStatusBarItem.name = 'httpyac: Select Environment';

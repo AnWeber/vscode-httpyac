@@ -26,7 +26,10 @@ class ResponseTreeItem extends vscode.TreeItem {
 export class HistoryController extends DisposeProvider implements vscode.TreeDataProvider<ResponseItem | ObjectItem> {
   readonly onDidChangeTreeData: vscode.Event<void>;
 
-  constructor(readonly documentStore: DocumentStore, readonly responseStore: ResponseStore) {
+  constructor(
+    readonly documentStore: DocumentStore,
+    readonly responseStore: ResponseStore
+  ) {
     super();
 
     this.onDidChangeTreeData = responseStore.historyChanged;

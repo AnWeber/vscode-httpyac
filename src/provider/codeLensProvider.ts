@@ -8,7 +8,10 @@ import { DisposeProvider } from '../utils';
 import { ResponseStore } from '../responseStore';
 
 export class CodeLensProvider extends DisposeProvider implements vscode.CodeLensProvider {
-  constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
+  constructor(
+    private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore
+  ) {
     super();
     this.subscriptions = [vscode.languages.registerCodeLensProvider(allHttpDocumentSelector, this)];
   }

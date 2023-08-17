@@ -9,10 +9,13 @@ export async function provideOutputChannelLogger(
   if (context.config && isProcessorContext(context)) {
     const resourceConfig = getResourceConfig(context.httpFile.fileName);
     if (resourceConfig.logRequest) {
-      const outputChannelLogResponse = httpyac.utils.requestLoggerFactory((arg: string) => {
-        const requestChannel = getOutputChannel('Request', 'http');
-        requestChannel.appendLine(arg);
-      }, getRequestLoggerOptions(resourceConfig, context.config));
+      const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
+        (arg: string) => {
+          const requestChannel = getOutputChannel('Request', 'http');
+          requestChannel.appendLine(arg);
+        },
+        getRequestLoggerOptions(resourceConfig, context.config)
+      );
       const logContextStream = context.logStream;
       context.logStream = async (type, message) => {
         await logStream(type, message);

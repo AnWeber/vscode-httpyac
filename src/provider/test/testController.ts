@@ -10,7 +10,10 @@ export class TestController extends utils.DisposeProvider {
   private testController: vscode.TestController | undefined;
   private testItemResolver: TestItemResolver | undefined;
 
-  constructor(private readonly documentStore: DocumentStore, private readonly responseStore: ResponseStore) {
+  constructor(
+    private readonly documentStore: DocumentStore,
+    private readonly responseStore: ResponseStore
+  ) {
     super();
 
     this.subscriptions.push(
