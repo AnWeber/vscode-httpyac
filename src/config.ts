@@ -168,7 +168,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
 }
 
 function getValueOrUndefined<T>(val: T) {
-  if (val === null || val === undefined) {
+  if (val === null || val === undefined || val === '') {
     return undefined;
   }
   return val;

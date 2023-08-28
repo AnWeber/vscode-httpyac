@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixes
+
+- Settings ignore `""` value (#215)
+
 ## [6.6.3]  (2023-07-25)
 
 ### Fixes
