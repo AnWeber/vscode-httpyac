@@ -3,6 +3,7 @@
 ### Fixes
 
 - Settings ignore `""` value (#215)
+- open Response Editor in same viewColumn as previous Editor (#216)
 
 ## [6.6.3]  (2023-07-25)
 

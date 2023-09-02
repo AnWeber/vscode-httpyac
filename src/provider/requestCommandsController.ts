@@ -187,7 +187,10 @@ export class RequestCommandsController extends DisposeProvider {
       'variables.json'
     );
     if (uri) {
-      await utils.showTextEditor(uri);
+      await utils.showTextEditor({
+        uri,
+        preview: true,
+      });
     }
   }
 

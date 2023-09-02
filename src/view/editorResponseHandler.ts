@@ -5,6 +5,8 @@ import { showTextEditor } from '../utils/textEditorUtils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
 
+let prevDocument: WeakRef<vscode.TextDocument> | undefined;
+
 export function previewResponseHandlerFactory(storageProvider: StorageProvider): ResponseHandler {
   return async function previewResponseHandler(responseItem: ResponseItem): Promise<boolean> {
     const config = getConfigSetting();
@@ -56,7 +58,13 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider):
         const language = getLanguageId(response.contentType, responseViewContent);
         vscode.languages.setTextDocumentLanguage(document, language);
       }
-      await showTextEditor(document, config.responseViewMode === 'preview');
+      await showTextEditor({
+        uri: document,
+        viewColumn: getPreviousDocumentEditorViewColumn(prevDocument?.deref()),
+        preview: config.responseViewMode === 'preview',
+      });
+
+      prevDocument = new WeakRef(document);
       return true;
     }
     return false;
@@ -158,4 +166,14 @@ export function getLanguageId(
     }
   }
   return 'plaintext';
+}
+
+function getPreviousDocumentEditorViewColumn(document: vscode.TextDocument | undefined): vscode.ViewColumn | undefined {
+  if (document) {
+    const editor = vscode.window.visibleTextEditors.find(editor => editor.document === document);
+    if (editor?.viewColumn) {
+      return editor.viewColumn;
+    }
+  }
+  return undefined;
 }
