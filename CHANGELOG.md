@@ -1,7 +1,16 @@
-## [Unreleased]
+## [6.6.4]  (2023-09-02)
 
 ### Fixes
 
+- support return of null in variable replacement (Anweber/httpyac#513)
+- allow for variable use in $pick picklists: `{{ $pick ask-variable? $value: data }}` (Anweber/httpyac#537)
+- pre request in intellij format is executed before variable replacer (Anweber/httpyac#534)
+- allow removal of UserAgent Header (httpyac/httpyac.github.io#70) using script
+```
+{{@request
+  request.headers["User-Agent"] = undefined
+}}
+```
 - Settings ignore `""` value (#215)
 - open Response Editor in same viewColumn as previous Editor (#216)
 
