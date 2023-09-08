@@ -1,5 +1,5 @@
 import { DocumentStore } from '../documentStore';
-import { HttpSymbol, HttpSymbolKind } from 'httpyac';
+import { HttpSymbol, HttpSymbolKind, io } from 'httpyac';
 import * as vscode from 'vscode';
 
 export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
@@ -9,30 +9,48 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
     const httpFile = await this.documentStore.getHttpFile(document);
 
     const symbols: Array<vscode.DocumentSymbol> = [];
+
     if (httpFile && httpFile.httpRegions.some(obj => !obj.isGlobal())) {
       for (const httpRegion of httpFile.httpRegions) {
-        symbols.push(this.toDocumentSymbol(httpRegion.symbol));
+        const httpRegionSymbol = this.toDocumentSymbol(httpRegion.symbol);
+        if (httpRegionSymbol) {
+          symbols.push(httpRegionSymbol);
+        }
       }
     }
+
     return symbols;
   }
 
-  private toDocumentSymbol(symbol: HttpSymbol): vscode.DocumentSymbol {
+  private toDocumentSymbol(symbol: HttpSymbol): vscode.DocumentSymbol | undefined {
     const range = new vscode.Range(symbol.startLine, symbol.startOffset, symbol.endLine, symbol.endOffset);
-    const result = new vscode.DocumentSymbol(
-      symbol.name,
-      `${symbol.description}`,
-      this.toDocumentSymbolKind(symbol.kind),
-      range,
-      range
-    );
-    if (symbol.children) {
-      for (const child of symbol.children) {
-        result.children.push(this.toDocumentSymbol(child));
+    try {
+      const result = new vscode.DocumentSymbol(
+        symbol.name,
+        `${symbol.description}`,
+        this.toDocumentSymbolKind(symbol.kind),
+        range,
+        range
+      );
+      if (symbol.children) {
+        for (const child of symbol.children) {
+          const childSymbol = this.toDocumentSymbol(child);
+          if (childSymbol) {
+            result.children.push(childSymbol);
+          }
+        }
       }
-    }
 
-    return result;
+      return result;
+    } catch (err) {
+      io.log.error(
+        `symbol for "${symbol.source || symbol.name}" (Line ${symbol.startLine}-${
+          symbol.endLine
+        }) could not be provided`,
+        err
+      );
+    }
+    return undefined;
   }
 
   private toDocumentSymbolKind(kind: HttpSymbolKind) {
