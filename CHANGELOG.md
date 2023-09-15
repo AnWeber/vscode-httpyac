@@ -1,3 +1,10 @@
+## [unreleased]
+
+### Fixes
+- resolve connect Promise in Websocket Requests on close before open Connection (AnWeber/httpbook#96)
+- fixed Syntax highlighting issue with Intellij scripts when JSON body is used (#220)
+- generate code did not load VSCode Settings configuration (#221)
+
 ## [6.6.4]  (2023-09-02)
 
 ### Fixes

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as httpyac from 'httpyac';
-import { getConfigSetting } from '../../config';
+import { getConfigSetting, getEnvironmentConfig } from '../../config';
 import { HTTPSnippet, HarRequest, availableTargets } from 'httpsnippet';
 
 import { GenerationTarget } from './generationTarget';
@@ -40,6 +40,7 @@ async function generateHttpSnippetCodeRequest(
       title: 'create har',
     },
     async (progress, token) => {
+      context.config = await getEnvironmentConfig(context.httpFile.fileName);
       context.progress = {
         divider: 1,
         isCanceled: () => token.isCancellationRequested,
