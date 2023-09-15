@@ -1,4 +1,4 @@
-## [unreleased]
+## [6.6.6]  (2023-09-15)
 
 ### Fixes
 - resolve connect Promise in Websocket Requests on close before open Connection (AnWeber/httpbook#96)
