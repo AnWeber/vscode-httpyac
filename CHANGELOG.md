@@ -1,3 +1,9 @@
+## [6.6.7]  (2023-09-18)
+
+### Fixes
+
+- reenable Http Header completion (#223)
+
 ## [6.6.6]  (2023-09-15)
 
 ### Fixes
