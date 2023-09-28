@@ -181,9 +181,9 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     const httpFile = await this.documentStore.getCurrentHttpFile();
     if (httpFile) {
       if (typeof env === 'string') {
-        this.selectEnvironment(httpFile, env !== NoEnvironment ? [env] : []);
+        this.selectEnvironment(env !== NoEnvironment ? [env] : [], httpFile);
       } else {
-        this.selectEnvironment(httpFile, env);
+        this.selectEnvironment(env, httpFile);
       }
     }
   }
@@ -225,15 +225,17 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       } else {
         activeEnvironment = undefined;
       }
-      await this.selectEnvironment(httpFile, activeEnvironment);
+      await this.selectEnvironment(activeEnvironment, httpFile);
     } else {
       vscode.window.showInformationMessage('no environment found');
     }
     return activeEnvironment;
   }
 
-  private async selectEnvironment(httpFile: httpyac.HttpFile, activeEnvironment: string[] | undefined) {
-    httpFile.activeEnvironment = activeEnvironment;
+  public async selectEnvironment(activeEnvironment: string[] | undefined, httpFile?: httpyac.HttpFile) {
+    if (httpFile) {
+      httpFile.activeEnvironment = activeEnvironment;
+    }
     this.documentStore.activeEnvironment = activeEnvironment;
     this.environmentChangedEmitter.fire(activeEnvironment);
     if (getConfigSetting().environmentStoreSelectedOnStart) {
@@ -243,7 +245,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     this.documentStore.documentStoreChangedEmitter.fire();
   }
 
-  private async reset(): Promise<void> {
+  public async reset(): Promise<void> {
     this.documentStore.clear();
     await this.responseStore.clear();
     await httpyac.store.userSessionStore.reset();

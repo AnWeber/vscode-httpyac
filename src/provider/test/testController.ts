@@ -5,6 +5,7 @@ import { watchConfigSettings } from '../../config';
 import { ResponseStore } from '../../responseStore';
 import { TestRunner } from './testRunner';
 import { TestItemResolver } from './testItemResolver';
+import { StoreController } from '../storeController';
 
 export class TestController extends utils.DisposeProvider {
   private testController: vscode.TestController | undefined;
@@ -12,7 +13,8 @@ export class TestController extends utils.DisposeProvider {
 
   constructor(
     private readonly documentStore: DocumentStore,
-    private readonly responseStore: ResponseStore
+    private readonly responseStore: ResponseStore,
+    private readonly storeController: StoreController
   ) {
     super();
 
@@ -45,7 +47,8 @@ export class TestController extends utils.DisposeProvider {
             this.testController,
             this.testItemResolver,
             this.documentStore,
-            this.responseStore
+            this.responseStore,
+            this.storeController
           );
 
           await testRunner.run(request, token);

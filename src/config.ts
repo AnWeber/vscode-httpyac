@@ -106,6 +106,8 @@ export interface AppConfig {
   testHiearchy?: 'filesystem' | 'flattened' | 'flat';
   testBailOnFailedTest?: 'no_bail' | 'error' | 'silent';
   testMaxConcurrency?: number;
+  testResetEnvBeforeRun?: boolean;
+  testRunAlwaysUseEnv?: Array<string>;
 }
 
 export function getConfigSetting(): AppConfig {

@@ -1,5 +1,9 @@
 ## [Unreleased] 
 
+### Feature
+
+- allow change of active Environment in provided context (Anweber/vscode-httpyac#225)
+
 ### Fixes
 
 - create unique filename for markdown preview to prevent microsoft/vscode#194421 (#226)

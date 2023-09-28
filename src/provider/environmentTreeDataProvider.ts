@@ -78,8 +78,8 @@ export class EnvironmentTreeDataProvider
         val = await httpyac.getVariables({
           httpFile: {
             ...httpFile,
-            activeEnvironment: element === NoEnvironment ? [] : [element],
           },
+          activeEnvironment: element === NoEnvironment ? [] : [element],
           config: await getEnvironmentConfig(httpFile.fileName),
         });
       }

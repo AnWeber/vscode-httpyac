@@ -4,6 +4,7 @@ import * as httpyac from 'httpyac';
 import { DocumentStore } from '../../documentStore';
 import { getConfigSetting } from '../../config';
 import { TestItemResolver } from './testItemResolver';
+import { StoreController } from '../storeController';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -16,13 +17,15 @@ export class TestRunner {
     private readonly testController: vscode.TestController,
     private readonly testItemResolver: TestItemResolver,
     private readonly documentStore: DocumentStore,
-    private readonly responseStore: ResponseStore
+    private readonly responseStore: ResponseStore,
+    private readonly storeController: StoreController
   ) {}
 
   public async run(request: vscode.TestRunRequest, token: vscode.CancellationToken): Promise<void> {
     const testRun = this.testController.createTestRun(request);
     const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
 
+    await this.resetEnvironmentIfNeeded();
     const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
       for (const item of items) {
         if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
@@ -38,6 +41,13 @@ export class TestRunner {
     });
     await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
     testRun.end();
+  }
+
+  private async resetEnvironmentIfNeeded() {
+    const config = getConfigSetting();
+    if (config.testResetEnvBeforeRun) {
+      await this.storeController.reset();
+    }
   }
 
   private async enqueuedTestItems(
@@ -78,6 +88,9 @@ export class TestRunner {
       const tmpLogResponse = sendContext.logResponse;
       sendContext.logResponse = async (response, httpRegion) => {
         await tmpLogResponse?.(response, httpRegion);
+      };
+      sendContext.variables = {
+        TEST_RUNNER: true,
       };
       try {
         await this.documentStore.send(sendContext);
@@ -131,6 +144,7 @@ export class TestRunner {
       const line = testItem.range?.start.line || 0;
       const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= line && obj.symbol.endLine >= line);
       const context: httpyac.HttpFileSendContext | httpyac.HttpRegionSendContext = {
+        activeEnvironment: config.testRunAlwaysUseEnv || httpFile.activeEnvironment,
         httpFile,
         httpRegion,
       };
