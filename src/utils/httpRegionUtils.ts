@@ -20,6 +20,7 @@ export async function getHttpRegionFromLine(
       );
       if (httpRegion) {
         return {
+          activeEnvironment: httpFile.activeEnvironment || documentStore.activeEnvironment,
           httpRegion,
           httpFile,
         };

@@ -229,6 +229,8 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
         if (!context.config) {
           context.config = config;
         }
+        context.activeEnvironment =
+          context.activeEnvironment || context.httpFile.activeEnvironment || this.activeEnvironment;
         const result = await httpyac.send(context);
         this.variables = context.variables;
         return result;
