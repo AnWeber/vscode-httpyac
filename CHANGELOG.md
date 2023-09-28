@@ -1,3 +1,9 @@
+## [Unreleased] 
+
+### Fixes
+
+- create unique filename for markdown preview to prevent microsoft/vscode#194421 (#226)
+
 ## [6.6.7]  (2023-09-18)
 
 ### Fixes

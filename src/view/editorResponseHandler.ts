@@ -33,7 +33,10 @@ export function previewResponseHandlerFactory(storageProvider: StorageProvider):
         content = getContent(response, responseViewContent);
         extension = 'http';
       }
-      const fileName = config.responseViewMode === 'reuse' ? 'response' : `${responseItem.name}.${extension}`;
+      const fileName =
+        config.responseViewMode === 'reuse'
+          ? 'response'
+          : `${responseItem.name}.${responseItem.id.slice(0, 8)}.${extension}`;
       const uri = await storageProvider.writeFile(content, fileName);
       let document: vscode.TextDocument;
       if (uri) {

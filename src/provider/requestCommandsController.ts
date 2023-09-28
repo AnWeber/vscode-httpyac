@@ -251,7 +251,10 @@ export class RequestCommandsController extends DisposeProvider {
             requestBody: true,
             prettyPrint: true,
           });
-          const uri = await this.storageProvider.writeFile(Buffer.from(content), `${responseItem.name}.md`);
+          const uri = await this.storageProvider.writeFile(
+            Buffer.from(content),
+            `${responseItem.name}.${responseItem.id.slice(0, 8)}.md`
+          );
           if (uri) {
             await vscode.commands.executeCommand('vscode.openWith', uri, 'vscode.markdown.preview.editor');
           }

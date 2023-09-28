@@ -9,7 +9,7 @@ export function openWithResponseHandlerFactory(storageProvider: StorageProvider)
       if (responseItem.response?.rawBody) {
         const uri = await storageProvider.writeFile(
           responseItem.response.rawBody,
-          `${responseItem.name}.${responseItem.extension}`
+          `${responseItem.name}..${responseItem.id.slice(0, 8)}.${responseItem.extension}`
         );
         if (uri) {
           responseItem.documentUri = uri;
