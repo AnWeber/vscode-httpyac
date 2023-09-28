@@ -9,7 +9,8 @@ export class ResponseItem implements IResponseItem {
   readonly id: string;
   readonly created: Date;
   readonly name: string;
-  readonly line?: number;
+  private readonly line?: number;
+  private readonly httpRegionName?: string;
   readonly openWith?: string;
   readonly extension: string;
   readonly testResults?: Array<httpyac.TestResult>;
@@ -24,6 +25,7 @@ export class ResponseItem implements IResponseItem {
   constructor(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion) {
     this.id = uuid();
     this.name = getName(response, httpRegion);
+    this.httpRegionName = httpRegion?.symbol?.name;
     this.line = httpRegion?.symbol?.startLine;
     this.created = new Date();
 
@@ -33,6 +35,10 @@ export class ResponseItem implements IResponseItem {
     this.testResults = httpRegion?.testResults;
     this.response = response;
     this.isCachedResponse = false;
+  }
+
+  public isResponseItemOfHttpRegion(httpRegion: httpyac.HttpRegion) {
+    return this.httpRegionName === httpRegion.symbol.name && this.line === httpRegion.symbol.startLine;
   }
 
   public async removeDocument(): Promise<void> {

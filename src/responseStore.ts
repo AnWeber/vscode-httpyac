@@ -46,9 +46,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   }
 
   findResponseByHttpRegion(httpRegion: httpyac.HttpRegion): view.ResponseItem | undefined {
-    return this.responseCache.find(
-      obj => obj.name === httpRegion.symbol.name && obj.line === httpRegion.symbol.startLine
-    );
+    return this.responseCache.find(obj => obj.isResponseItemOfHttpRegion(httpRegion));
   }
 
   public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion, show = true): Promise<void> {
