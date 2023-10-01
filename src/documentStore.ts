@@ -187,7 +187,6 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     const config = await getEnvironmentConfig(path);
     return await this.httpFileStore.getOrCreate(path, getText, version, {
       config,
-      activeEnvironment: this.activeEnvironment,
     });
   }
 
@@ -199,7 +198,6 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     }
     return await this.httpFileStore.parse(path, text, {
       config,
-      activeEnvironment: this.activeEnvironment,
     });
   }
 

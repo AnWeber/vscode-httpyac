@@ -89,7 +89,7 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
       for (const provider of httpyac.io.completionItemProvider.variableProvider) {
         items.push(
-          ...provider(text).map(obj => ({
+          ...provider().map(obj => ({
             ...obj,
             kind: vscode.CompletionItemKind.Function,
           }))
