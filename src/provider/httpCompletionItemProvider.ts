@@ -2,13 +2,12 @@ import { httpDocumentSelector } from '../config';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
 import * as httpyac from 'httpyac';
-import { types } from 'mime-types';
 import * as vscode from 'vscode';
 
 interface HttpCompletionItem {
   name: string;
   description: string;
-  text?: string | vscode.SnippetString;
+  text?: string;
   kind: vscode.CompletionItemKind;
 }
 
@@ -22,8 +21,8 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
     document: vscode.TextDocument,
     position: vscode.Position
   ): Promise<vscode.CompletionItem[] | undefined> {
-    const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character)).trim();
-    const httpFile = await this.documentStore.getHttpFile(document);
+    const textLine = document.getText(new vscode.Range(position.line, 0, position.line, position.character));
+    const httpFile = this.documentStore.get(document.uri);
 
     const httpRegion =
       httpFile &&
@@ -32,7 +31,8 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
     const result: Array<HttpCompletionItem> = [];
 
-    result.push(...this.getRequestMethodCompletionItems(textLine));
+    result.push(...this.getEmptylineProviderCompletionItems(textLine));
+    result.push(...this.getVariableProviderCompletionItems(textLine));
 
     result.push(...this.getRequestHeaders(textLine, isInRequestLine, httpRegion));
 
@@ -45,34 +45,64 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
       const item = new vscode.CompletionItem(obj.name, obj.kind);
       item.detail = obj.description;
       item.documentation = obj.description;
-      item.insertText = obj.text || obj.name;
+      item.insertText = obj.text;
       return item;
     });
   }
 
-  private getRequestMethodCompletionItems(textLine: string): Array<HttpCompletionItem> {
+  private removeStartingSpecialChars(text: string, min: number) {
+    const index = Math.min(
+      min,
+      Array.from(text).findIndex(c => !['{', '?', '$', ' '].includes(c))
+    );
+
+    if (index > 0 && index < text.length) {
+      return text.slice(index);
+    }
+    return text;
+  }
+
+  private getEmptylineProviderCompletionItems(textLine: string): Array<HttpCompletionItem> {
     const items = [];
-    const line = textLine.trim();
     for (const provider of httpyac.io.completionItemProvider.emptyLineProvider) {
       items.push(
-        ...provider(line).map(obj => ({
+        ...provider().map(obj => ({
           ...obj,
           kind: vscode.CompletionItemKind.Function,
         }))
       );
     }
-    if (line.length > 0) {
-      const result = [];
-      for (const item of items) {
-        const text = item.text || item.name;
-        if (text.startsWith(line)) {
-          result.push(item);
-          item.text = text.slice(line.length);
-        }
+    return items
+      .filter(obj => (obj.text || obj.name).startsWith(textLine))
+      .map(item => ({
+        ...item,
+        text: this.removeStartingSpecialChars(item.text || item.name, textLine.trimStart().length),
+      }));
+  }
+
+  private getVariableProviderCompletionItems(textLine: string): Array<HttpCompletionItem> {
+    const items = [];
+
+    const lastIndex = textLine.lastIndexOf('{{');
+    if (lastIndex > 0) {
+      const text = textLine.slice(lastIndex + 2);
+
+      for (const provider of httpyac.io.completionItemProvider.variableProvider) {
+        items.push(
+          ...provider(text).map(obj => ({
+            ...obj,
+            kind: vscode.CompletionItemKind.Function,
+          }))
+        );
       }
-      return result;
+      return items
+        .filter(obj => obj.name.startsWith(text))
+        .map(item => ({
+          ...item,
+          text: this.removeStartingSpecialChars(item.text || item.name, text.length),
+        }));
     }
-    return items;
+    return [];
   }
 
   private getRequestHeaders(
@@ -111,16 +141,23 @@ export class HttpCompletionItemProvider extends DisposeProvider implements vscod
 
   private getMimetypes(line: string, isInRequestLine: boolean): Array<HttpCompletionItem> {
     if (isInRequestLine && line.toLowerCase().indexOf('content-type') >= 0) {
-      const result = Object.entries(types).map(([key, value]) => ({
-        name: value,
-        description: key,
+      const mimetypes = [
+        'application/pdf',
+        'image/tiff',
+        'image/png',
+        'image/jpeg',
+        'application/json',
+        'application/xml',
+        'application/x-www-form-urlencoded',
+        'application/zip',
+        'text/html',
+        'text/calendar',
+      ];
+      const result = mimetypes.map(name => ({
+        name,
+        description: name,
         kind: vscode.CompletionItemKind.Value,
       }));
-      result.push({
-        name: 'application/x-www-form-urlencoded',
-        description: 'application/x-www-form-urlencoded',
-        kind: vscode.CompletionItemKind.Value,
-      });
       return result;
     }
     return [];

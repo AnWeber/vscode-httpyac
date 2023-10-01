@@ -8,6 +8,8 @@
 
 - create unique filename for markdown preview to prevent microsoft/vscode#194421 (#226)
 - responseItem for httpregion were not found, which caused an incorrect display of the CodeLens (#228)
+- improvements to completionItem API (AnWeber/vscode-httpyac#224)
+
 
 ## [6.6.7]  (2023-09-18)
 
