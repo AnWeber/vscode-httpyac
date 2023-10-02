@@ -36,6 +36,7 @@ export type HttpFileChangedEvent =
 
 export class DocumentStore extends utils.DisposeProvider implements IDocumentStore {
   activeEnvironment: Array<string> | undefined;
+  private fileEnvironments: Record<string, Array<string> | undefined> = {};
 
   public getDocumentPathLike: (document: vscode.TextDocument) => httpyac.PathLike;
 
@@ -227,8 +228,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
         if (!context.config) {
           context.config = config;
         }
-        context.activeEnvironment =
-          context.activeEnvironment || context.httpFile.activeEnvironment || this.activeEnvironment;
+        context.activeEnvironment = context.activeEnvironment || this.getActiveEnvironment(context.httpFile);
         const result = await httpyac.send(context);
         this.variables = context.variables;
         return result;
@@ -253,5 +253,25 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
       return await this.getHttpFile(editor.document);
     }
     return undefined;
+  }
+
+  public getActiveEnvironment(httpFile: httpyac.HttpFile) {
+    const key = httpyac.io.fileProvider.toString(httpFile.fileName);
+    if (this.fileEnvironments[key]) {
+      return this.fileEnvironments[key];
+    }
+    this.fileEnvironments[key] = this.activeEnvironment;
+
+    return this.activeEnvironment;
+  }
+
+  public setActiveEnvironment(httpFile: httpyac.HttpFile, env: Array<string> | undefined) {
+    const key = httpyac.io.fileProvider.toString(httpFile.fileName);
+    if (!env) {
+      delete this.fileEnvironments[key];
+    } else {
+      this.fileEnvironments[key] = env;
+    }
+    this.activeEnvironment = env;
   }
 }

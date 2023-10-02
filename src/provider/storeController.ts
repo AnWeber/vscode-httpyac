@@ -68,7 +68,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
           new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
             command: commands.toggleEnv,
             arguments: args,
-            title: `env: ${this.getEnvironmentTitle(httpFile.activeEnvironment)}`,
+            title: `env: ${this.getEnvironmentTitle(this.documentStore.getActiveEnvironment(httpFile))}`,
           })
         );
       }
@@ -117,7 +117,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     const config = getConfigSetting();
 
     if (config.environmentShowStatusBarItem) {
-      const env = this.getEnvironmentTitle(httpFile.activeEnvironment);
+      const env = this.getEnvironmentTitle(this.documentStore.getActiveEnvironment(httpFile));
       this.envStatusBarItem.text = env;
       this.envStatusBarItem.tooltip = 'Select httpYac Environment';
       this.envStatusBarItem.command = {
@@ -170,7 +170,7 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
       const httpFile = await this.documentStore.getHttpFile(editor.document);
       if (httpFile) {
         const env = await this.showQuickPickEnvironments(httpFile);
-        httpFile.activeEnvironment = env;
+        this.selectEnvironment(env, httpFile);
         this.refreshEnvStatusBarItem(httpFile);
       }
     }
@@ -232,11 +232,8 @@ export class StoreController extends utils.DisposeProvider implements vscode.Cod
     return activeEnvironment;
   }
 
-  public async selectEnvironment(activeEnvironment: string[] | undefined, httpFile?: httpyac.HttpFile) {
-    if (httpFile) {
-      httpFile.activeEnvironment = activeEnvironment;
-    }
-    this.documentStore.activeEnvironment = activeEnvironment;
+  public async selectEnvironment(activeEnvironment: string[] | undefined, httpFile: httpyac.HttpFile) {
+    this.documentStore.setActiveEnvironment(httpFile, activeEnvironment);
     this.environmentChangedEmitter.fire(activeEnvironment);
     if (getConfigSetting().environmentStoreSelectedOnStart) {
       const config = vscode.workspace.getConfiguration(APP_NAME);

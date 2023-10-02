@@ -144,7 +144,7 @@ export class TestRunner {
       const line = testItem.range?.start.line || 0;
       const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= line && obj.symbol.endLine >= line);
       const context: httpyac.HttpFileSendContext | httpyac.HttpRegionSendContext = {
-        activeEnvironment: config.testRunAlwaysUseEnv || httpFile.activeEnvironment,
+        activeEnvironment: config.testRunAlwaysUseEnv || this.documentStore.getActiveEnvironment(httpFile),
         httpFile,
         httpRegion,
       };

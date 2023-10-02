@@ -1020,12 +1020,17 @@
           "description": "reset environment before a test run is executed"
         },
         "httpyac.testRunAlwaysUseEnv": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
+          "required": false,
           "items": {
             "type": "string"
           },
           "scope": "window",
-          "description": "use this environment on a test run"
+          "description": "use this environment on a test run",
+          "default": null
         }
       }
     },

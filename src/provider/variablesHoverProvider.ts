@@ -82,8 +82,8 @@ export class VariablesHoverProvider extends DisposeProvider implements vscode.Ho
       (await httpyac.getVariables({
         httpFile: {
           ...httpFile,
-          activeEnvironment: httpFile.activeEnvironment,
         },
+        activeEnvironment: this.documentStore.getActiveEnvironment(httpFile),
         config: await getEnvironmentConfig(httpFile.fileName),
       }))
     );

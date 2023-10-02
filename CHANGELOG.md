@@ -1,4 +1,11 @@
-## [Unreleased] 
+## [6.7.1]
+
+### Fix
+
+- default of setting `testRunAlwaysUseEnv`is null (Anweber/vscode-httpyac#230)
+- testRunner uses latest activeEnvironemnt (Anweber/vscode-httpyac#230)
+
+## [6.7.0]   (2023-10-01)
 
 ### Feature
 
