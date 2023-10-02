@@ -5,11 +5,13 @@ import { DocumentStore } from '../../documentStore';
 import { getConfigSetting } from '../../config';
 import { TestItemResolver } from './testItemResolver';
 import { StoreController } from '../storeController';
+import { logTestRun } from './testRunOutput';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
   testItems: Array<vscode.TestItem>;
   token: vscode.CancellationToken;
+  processedHttpRegions: Array<httpyac.ProcessedHttpRegion>;
 }
 
 export class TestRunner {
@@ -26,6 +28,7 @@ export class TestRunner {
     const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
 
     await this.resetEnvironmentIfNeeded();
+    const processedHttpRegions: Array<httpyac.ProcessedHttpRegion> = [];
     const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
       for (const item of items) {
         if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
@@ -33,13 +36,18 @@ export class TestRunner {
             testRun,
             testItems,
             token,
+            processedHttpRegions,
           });
         } else {
           testRun.skipped(item);
         }
       }
     });
-    await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
+    const repeatTimes = getConfigSetting().testRunRepeatTimes || 1;
+    for (let index = 0; index < repeatTimes; index++) {
+      await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
+    }
+    logTestRun(processedHttpRegions);
     testRun.end();
   }
 
@@ -88,9 +96,6 @@ export class TestRunner {
       const tmpLogResponse = sendContext.logResponse;
       sendContext.logResponse = async (response, httpRegion) => {
         await tmpLogResponse?.(response, httpRegion);
-      };
-      sendContext.variables = {
-        TEST_RUNNER: true,
       };
       try {
         await this.documentStore.send(sendContext);
@@ -147,6 +152,10 @@ export class TestRunner {
         activeEnvironment: config.testRunAlwaysUseEnv || this.documentStore.getActiveEnvironment(httpFile),
         httpFile,
         httpRegion,
+        variables: {
+          TEST_RUNNER: true,
+        },
+        processedHttpRegions: testRunContext.processedHttpRegions,
       };
       context.progress = {
         divider: 1,

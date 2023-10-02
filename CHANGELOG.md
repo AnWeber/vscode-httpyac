@@ -1,11 +1,12 @@
-## [6.7.1]
+## [6.7.1] (2023-10-02)
 
 ### Fix
 
 - default of setting `testRunAlwaysUseEnv`is null (Anweber/vscode-httpyac#230)
 - testRunner uses latest activeEnvironemnt (Anweber/vscode-httpyac#230)
+- testRunner supports repeating tests multipe times (Anweber/vscode-httpyac#229)
 
-## [6.7.0]   (2023-10-01)
+## [6.7.0] (2023-10-01)
 
 ### Feature
 

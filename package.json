@@ -4,7 +4,7 @@
   "license": "MIT",
   "publisher": "anweber",
   "description": "Quickly and easily send REST, Soap, GraphQL, GRPC, MQTT, RabbitMQ and WebSocket requests directly within Visual Studio Code",
-  "version": "6.7.0",
+  "version": "6.7.1",
   "homepage": "https://github.com/AnWeber/vscode-httpyac",
   "repository": {
     "type": "git",
@@ -1031,6 +1031,12 @@
           "scope": "window",
           "description": "use this environment on a test run",
           "default": null
+        },
+        "httpyac.testRunRepeatTimes": {
+          "type": "number",
+          "scope": "window",
+          "description": "repeat times of test run",
+          "default": 1
         }
       }
     },
@@ -1516,7 +1522,7 @@
   "dependencies": {
     "filesize": "^10.0.12",
     "httpsnippet": "^3.0.1",
-    "httpyac": "^6.7.0",
+    "httpyac": "^6.7.1",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "uuid": "^9.0.1"

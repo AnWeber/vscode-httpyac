@@ -108,6 +108,7 @@ export interface AppConfig {
   testMaxConcurrency?: number;
   testResetEnvBeforeRun?: boolean;
   testRunAlwaysUseEnv?: Array<string>;
+  testRunRepeatTimes?: number;
 }
 
 export function getConfigSetting(): AppConfig {
