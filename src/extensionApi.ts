@@ -26,6 +26,7 @@ export interface DocumentStore {
   readonly httpFileStore: httpyac.store.HttpFileStore;
   activeEnvironment: Array<string> | undefined;
   getActiveEnvironment(httpFile: httpyac.HttpFile): Array<string> | undefined;
+  setActiveEnvironment(httpFile: httpyac.HttpFile, env: Array<string> | undefined): void;
   getDocumentPathLike: (document: vscode.TextDocument) => httpyac.PathLike;
   getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile | undefined>;
   getAll(): Array<httpyac.HttpFile>;
