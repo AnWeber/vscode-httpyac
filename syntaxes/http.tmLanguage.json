@@ -26,13 +26,13 @@
       "include": "#variable"
     },
     {
-      "include": "#comments"
-    },
-    {
       "include": "#response-line"
     },
     {
       "include": "#request-line"
+    },
+    {
+      "include": "#comments"
     }
   ],
   "repository": {
@@ -172,6 +172,9 @@
     },
     "headers": {
       "patterns": [
+        {
+          "include": "#comments"
+        },
         {
           "captures": {
             "1": {

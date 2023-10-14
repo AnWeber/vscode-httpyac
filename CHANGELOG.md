@@ -1,3 +1,9 @@
+## [unreleased]
+
+### Fix
+
+- add syntax highlighting if comment is in request line (#234)
+
 ## [6.7.1] (2023-10-02)
 
 ### Fix
