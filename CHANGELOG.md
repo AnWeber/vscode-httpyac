@@ -1,28 +1,35 @@
-## [unreleased]
+## [6.8.0] (2023-10-15)
+
+### Feature
+
+- add support for grpc-reflection (Anweber/httpyac#566)
 
 ### Fix
-
+- only use default scope `opendid` if no scope is defined (Anweber/httpyac#560)
+- use repeat only in mainContext and not in forceRef calls (Anweber/httpyac#562)
+- store all connections as session in userStorage to allow disconnect (Anweber/httpyac#565)
+- new amqp client does not disconnect previous amqp client (Anweber/httpyac#565)
 - add syntax highlighting if comment is in request line (#234)
 
 ## [6.7.1] (2023-10-02)
 
 ### Fix
 
-- default of setting `testRunAlwaysUseEnv`is null (Anweber/vscode-httpyac#230)
-- testRunner uses latest activeEnvironemnt (Anweber/vscode-httpyac#230)
-- testRunner supports repeating tests multipe times (Anweber/vscode-httpyac#229)
+- default of setting `testRunAlwaysUseEnv`is null (#230)
+- testRunner uses latest activeEnvironemnt (#230)
+- testRunner supports repeating tests multipe times (#229)
 
 ## [6.7.0] (2023-10-01)
 
 ### Feature
 
-- allow change of active Environment in provided context (Anweber/vscode-httpyac#225)
+- allow change of active Environment in provided context (#225)
 
 ### Fixes
 
 - create unique filename for markdown preview to prevent microsoft/vscode#194421 (#226)
 - responseItem for httpregion were not found, which caused an incorrect display of the CodeLens (#228)
-- improvements to completionItem API (AnWeber/vscode-httpyac#224)
+- improvements to completionItem API (#224)
 
 
 ## [6.6.7]  (2023-09-18)
@@ -103,14 +110,14 @@
 
 ### Fixes
 
-- use `env` as default env dirname (Anweber/vscode-httpyac#198)
+- use `env` as default env dirname (#198)
 
 ## [6.4.6]  (2023-06-09)
 
 ### Fixes
 
-- default headers do not overwrite headers with other casing (Anweber/vscode-httpyac#200)
-- env dir is resolved correctly (Anweber/vscode-httpyac#198)
+- default headers do not overwrite headers with other casing (#200)
+- env dir is resolved correctly (#198)
 
 ## [6.4.5]
 
@@ -210,9 +217,9 @@
 
 ### Features
 
-- allow sending body in GET Request (AnWeber/vscode-httpyac#179)
-- allow import of files into variable (AnWeber/vscode-httpyac#180)
-- allow setting global var with variable notation (AnWeber/vscode-httpyac#180)
+- allow sending body in GET Request (#179)
+- allow import of files into variable (#180)
+- allow setting global var with variable notation (#180)
 
 ### Fixes
 
@@ -305,13 +312,13 @@ wss://scrumpoker.foo
 
 - add parallel option to cli and test runner to execute requests in parallel.
 - process each line of an event stream like Intellij ([see](https://www.jetbrains.com/help/idea/http-response-handling-examples.html#stream_scripting))
-- add `proxyExcludeList` config to exclude some url from proxy calls (AnWeber/vscode-httpyac#176)
+- add `proxyExcludeList` config to exclude some url from proxy calls (#176)
 - add icon indicator for copy value (#169)
 
 #### Fixes
 
-- no-redirect did not prevent redirect (AnWeber/vscode-httpyac#171)
-- `private.env.json` settings overrides other `env.json` settings to be Intellij compatible (AnWeber/vscode-httpyac#175)
+- no-redirect did not prevent redirect (#171)
+- `private.env.json` settings overrides other `env.json` settings to be Intellij compatible (#175)
 
 ## 5.10.3 (2023-01-21)
 
@@ -335,7 +342,7 @@ wss://scrumpoker.foo
 
 #### Features
 
-- add Intellijj Http Graphql Method support (AnWeber/vscode-httpyac#165)
+- add Intellijj Http Graphql Method support (#165)
 - update Intellijj Dynamic Variables
 - add Intellij PreRequest Script Support
 - add `$random` Utils to create Mock Data
@@ -389,7 +396,7 @@ wss://scrumpoker.foo
 
 #### Fixes
 
-- support protocol with multiline urls (AnWeber/vscode-httpyac#159)
+- support protocol with multiline urls (#159)
 - prevent issue with string.replace special replacement patterns (httpyac/httpyac.github.io#57)
 
 ## 5.7.5 (2022-10-21)
@@ -462,8 +469,8 @@ wss://scrumpoker.foo
 
 #### Fixes
 
-- prevent override of httpYac Script Keywords (AnWeber/vscode-httpyac#144)
-- output failed tests and not success message (AnWeber/vscode-httpyac#143)
+- prevent override of httpYac Script Keywords (#144)
+- output failed tests and not success message (#143)
 
 ## 5.6.0 (2022-08-04)
 
@@ -943,7 +950,7 @@ GET https://httpbin.org/json
 
 #### Fix
 
-- environments in .httpyac.js are not recognized (AnWeber/vscode-httpyac#71)
+- environments in .httpyac.js are not recognized (#71)
 - js keyword as variable name not allowed (#76)
 
 ## 4.1.0 (2021-10-02)
@@ -1080,7 +1087,7 @@ GET https://httpbin.org/json
 
 #### Features
 
-- fix error with global variables (Anweber/vscode-httpyac#48)
+- fix error with global variables (#48)
 
 ## 2.18.0 (2021-06-30)
 
@@ -1095,7 +1102,7 @@ GET https://httpbin.org/json
 
 #### Fix
 
-- fixed parser, if global variable is used in first line (Anweber/vscode-httpyac#45)
+- fixed parser, if global variable is used in first line (#45)
 - http2 needs to explicitly activated (second attempt:-))
 - multiple user-agent header removed
 
