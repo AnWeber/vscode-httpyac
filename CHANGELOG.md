@@ -1,3 +1,10 @@
+## [6.8.1] (2023-10-16)
+
+### Fix
+
+- allow import of `.httpyac.cjs` or `.httpyac.config.cjs` file
+- Memory Leak in grpc client, because grpc client is not closed (#231)
+
 ## [6.8.0] (2023-10-15)
 
 ### Feature
