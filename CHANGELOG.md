@@ -1,3 +1,9 @@
+## [6.9.0] (2023-11-05)
+
+### Fix
+
+- do not fail on javascript assert (Anweber/httpyac#572)
+
 ## [6.8.2] (2023-10-23)
 
 ### Feature
