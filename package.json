@@ -1522,7 +1522,7 @@
   "dependencies": {
     "filesize": "^10.1.0",
     "httpsnippet": "^3.0.1",
-    "httpyac": "^6.9.2",
+    "httpyac": "^6.9.3",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "uuid": "^9.0.1"
