@@ -1,3 +1,13 @@
+## [unreleased]
+
+### Feature
+- allow configuration of local cache store (#241)
+
+### Fix
+
+- escaping of `\{\{2\}\}` did not work (Anweber/vscode-httpyac#244)
+- support only `http-client.env.json` and `http-client.private.env.json` files for intellij environments (Anweber/vscode-httpyac#245)
+
 ## [6.10.0] (2023-11-13)
 
 ### Feature

@@ -18,7 +18,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
     this.responseHandlers = [
       view.saveFileResponseHandler,
       view.noResponseViewResponseHandler,
-      view.openWithResponseHandlerFactory(storageProvider),
+      view.openWithResponseHandlerFactory(),
       view.previewResponseHandlerFactory(storageProvider),
     ];
     this.subscriptions = [
@@ -42,7 +42,9 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
 
   findResponseByDocument(document: vscode.TextDocument): view.ResponseItem | undefined {
     const docUri = document.uri.toString();
-    return this.responseCache.find(obj => obj.documentUri?.toString() === docUri);
+    return this.responseCache.find(
+      obj => obj.responseUri?.toString() === docUri || obj.documentUri?.toString() === docUri
+    );
   }
 
   findResponseByHttpRegion(httpRegion: httpyac.HttpRegion): view.ResponseItem | undefined {
@@ -52,11 +54,33 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion, show = true): Promise<void> {
     const responseItem = new view.ResponseItem(response, httpRegion);
     this.addToCache(responseItem);
+    this.storeFileInStorage(responseItem);
     if (show) {
       await this.show(responseItem);
     }
     httpyac.io.log.debug(`add response ${responseItem.id} to cache`);
     await this.shrink(responseItem);
+  }
+
+  private async storeFileInStorage(responseItem: ResponseItem) {
+    const response = responseItem.response;
+    if (response.rawBody) {
+      const responseUri = await this.storageProvider.writeFile(
+        response.rawBody,
+        `${responseItem.name}.${responseItem.id.slice(0, 8)}.${responseItem.extension}`
+      );
+      if (responseUri) {
+        responseItem.responseUri = responseUri;
+        responseItem.isCachedResponse = true;
+        responseItem.loadResponseBody = async () => {
+          const buffer = await vscode.workspace.fs.readFile(responseUri);
+          response.rawBody = Buffer.from(buffer);
+          response.body = response.rawBody.toString('utf-8');
+          responseItem.isCachedResponse = false;
+          delete responseItem.loadResponseBody;
+        };
+      }
+    }
   }
 
   private addToCache(responseItem: view.ResponseItem) {
@@ -69,9 +93,6 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   async remove(responseItem: ResponseItem): Promise<boolean> {
     const index = this.responseCache.findIndex(obj => obj.id === responseItem.id);
     if (index >= 0) {
-      if (responseItem.responseUri) {
-        await this.storageProvider.deleteFile(responseItem.responseUri);
-      }
       this.responseCache.splice(index, 1);
       this.refreshHistory.fire();
       return true;
@@ -84,35 +105,16 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   }
 
   async clear(): Promise<void> {
-    for (const responseItem of this.responseCache) {
-      if (responseItem.responseUri) {
-        await this.storageProvider.deleteFile(responseItem.responseUri);
-      }
-    }
+    await this.storageProvider.clear();
     this.responseCache.length = 0;
     this.refreshHistory.fire();
   }
 
   public async shrink(responseItem: ResponseItem): Promise<void> {
-    const response = responseItem.response;
-    if (response.rawBody) {
-      const responseUri =
-        responseItem.responseUri ||
-        (await this.storageProvider.writeFile(response.rawBody, `${responseItem.id}.${responseItem.extension}`));
-      if (responseUri) {
-        this.shrinkResponseItem(response);
-        responseItem.responseUri = responseUri;
-        responseItem.isCachedResponse = true;
-        responseItem.loadResponseBody = async () => {
-          const buffer = await vscode.workspace.fs.readFile(responseUri);
-          response.rawBody = Buffer.from(buffer);
-          response.body = response.rawBody.toString('utf-8');
-          responseItem.isCachedResponse = false;
-          delete responseItem.loadResponseBody;
-        };
-      } else {
-        await this.remove(responseItem);
-      }
+    if (responseItem.response.rawBody && responseItem.responseUri) {
+      this.shrinkResponseItem(responseItem.response);
+    } else {
+      await this.remove(responseItem);
     }
     this.refreshHistory.fire();
   }

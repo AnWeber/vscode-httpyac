@@ -661,6 +661,28 @@
           "scope": "resource",
           "description": "content of response view"
         },
+        "httpyac.responseStorage": {
+          "type": "string",
+          "enum": [
+            "global",
+            "workspace",
+            "file",
+            "none"
+          ],
+          "markdownEnumDescriptions": [
+            "use global folder",
+            "use folder in workspace",
+            "use folder next to file",
+            "none"
+          ],
+          "default": "global",
+          "description": "store responses in file storage"
+        },
+        "httpyac.responseStorageLocation": {
+          "type": "string",
+          "default": ".httpyac",
+          "description": "path to store response files"
+        },
         "httpyac.logLevel": {
           "type": "string",
           "default": "warn",

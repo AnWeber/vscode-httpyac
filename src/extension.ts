@@ -36,6 +36,7 @@ export function activate(context: vscode.ExtensionContext): HttpYacExtensionApi 
         config.allHttpDocumentSelector,
         new provider.HttpDocumentSymbolProvider(documentStore)
       ),
+      storageProvider,
     ]
   );
   vscode.commands.executeCommand(

@@ -7,70 +7,89 @@ import * as vscode from 'vscode';
 
 let prevDocument: WeakRef<vscode.TextDocument> | undefined;
 
+type DocumentContent = {
+  uri?: vscode.Uri;
+  content?: string | Buffer;
+  responseViewContent?: ResponseViewContent;
+};
+
 export function previewResponseHandlerFactory(storageProvider: StorageProvider): ResponseHandler {
   return async function previewResponseHandler(responseItem: ResponseItem): Promise<boolean> {
     const config = getConfigSetting();
 
     if (config.responseViewMode !== 'none') {
       await responseItem.loadResponseBody?.();
-      const response = responseItem.response;
-      if (!response) {
+      if (!responseItem.response) {
         return false;
       }
-      const responseViewContent = getResponseViewContext(config.responseViewContent, !!response?.body);
 
-      let content: string | Buffer | undefined = response.rawBody;
-      let extension = responseItem.extension;
-      if (httpyac.utils.isString(response.body)) {
-        if (config.responseViewContent && config.responseViewContent !== 'body') {
-          content = getContent(response, config.responseViewContent);
-          extension = 'http';
-        } else if (response.prettyPrintBody && config.responseViewPrettyPrint) {
-          content = response.prettyPrintBody;
-        }
-      }
-      if (!content || content.length === 0) {
-        content = getContent(response, responseViewContent);
-        extension = 'http';
-      }
-      const fileName =
-        config.responseViewMode === 'reuse'
-          ? 'response'
-          : `${responseItem.name}.${responseItem.id.slice(0, 8)}.${extension}`;
-      const uri = await storageProvider.writeFile(content, fileName);
-      let document: vscode.TextDocument;
-      if (uri) {
-        responseItem.documentUri = uri;
-        document = await vscode.workspace.openTextDocument(uri);
-        const languageMap = getConfigSetting().responseViewLanguageMap;
-        if (languageMap && response?.contentType && languageMap[response.contentType.mimeType]) {
-          const languageId = languageMap[response.contentType.mimeType];
-          if (document.languageId !== languageId) {
-            vscode.languages.setTextDocumentLanguage(document, languageId);
-          }
-        }
-      } else {
-        content = httpyac.utils.isString(content) ? content : getContent(response, responseViewContent);
-        const language = getLanguageId(response.contentType, responseViewContent);
-        document = await vscode.workspace.openTextDocument({
-          language,
-          content,
-        });
-      }
-      if (config.responseViewMode === 'reuse') {
-        const language = getLanguageId(response.contentType, responseViewContent);
-        vscode.languages.setTextDocumentLanguage(document, language);
-      }
-      await showTextEditor({
-        uri: document,
-        viewColumn: getPreviousDocumentEditorViewColumn(prevDocument?.deref()),
-        preview: config.responseViewMode === 'preview',
-      });
-
-      prevDocument = new WeakRef(document);
+      const documentContent = await getResponseContentUri(responseItem, storageProvider);
+      responseItem.documentUri = documentContent.uri;
+      await openTextEditor(documentContent, responseItem.response);
       return true;
     }
     return false;
+  };
+}
+
+async function openTextEditor(documentContent: DocumentContent, response: httpyac.HttpResponse) {
+  const config = getConfigSetting();
+  let document: vscode.TextDocument | undefined;
+  const language = getLanguageId(response.contentType, documentContent.responseViewContent);
+  if (documentContent.uri) {
+    document = await vscode.workspace.openTextDocument(documentContent.uri);
+  } else if (httpyac.utils.isString(documentContent.content)) {
+    document = await vscode.workspace.openTextDocument({
+      language,
+      content: documentContent.content,
+    });
+  }
+  if (document) {
+    vscode.languages.setTextDocumentLanguage(document, language);
+
+    await showTextEditor({
+      uri: document,
+      viewColumn: getPreviousDocumentEditorViewColumn(prevDocument?.deref()),
+      preview: config.responseViewMode === 'preview',
+    });
+
+    prevDocument = new WeakRef(document);
+  }
+}
+
+export async function getResponseContentUri(
+  responseItem: ResponseItem,
+  storageProvider: StorageProvider
+): Promise<DocumentContent> {
+  const config = getConfigSetting();
+  const responseViewContent = getResponseViewContext(config.responseViewContent, responseItem);
+
+  if (responseViewContent === 'body' && !config.responseViewPrettyPrint) {
+    if (responseItem.responseUri || !responseItem.response.body) {
+      return {
+        uri: config.responseViewMode === 'reuse' ? undefined : responseItem.responseUri,
+        content: httpyac.utils.isString(responseItem.response.body)
+          ? responseItem.response.body
+          : responseItem.response.rawBody,
+        responseViewContent,
+      };
+    }
+  }
+  await responseItem.loadResponseBody?.();
+  const content = getContent(responseItem.response, responseViewContent);
+
+  const filename =
+    config.responseViewMode === 'reuse'
+      ? 'response'
+      : `${responseItem.name}.${responseItem.id.slice(0, 8)}.${
+          responseViewContent === 'body' ? responseItem.extension : 'http'
+        }`;
+
+  const uri = await storageProvider.writeFile(content, filename);
+  return {
+    uri,
+    content,
+    responseViewContent,
   };
 }
 
@@ -129,8 +148,9 @@ export function getContent(response: httpyac.HttpResponse, viewContent?: Respons
 
 export function getResponseViewContext(
   viewContent: ResponseViewContent | undefined,
-  hasBody: boolean
+  responseItem: ResponseItem
 ): ResponseViewContent | undefined {
+  const hasBody = !!responseItem.responseUri || !!responseItem.response?.body;
   if (!hasBody && viewContent === 'body') {
     return 'exchange';
   }
@@ -144,6 +164,7 @@ export function getLanguageId(
   if (viewContent && viewContent !== 'body') {
     return 'http';
   }
+
   if (contentType) {
     const languageMap = getConfigSetting().responseViewLanguageMap;
     if (languageMap && languageMap[contentType.mimeType]) {

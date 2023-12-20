@@ -40,18 +40,6 @@ export class ResponseItem implements IResponseItem {
   public isResponseItemOfHttpRegion(httpRegion: httpyac.HttpRegion) {
     return this.httpRegionName === httpRegion.symbol.name && this.line === httpRegion.symbol.startLine;
   }
-
-  public async removeDocument(): Promise<void> {
-    if (this.documentUri) {
-      try {
-        await vscode.workspace.fs.delete(this.documentUri);
-      } catch (err) {
-        httpyac.io.log.error(err);
-      } finally {
-        delete this.documentUri;
-      }
-    }
-  }
 }
 
 function getOpenWith(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion): string | undefined {
