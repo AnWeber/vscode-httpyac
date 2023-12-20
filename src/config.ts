@@ -58,7 +58,7 @@ export interface AppConfig {
   environmentStatusBarItemErrorEnvs?: Array<string>;
   environmentShowStatusBarItem?: boolean;
   environmentPickMany?: boolean;
-  responseStorage: 'global' | 'workspace' | 'file' | 'none';
+  responseStorage?: 'global' | 'workspace' | 'file' | 'none';
   responseStorageLocation?: string;
   responseViewHeader?: Array<string>;
   responseViewContent?: ResponseViewContent;
