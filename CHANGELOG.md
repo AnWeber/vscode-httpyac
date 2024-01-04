@@ -1,3 +1,9 @@
+## [unreleased]
+
+### Fix
+
+- update documentSelector based on storageLocation for Response CodeLensProvider (#251)
+
 ## [6.11.0] (2023-12-29)
 
 ### Feature

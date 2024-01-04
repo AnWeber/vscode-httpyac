@@ -1,4 +1,4 @@
-import { getConfigSetting, commands } from '../config';
+import { watchConfigSettings, commands, getConfigSetting } from '../config';
 import { ResponseStore } from '../responseStore';
 import { DisposeProvider } from '../utils';
 import * as httpyac from 'httpyac';
@@ -11,15 +11,20 @@ export class ResponseDocumentController
   constructor(private readonly responseStore: ResponseStore) {
     super();
 
-    const documentFilter = [
-      {
-        pattern: '**/_httpyac_/**',
-      },
-    ];
-
     this.subscriptions = [
-      vscode.languages.registerHoverProvider(documentFilter, this),
-      vscode.languages.registerCodeLensProvider(documentFilter, this),
+      watchConfigSettings(config => {
+        const documentFilter =
+          config.responseStorage === 'file'
+            ? '*'
+            : {
+                pattern: `**/${config.responseStorageLocation}/**`,
+              };
+
+        return [
+          vscode.languages.registerHoverProvider(documentFilter, this),
+          vscode.languages.registerCodeLensProvider(documentFilter, this),
+        ];
+      }),
     ];
   }
 

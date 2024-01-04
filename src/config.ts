@@ -179,13 +179,38 @@ function getValueOrUndefined<T>(val: T) {
   return val;
 }
 
-export function watchConfigSettings(watcher: (appConfig: AppConfig) => void): vscode.Disposable {
-  watcher(getConfigSetting());
-  return vscode.workspace.onDidChangeConfiguration(changeEvent => {
+export function watchConfigSettings(
+  watcher: (appConfig: AppConfig) => vscode.Disposable | Array<vscode.Disposable> | void
+): vscode.Disposable {
+  const disposables: Array<vscode.Disposable> = [];
+
+  const callWatcher = () => {
+    if (disposables.length > 0) {
+      disposables.forEach(d => d.dispose());
+    }
+    const result = watcher(getConfigSetting());
+    if (result) {
+      if (Array.isArray(result)) {
+        disposables.push(...result);
+      } else {
+        disposables.push(result);
+      }
+    }
+  };
+
+  callWatcher();
+  const dispose = vscode.workspace.onDidChangeConfiguration(changeEvent => {
     if (changeEvent.affectsConfiguration(APP_NAME)) {
-      watcher(getConfigSetting());
+      callWatcher();
     }
   });
+
+  return {
+    dispose() {
+      dispose.dispose();
+      disposables.forEach(d => d.dispose());
+    },
+  };
 }
 
 export const httpDocumentSelector: Array<vscode.DocumentFilter> = [{ language: 'http', scheme: '*' }];
