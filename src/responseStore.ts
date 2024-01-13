@@ -54,7 +54,7 @@ export class ResponseStore extends DisposeProvider implements IResponseStore {
   public async add(response: httpyac.HttpResponse, httpRegion?: httpyac.HttpRegion, show = true): Promise<void> {
     const responseItem = new view.ResponseItem(response, httpRegion);
     this.addToCache(responseItem);
-    this.storeFileInStorage(responseItem);
+    await this.storeFileInStorage(responseItem);
     if (show) {
       await this.show(responseItem);
     }

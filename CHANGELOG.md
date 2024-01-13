@@ -1,3 +1,10 @@
+## [unreleased]
+
+### Fix
+- Intellij store variables independent from current env in global cache (Anweber/httpyac#612)
+- always use GRPC Reflection to support same Behaviour as Intellij (#254)
+- save of response is await before editor is shown (#252)
+
 ## [6.11.1] (2023-01-04)
 
 ### Fix
