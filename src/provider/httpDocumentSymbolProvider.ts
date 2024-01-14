@@ -83,6 +83,8 @@ export class HttpDocumentSymbolProvider implements vscode.DocumentSymbolProvider
         return vscode.SymbolKind.String;
       case HttpSymbolKind.response:
         return vscode.SymbolKind.Package;
+      case HttpSymbolKind.path:
+        return vscode.SymbolKind.File;
       default:
         return vscode.SymbolKind.Object;
     }

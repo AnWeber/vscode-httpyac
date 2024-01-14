@@ -1,4 +1,7 @@
-## [unreleased]
+## [6.11.2] (2023-01-14)
+
+### Feature
+- add navigation support to imported files (#250) 
 
 ### Fix
 - Intellij store variables independent from current env in global cache (Anweber/httpyac#612)
