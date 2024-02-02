@@ -1,3 +1,9 @@
+## [6.11.4] (2023-02-02)
+
+### Fix
+- Variable is replaced in multipart/form-data when file is injected (AnWeber/vscode-httpyac#258)
+
+
 ## [6.11.3] (2023-01-31)
 
 ### Fix
