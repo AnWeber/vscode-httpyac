@@ -1,8 +1,8 @@
 ## [6.11.5] (2023-02-25)
 
 ### Fix
-- Assertsions for Zero are working (AnWeber/vscode-httpyac#260)
-- typo in junit report.xml generation (#642)
+- Assertsions for Zero are working (#260)
+- typo in junit report.xml generation (AnWeber/httpyac#642)
 
 ## [6.11.4] (2023-02-02)
 
