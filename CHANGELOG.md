@@ -1,4 +1,10 @@
-## [6.11.5] (2023-02-25)
+
+## [6.11.5] (2023-02-27)
+### Fix
+- replace grpc-reflection-js with grpc-js-reflection-client
+- fix order of log output in cli (Anweber/httpyac#644)
+
+## [6.11.6] (2023-02-25)
 
 ### Fix
 - Assertsions for Zero are working (#260)
