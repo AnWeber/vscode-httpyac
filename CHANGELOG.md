@@ -1,4 +1,8 @@
 
+## [unreleased]
+### Features
+- add folding range provider (#265)
+
 ## [6.11.5] (2023-02-27)
 ### Fix
 - replace grpc-reflection-js with grpc-js-reflection-client
