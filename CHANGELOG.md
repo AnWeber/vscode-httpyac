@@ -1,5 +1,5 @@
 
-## [unreleased]
+## [6.12.0] (2023-03-17)
 ### Features
 - add folding range provider (#265)
 
