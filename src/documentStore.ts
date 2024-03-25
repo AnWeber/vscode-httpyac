@@ -256,12 +256,13 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
   }
 
   public getActiveEnvironment(httpFile: httpyac.HttpFile) {
-    const key = httpyac.io.fileProvider.toString(httpFile.fileName);
-    if (this.fileEnvironments[key]) {
-      return this.fileEnvironments[key];
+    if (!getConfigSetting().environmentUseSameForAllFiles) {
+      const key = httpyac.io.fileProvider.toString(httpFile.fileName);
+      if (this.fileEnvironments[key]) {
+        return this.fileEnvironments[key];
+      }
+      this.fileEnvironments[key] = this.activeEnvironment;
     }
-    this.fileEnvironments[key] = this.activeEnvironment;
-
     return this.activeEnvironment;
   }
 

@@ -526,6 +526,12 @@
           "default": true,
           "description": "allow picking many environments at the same time"
         },
+        "httpyac.environmentUseSameForAllFiles": {
+          "type": "boolean",
+          "scope": "window",
+          "default": false,
+          "description": "use same environment for all files"
+        },
         "httpyac.environmentVariables": {
           "type": "object",
           "scope": "resource",

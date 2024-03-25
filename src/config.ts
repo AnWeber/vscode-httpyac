@@ -52,6 +52,7 @@ export interface ResourceConfig {
 
 export interface AppConfig {
   environmentSelectedOnStart?: Array<string>;
+  environmentUseSameForAllFiles?: boolean;
   environmentStoreSelectedOnStart?: boolean;
   environmentStatusBarItemDefaultBackground?: 'none' | 'warning' | 'error';
   environmentStatusBarItemWarningEnvs?: Array<string>;
