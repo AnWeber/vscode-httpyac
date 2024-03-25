@@ -3,6 +3,9 @@
 ### Features
 - use an environment for all files/tabs (#272)
 
+### Fix
+- implement indentation foldingrangeprovider for request body (#269)
+
 ## [6.12.0] (2023-03-17)
 ### Features
 - add folding range provider (#265)
