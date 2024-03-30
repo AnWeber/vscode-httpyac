@@ -1,10 +1,12 @@
 
-## [unreleased]
+## [6.12.1]
 ### Features
 - use an environment for all files/tabs (#272)
 
 ### Fix
 - implement indentation foldingrangeprovider for request body (#269)
+- request count ignores disabled region (Anweber/httpyac#663)
+- show replaced expected value in test results to improve user experience (Anweber/httpyac#663)
 
 ## [6.12.0] (2023-03-17)
 ### Features
