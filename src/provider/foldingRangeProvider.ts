@@ -21,7 +21,11 @@ export class FoldingRangeProvider extends DisposeProvider implements vscode.Fold
         for (const symbol of symbols) {
           if ([HttpSymbolKind.requestBody].includes(symbol.kind) && httpRegion.request?.contentType?.boundary) {
             result.push(...this.getBoundaryFoldingRange(symbol, httpRegion.request?.contentType?.boundary));
-          } else if ([HttpSymbolKind.requestBody, HttpSymbolKind.script, HttpSymbolKind.gql].includes(symbol.kind)) {
+          } else if (
+            [HttpSymbolKind.requestBody, HttpSymbolKind.response, HttpSymbolKind.script, HttpSymbolKind.gql].includes(
+              symbol.kind
+            )
+          ) {
             result.push(...this.getIndentationFoldingRange(symbol));
           } else {
             const foldingRange = new vscode.FoldingRange(
