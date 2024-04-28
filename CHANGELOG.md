@@ -1,4 +1,9 @@
 
+## [6.13.0]
+### Features
+- update to new API Changes of Intellij Http Client
+- add support for OAuth2 Intellij API (AnWeber/vscode-httpyac#275)
+
 ## [6.12.1]
 ### Features
 - use an environment for all files/tabs (#272)
