@@ -1,8 +1,14 @@
 
+## [6.13.1] ( 2024-04-29)
+
+### Fix
+- `$random.integer() returns valid integer (#277)
+- prevent executing wrong test after file change (#278)
+
 ## [6.13.0]
 ### Features
 - update to new API Changes of Intellij Http Client
-- add support for OAuth2 Intellij API (AnWeber/vscode-httpyac#275)
+- add support for OAuth2 Intellij API (#275)
 
 ## [6.12.1]
 ### Features
@@ -31,14 +37,14 @@
 ## [6.11.4] (2023-02-02)
 
 ### Fix
-- Variable is replaced in multipart/form-data when file is injected (AnWeber/vscode-httpyac#258)
+- Variable is replaced in multipart/form-data when file is injected (#258)
 
 
 ## [6.11.3] (2023-01-31)
 
 ### Fix
 - hide password answer in sessionStore (AnWeber/httpbook#111)
-- add Content-Type if protocol `GRAPHQL` is used to support same API as Intellij HTTP Client (AnWeber/vscode-httpyac#257)
+- add Content-Type if protocol `GRAPHQL` is used to support same API as Intellij HTTP Client (#257)
 
 ## [6.11.2] (2023-01-14)
 

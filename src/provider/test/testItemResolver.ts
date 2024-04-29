@@ -31,6 +31,9 @@ export class TestItemResolver extends DisposeProvider {
       vscode.workspace.onDidChangeWorkspaceFolders(async () => {
         await this.refreshTestItems();
       }),
+      vscode.workspace.onDidChangeTextDocument(async editor => {
+        await this.onDidChangeUri(editor.document.uri);
+      }),
       vscode.workspace.onDidRenameFiles(async evt => {
         for (const fileMove of evt.files) {
           const oldUriString = fileMove.oldUri.toString();
@@ -75,16 +78,7 @@ export class TestItemResolver extends DisposeProvider {
       }
     });
     fsWatcher.onDidChange(async uri => {
-      const testItem = this.findFileTestItem(uri);
-      if (testItem) {
-        testItem.children.replace([]);
-        const httpFile = await this.documentStore.getOrCreate(
-          uri,
-          async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
-          0
-        );
-        this.createFileTestItem(uri, httpFile);
-      }
+      await this.onDidChangeUri(uri);
     });
     fsWatcher.onDidDelete(async uri => {
       const testItems = this.items.filter(
@@ -95,6 +89,19 @@ export class TestItemResolver extends DisposeProvider {
       }
     });
     return fsWatcher;
+  }
+
+  private async onDidChangeUri(uri: vscode.Uri) {
+    const testItem = this.findFileTestItem(uri);
+    if (testItem) {
+      testItem.children.replace([]);
+      const httpFile = await this.documentStore.getOrCreate(
+        uri,
+        async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
+        0
+      );
+      this.createFileTestItem(uri, httpFile);
+    }
   }
 
   private hasTestItemExtension(documentOrUri: vscode.TextDocument | vscode.Uri) {
