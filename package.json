@@ -36,7 +36,10 @@
     "Intellij Http Client",
     "Postman",
     "Soap",
-    "rest-client"
+    "rest-client",
+    "restclient",
+    "thunder client",
+    "rapidapi"
   ],
   "activationEvents": [
     "onCommand:httpyac.new",
