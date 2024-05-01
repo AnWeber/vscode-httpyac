@@ -1,4 +1,9 @@
 
+## [6.13.2] ( 2024-05-01)
+### Fix
+- ensureUniqueId on merge (#280)
+- replace header variables after body variables to allow valide Request Signing (Anweber/httpyac#684)
+
 ## [6.13.1] ( 2024-04-29)
 
 ### Fix
