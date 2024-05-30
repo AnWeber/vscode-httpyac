@@ -1,3 +1,14 @@
+## [unreleased]
+### Features
+- add `--tag` support to cli to only execute httpRegion with defined tag (Anweber/httpyac#693)
+
+### Fix
+- prevent readFile Error log output on package.json search (#293)
+- disabled MetaData Handler checks disabled State on occurence of line in execution order (#292)
+- support Intellij Multiline FormUrlEncoded Syntax (Anweber/httpyac#699)
+- better match .env files to ignore false positive like `.envrc` (Anweber/httpyac#700)
+- change order in http.tmlanguage.json to support comment highlighting (Anweber/httpyac#703)
+
 ## [6.13.3]
 ### Fix
 - Aws Signing use query params in signing request (Anweber/httpyac#684)
