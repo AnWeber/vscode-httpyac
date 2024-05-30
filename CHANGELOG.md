@@ -8,6 +8,7 @@
 - support Intellij Multiline FormUrlEncoded Syntax (Anweber/httpyac#699)
 - better match .env files to ignore false positive like `.envrc` (Anweber/httpyac#700)
 - change order in http.tmlanguage.json to support comment highlighting (Anweber/httpyac#703)
+- fix end of response-line to support truncated response body (#295)
 
 ## [6.13.3]
 ### Fix
