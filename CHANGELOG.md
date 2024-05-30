@@ -9,6 +9,7 @@
 - better match .env files to ignore false positive like `.envrc` (Anweber/httpyac#700)
 - change order in http.tmlanguage.json to support comment highlighting (Anweber/httpyac#703)
 - fix end of response-line to support truncated response body (#295)
+- test runner indicator support disabled test using `$cancel` variable (#292)
 
 ## [6.13.3]
 ### Fix

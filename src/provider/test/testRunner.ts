@@ -100,11 +100,10 @@ export class TestRunner {
       try {
         await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
-
-        if (!testResults || testResults.every(obj => !obj.error)) {
-          testRunContext.testRun.passed(testItem, duration());
-        } else if (sendContext.httpRegion.metaData.disabled) {
+        if (sendContext.httpRegion.metaData.disabled || sendContext.variables?.$cancel) {
           testRunContext.testRun.skipped(testItem);
+        } else if (!testResults || testResults.every(obj => !obj.error)) {
+          testRunContext.testRun.passed(testItem, duration());
         } else {
           testRunContext.testRun.failed(
             testItem,
