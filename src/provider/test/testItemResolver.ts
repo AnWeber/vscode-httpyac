@@ -5,16 +5,12 @@ import * as httpyac from 'httpyac';
 import { basename } from 'path';
 import { getConfigSetting } from '../../config';
 import { toUri } from '../../io';
-
-enum TestItemKind {
-  httpRegion = 'httpRegion',
-  file = 'file',
-  folder = 'folder',
-  workspace = 'workspace',
-}
+import { TestTagResolver } from './testTagResolver';
+import { TestItemKind, isFolderTestItem, parseTestItemId } from './testItemKind';
 
 export class TestItemResolver extends DisposeProvider {
   private items: Array<vscode.TestItem> = [];
+  private testTagResolver = new TestTagResolver();
   constructor(
     private readonly testController: vscode.TestController,
     private readonly documentStore: DocumentStore
@@ -56,8 +52,11 @@ export class TestItemResolver extends DisposeProvider {
   }
   private async createDocumentTestItem(document: vscode.TextDocument) {
     if (this.hasTestItemExtension(document)) {
+      const testItem = this.createFileTestItem(document.uri);
       const httpFile = await this.documentStore.getHttpFile(document);
-      this.createFileTestItem(document.uri, httpFile);
+      if (httpFile) {
+        this.createHttpFileTestItem(httpFile, testItem);
+      }
     }
   }
 
@@ -66,15 +65,12 @@ export class TestItemResolver extends DisposeProvider {
 
     const fsWatcher = vscode.workspace.createFileSystemWatcher(`**/*.{${testItemExtensions.join(',')}}`);
     fsWatcher.onDidCreate(async uri => {
-      const httpFile = await this.documentStore.getOrCreate(
-        uri,
-        async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
-        0
-      );
       if (this.isFlattendedTestHiearchy()) {
         await this.refreshTestItems();
       } else {
-        this.createFileTestItem(uri, httpFile);
+        const testItem = this.createFileTestItem(uri);
+        const httpFile = await this.documentStore.getWithUri(uri);
+        this.createHttpFileTestItem(httpFile, testItem);
       }
     });
     fsWatcher.onDidChange(async uri => {
@@ -94,13 +90,9 @@ export class TestItemResolver extends DisposeProvider {
   private async onDidChangeUri(uri: vscode.Uri) {
     const testItem = this.findFileTestItem(uri);
     if (testItem) {
-      testItem.children.replace([]);
-      const httpFile = await this.documentStore.getOrCreate(
-        uri,
-        async () => await httpyac.io.fileProvider.readFile(uri, 'utf-8'),
-        0
-      );
-      this.createFileTestItem(uri, httpFile);
+      const testItem = this.createFileTestItem(uri);
+      const httpFile = await this.documentStore.getWithUri(uri);
+      this.createHttpFileTestItem(httpFile, testItem);
     }
   }
 
@@ -111,7 +103,8 @@ export class TestItemResolver extends DisposeProvider {
     } else {
       uri = documentOrUri;
     }
-    return this.getTestItemExtensions().some(ext => uri?.toString().endsWith(`.${ext}`));
+    const filename = uri?.toString();
+    return this.getTestItemExtensions().some(ext => filename.endsWith(`.${ext}`));
   }
 
   private getTestItemExtensions() {
@@ -128,13 +121,20 @@ export class TestItemResolver extends DisposeProvider {
       if (testItem) {
         await this.resolveTestItemChildren(testItem);
       } else {
-        const files = await this.loadAllHttpFilesInWorkspace();
+        const files = await vscode.workspace.findFiles(`**/*.{${this.getTestItemExtensions().join(',')}}`, undefined);
         this.testController.items.replace([]);
         this.items.length = 0;
-        for (const file of files) {
-          this.createFileTestItem(file);
+
+        const promises = [];
+        for (const uri of files) {
+          const testItem = this.createFileTestItem(uri);
+
+          if (testItem.children.size === 0) {
+            promises.push(this.loadTagsForHttpFile(testItem));
+          }
         }
         this.checkForFlattendFileSystem();
+        await Promise.all(promises);
       }
     } catch (err) {
       httpyac.io.log.error(err);
@@ -144,23 +144,31 @@ export class TestItemResolver extends DisposeProvider {
     }
   }
 
+  public async loadTagsForHttpFile(testItem: vscode.TestItem) {
+    if (testItem.uri) {
+      const text = await httpyac.io.fileProvider.readFile(testItem.uri, 'utf-8');
+      if (text.includes('@tag')) {
+        const httpFile = await this.documentStore.getOrCreate(testItem.uri, () => Promise.resolve(text), 0);
+        if (httpFile) {
+          this.createHttpFileTestItem(httpFile, testItem);
+        }
+      }
+    }
+  }
+
   public async resolveTestItemChildren(testItem: vscode.TestItem) {
-    const item = this.parseId(testItem.id);
+    const item = parseTestItemId(testItem.id);
     if (item.kind === TestItemKind.file && testItem.children.size === 0) {
       const itemUri = testItem.uri;
       if (itemUri) {
-        const httpFile = await this.documentStore.getOrCreate(
-          itemUri,
-          () => httpyac.io.fileProvider.readFile(itemUri, 'utf-8'),
-          0
-        );
+        const httpFile = await this.documentStore.getWithUri(itemUri);
         this.createHttpFileTestItem(httpFile, testItem);
       }
     }
     return this.getChildren(testItem);
   }
 
-  private createFileTestItem(file: vscode.Uri, httpFile?: httpyac.HttpFile) {
+  private createFileTestItem(file: vscode.Uri): vscode.TestItem {
     const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
     const workspaceTestItem = this.createTestItem(
       TestItemKind.workspace,
@@ -168,15 +176,17 @@ export class TestItemResolver extends DisposeProvider {
       workspaceRoot.uri
     );
     this.testController.items.add(workspaceTestItem);
-    const parent = this.getParentTestItem(file, workspaceTestItem);
     const testItem = this.createTestItem(TestItemKind.file, basename(file.toString(true)), file);
     testItem.canResolveChildren = true;
+    const parent = this.getParentTestItem(file, workspaceTestItem);
     parent.children.add(testItem);
 
-    const httpFileParsed = httpFile || this.documentStore.get(file);
-    if (httpFileParsed) {
-      this.createHttpFileTestItem(httpFileParsed, testItem);
+    const httpFile = this.documentStore.get(file);
+    if (httpFile) {
+      this.createHttpFileTestItem(httpFile, testItem);
     }
+
+    return testItem;
   }
 
   private getFoldersUntilRoot(current: vscode.Uri, rootUri: vscode.Uri | undefined): Array<vscode.Uri> {
@@ -217,7 +227,7 @@ export class TestItemResolver extends DisposeProvider {
 
   private checkForFlattendFileSystem() {
     if (this.isFlattendedTestHiearchy()) {
-      const folderTestItems = this.items.filter(item => this.isFolderTestItem(item));
+      const folderTestItems = this.items.filter(item => isFolderTestItem(item));
       for (const folder of folderTestItems) {
         if (folder.children.size === 1 && folder.parent) {
           const parent = folder.parent;
@@ -238,6 +248,7 @@ export class TestItemResolver extends DisposeProvider {
   private createHttpFileTestItem(httpFile: httpyac.HttpFile, parent: vscode.TestItem) {
     const fileUri = toUri(httpFile.fileName);
     if (fileUri) {
+      const items: Array<vscode.TestItem> = [];
       for (const httpRegion of httpFile.httpRegions) {
         if (!httpRegion.isGlobal()) {
           const testItem = this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri);
@@ -248,9 +259,15 @@ export class TestItemResolver extends DisposeProvider {
             new vscode.Position(requestLine, 0),
             new vscode.Position(httpRegion.symbol.endLine, httpRegion.symbol.endOffset)
           );
-          parent.children.add(testItem);
+          if (typeof httpRegion.metaData?.tag === 'string') {
+            testItem.tags = httpRegion.metaData.tag
+              ?.split(',')
+              .map(t => this.testTagResolver.getOrCreateTestTag(t.trim()));
+          }
+          items.push(testItem);
         }
       }
+      parent.children.replace(items);
     }
   }
 
@@ -265,24 +282,6 @@ export class TestItemResolver extends DisposeProvider {
       testItems = testItems.filter(testItem => !request.exclude?.includes(testItem));
     }
     return testItems;
-  }
-
-  private async loadAllHttpFilesInWorkspace(): Promise<Array<vscode.Uri>> {
-    const uris: Array<vscode.Uri> = [];
-    const testItemExtensions = this.getTestItemExtensions();
-    for (const file of await this.findNonIgnoredFiles(`**/*.{${testItemExtensions.join(',')}}`)) {
-      uris.push(file);
-    }
-    return uris;
-  }
-
-  private async findNonIgnoredFiles(pattern: vscode.GlobPattern) {
-    const exclude = [
-      ...Object.keys((await vscode.workspace.getConfiguration('search', null).get('exclude')) || {}),
-      ...Object.keys((await vscode.workspace.getConfiguration('files', null).get('exclude')) || {}),
-    ].join(',');
-
-    return await vscode.workspace.findFiles(pattern, `{${exclude}}`);
   }
 
   private findFileTestItem(uri: vscode.Uri) {
@@ -310,39 +309,6 @@ export class TestItemResolver extends DisposeProvider {
       return `${kind}|${safeUri}|${httpyac.utils.replaceInvalidChars(label)}`;
     }
     return `${kind}|${safeUri}`;
-  }
-
-  private parseId(id: string) {
-    const [kindString, identifier] = id.split('|');
-    return {
-      kind: this.toKind(kindString),
-      identifier,
-    };
-  }
-
-  private toKind(kind: string) {
-    if (kind === 'httpRegion') {
-      return TestItemKind.httpRegion;
-    }
-    if (kind === 'file') {
-      return TestItemKind.file;
-    }
-    if (kind === 'folder') {
-      return TestItemKind.folder;
-    }
-    return TestItemKind.workspace;
-  }
-
-  public isHttpRegionTestItem(testItem: vscode.TestItem): boolean {
-    return testItem.id.startsWith(`${TestItemKind.httpRegion}|`);
-  }
-
-  public isHttpFileItem(testItem: vscode.TestItem): boolean {
-    return testItem.id.startsWith(`${TestItemKind.file}|`);
-  }
-
-  private isFolderTestItem(testItem: vscode.TestItem): boolean {
-    return testItem.id.startsWith(`${TestItemKind.folder}|`);
   }
 
   private getChildren(testItem: vscode.TestItem): Array<vscode.TestItem> {

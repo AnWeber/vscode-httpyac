@@ -170,7 +170,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     return this.httpFileChangedEmitter.event;
   }
 
-  async getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile | undefined> {
+  public async getHttpFile(document: vscode.TextDocument): Promise<httpyac.HttpFile | undefined> {
     if (!vscode.languages.match(outputDocumentSelector, document)) {
       const path = this.getDocumentPathLike(document);
 
@@ -180,7 +180,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     return undefined;
   }
 
-  async getOrCreate(
+  public async getOrCreate(
     path: httpyac.PathLike,
     getText: () => Promise<string>,
     version: number
@@ -191,7 +191,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     });
   }
 
-  async parse(uri: vscode.Uri | undefined, text: string): Promise<httpyac.HttpFile> {
+  public async parse(uri: vscode.Uri | undefined, text: string): Promise<httpyac.HttpFile> {
     let config: httpyac.EnvironmentConfig = {};
     const path: httpyac.PathLike = uri || 'unknown';
     if (uri) {
@@ -202,15 +202,19 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     });
   }
 
-  getAll(): Array<httpyac.HttpFile> {
+  public getAll(): Array<httpyac.HttpFile> {
     return this.httpFileStore.getAll();
   }
 
-  get(fileName: httpyac.PathLike): httpyac.HttpFile | undefined {
+  public get(fileName: httpyac.PathLike): httpyac.HttpFile | undefined {
     return this.httpFileStore.get(fileName);
   }
 
-  remove(document: vscode.TextDocument): void {
+  public async getWithUri(uri: vscode.Uri): Promise<httpyac.HttpFile> {
+    return await this.getOrCreate(uri, () => httpyac.io.fileProvider.readFile(uri, 'utf-8'), 0);
+  }
+
+  public remove(document: vscode.TextDocument): void {
     const path = this.getDocumentPathLike(document);
     this.httpFileStore.remove(path);
   }
@@ -239,13 +243,13 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     }
   }
 
-  clear() {
+  public clear() {
     this.httpFileStore.clear();
     delete this.variables;
     this.documentStoreChangedEmitter.fire();
   }
 
-  async getCurrentHttpFile(
+  public async getCurrentHttpFile(
     editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor,
     documentSelector: vscode.DocumentSelector = allHttpDocumentSelector
   ): Promise<httpyac.HttpFile | undefined> {

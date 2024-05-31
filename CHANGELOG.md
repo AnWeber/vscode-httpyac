@@ -1,6 +1,7 @@
 ## [unreleased]
 ### Features
 - add `--tag` support to cli to only execute httpRegion with defined tag (Anweber/httpyac#693)
+- add support to search for test tags in vscode (Anweber/httpyac#693)
 
 ### Fix
 - prevent readFile Error log output on package.json search (#293)

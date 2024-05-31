@@ -6,6 +6,7 @@ import { getConfigSetting } from '../../config';
 import { TestItemResolver } from './testItemResolver';
 import { StoreController } from '../storeController';
 import { logTestRun } from './testRunOutput';
+import { isHttpFileItem, isHttpRegionTestItem } from './testItemKind';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -31,7 +32,7 @@ export class TestRunner {
     const processedHttpRegions: Array<httpyac.ProcessedHttpRegion> = [];
     const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
       for (const item of items) {
-        if (!token.isCancellationRequested && this.testItemResolver.isHttpRegionTestItem(item)) {
+        if (!token.isCancellationRequested && isHttpRegionTestItem(item)) {
           await this.runTestItem(item, {
             testRun,
             testItems,
@@ -64,10 +65,10 @@ export class TestRunner {
   ): Promise<Array<Array<vscode.TestItem>>> {
     const result: Array<Array<vscode.TestItem>> = [];
     for (const testItem of testItems) {
-      if (this.testItemResolver.isHttpRegionTestItem(testItem)) {
+      if (isHttpRegionTestItem(testItem)) {
         testRun.enqueued(testItem);
         result.push([testItem]);
-      } else if (this.testItemResolver.isHttpFileItem(testItem)) {
+      } else if (isHttpFileItem(testItem)) {
         const childTestItems = await this.testItemResolver.resolveTestItemChildren(testItem);
         for (const childTestItem of childTestItems) {
           testRun.enqueued(childTestItem);
@@ -140,11 +141,7 @@ export class TestRunner {
       const config = getConfigSetting();
 
       const testItemUri = testItem.uri;
-      const httpFile = await this.documentStore.getOrCreate(
-        testItemUri,
-        () => httpyac.io.fileProvider.readFile(testItemUri, 'utf-8'),
-        0
-      );
+      const httpFile = await this.documentStore.getWithUri(testItemUri);
       const line = testItem.range?.start.line || 0;
       const httpRegion = httpFile.httpRegions.find(obj => obj.symbol.startLine <= line && obj.symbol.endLine >= line);
       const context: httpyac.HttpFileSendContext | httpyac.HttpRegionSendContext = {
