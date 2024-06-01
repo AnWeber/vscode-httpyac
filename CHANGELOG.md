@@ -1,4 +1,4 @@
-## [unreleased]
+## [6.14.0] ( 2024-06-01)
 ### Features
 - add `--tag` support to cli to only execute httpRegion with defined tag (Anweber/httpyac#693)
 - add support to search for test tags in vscode (Anweber/httpyac#693)
