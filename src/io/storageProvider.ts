@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 export class StorageProvider extends DisposeProvider {
   private cachedUris: Array<vscode.Uri> = [];
 
-  constructor(private readonly storageUri: vscode.Uri) {
+  public constructor(private readonly storageUri: vscode.Uri) {
     super();
     this.subscriptions = [vscode.commands.registerCommand(commands.pruneStorage, this.clear, this)];
   }
@@ -63,7 +63,7 @@ export class StorageProvider extends DisposeProvider {
     return undefined;
   }
 
-  async writeFile(content: string | Buffer, fileName: string): Promise<vscode.Uri | undefined> {
+  public async writeFile(content: string | Buffer, fileName: string): Promise<vscode.Uri | undefined> {
     const folderUri = await this.getFolderUri();
     if (folderUri) {
       try {
@@ -82,26 +82,37 @@ export class StorageProvider extends DisposeProvider {
     return undefined;
   }
 
-  async clear(): Promise<void> {
+  private async fileExists(uri: vscode.Uri) {
+    try {
+      const stats = await vscode.workspace.fs.stat(uri);
+      return !!stats;
+    } catch {
+      return false;
+    }
+  }
+
+  public async clear(): Promise<void> {
     const config = getConfigSetting();
 
-    if (config.responseStorage !== 'none') {
-      const baseUri = this.baseStoragePath(config);
-      try {
-        if (baseUri) {
-          await vscode.workspace.fs.delete(baseUri, { useTrash: false, recursive: true });
-        }
-      } catch (err) {
-        httpyac.io.log.error(`delete of uri ${baseUri} failed`, err);
-      }
-    }
     for (const uri of this.cachedUris) {
-      try {
-        await vscode.workspace.fs.delete(uri, { useTrash: false });
-      } catch (err) {
-        httpyac.io.log.error(`delete of uri ${uri} failed`, err);
+      if (await this.fileExists(uri)) {
+        try {
+          await vscode.workspace.fs.delete(uri, { useTrash: false });
+        } catch (err) {
+          httpyac.io.log.debug(`delete of uri ${uri} failed`, err);
+        }
       }
     }
     this.cachedUris = [];
+    if (config.responseStorage !== 'none') {
+      const baseUri = this.baseStoragePath(config);
+      try {
+        if (baseUri && (await this.fileExists(baseUri))) {
+          await vscode.workspace.fs.delete(baseUri, { useTrash: false, recursive: true });
+        }
+      } catch (err) {
+        httpyac.io.log.debug(`delete of uri ${baseUri} failed`, err);
+      }
+    }
   }
 }
