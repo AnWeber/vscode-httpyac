@@ -99,9 +99,9 @@ export class TestRunner {
         await tmpLogResponse?.(response, httpRegion);
       };
       try {
-        await this.documentStore.send(sendContext);
+        const cancelled = !(await this.documentStore.send(sendContext));
         const testResults = sendContext.httpRegion?.testResults;
-        if (sendContext.httpRegion.metaData.disabled || sendContext.variables?.$cancel) {
+        if (sendContext.httpRegion.metaData.disabled || cancelled) {
           testRunContext.testRun.skipped(testItem);
         } else if (!testResults || testResults.every(obj => !obj.error)) {
           testRunContext.testRun.passed(testItem, duration());
