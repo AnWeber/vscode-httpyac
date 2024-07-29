@@ -351,11 +351,7 @@
           },
           "additionalProperties": true,
           "scope": "resource",
-          "description": "default request headers if not overwritten",
-          "default": {
-            "Accept": "*/*",
-            "User-Agent": "httpyac"
-          }
+          "description": "default request headers if not overwritten"
         },
         "httpyac.requestBodyInjectVariablesExtensions": {
           "type": "array",
