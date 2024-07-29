@@ -1198,6 +1198,18 @@
       }
     ],
     "menus": {
+      "explorer/context": [
+        {
+          "command": "httpyac.sendAll",
+          "group": "httpyac",
+          "when": "resourceLangId == 'http'"
+        },
+        {
+          "command": "httpyac.sendSelected",
+          "group": "httpyac",
+          "when": "resourceLangId == 'http'"
+        }
+      ],
       "commandPalette": [
         {
           "command": "httpyac.send",

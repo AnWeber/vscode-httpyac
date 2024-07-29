@@ -71,8 +71,8 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async sendAll(): Promise<void> {
-    const document = vscode.window.activeTextEditor?.document;
+  private async sendAll(uri?: vscode.Uri): Promise<void> {
+    const document = uri ? await vscode.workspace.openTextDocument(uri) : vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
       if (httpFile) {
@@ -84,8 +84,8 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   @errorHandler()
-  private async sendSelected(): Promise<void> {
-    const document = vscode.window.activeTextEditor?.document;
+  private async sendSelected(uri?: vscode.Uri): Promise<void> {
+    const document = uri ? await vscode.workspace.openTextDocument(uri) : vscode.window.activeTextEditor?.document;
     if (document) {
       const httpFile = await this.documentStore.getHttpFile(document);
 
