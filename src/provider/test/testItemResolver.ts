@@ -251,7 +251,7 @@ export class TestItemResolver extends DisposeProvider {
       const items: Array<vscode.TestItem> = [];
       for (const httpRegion of httpFile.httpRegions) {
         if (!httpRegion.isGlobal()) {
-          const testItem = this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri);
+          const testItem = this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri, httpRegion.id);
           const requestLine =
             httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine ||
             httpRegion.symbol.startLine;
@@ -288,8 +288,8 @@ export class TestItemResolver extends DisposeProvider {
     return this.items.find(obj => obj.canResolveChildren && httpyac.utils.equalsPath(obj.uri, uri));
   }
 
-  private createTestItem(kind: TestItemKind, label: string, uri: vscode.Uri) {
-    const id = this.createId(kind, label, uri);
+  private createTestItem(kind: TestItemKind, label: string, uri: vscode.Uri, idPart?: string) {
+    const id = this.createId(kind, uri, idPart);
     let item = this.items.find(obj => obj.id === id);
 
     if (item && !httpyac.utils.equalsPath(item?.uri, uri)) {
@@ -300,13 +300,14 @@ export class TestItemResolver extends DisposeProvider {
       item = this.testController.createTestItem(id, label, uri);
       this.items.push(item);
     }
+    item.label = label;
     return item;
   }
 
-  private createId(kind: TestItemKind, label: string, uri: vscode.Uri) {
+  private createId(kind: TestItemKind, uri: vscode.Uri, idPart?: string) {
     const safeUri = httpyac.utils.replaceInvalidChars(uri?.toString());
-    if (kind === TestItemKind.httpRegion) {
-      return `${kind}|${safeUri}|${httpyac.utils.replaceInvalidChars(label)}`;
+    if (idPart) {
+      return `${kind}|${safeUri}|${idPart}`;
     }
     return `${kind}|${safeUri}`;
   }
