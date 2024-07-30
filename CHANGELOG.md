@@ -6,6 +6,7 @@
 - variables in gql Query body are replaced (AnWeber/vscode-httpyac#303)
 - allow defaultHeaders to overwrite accept or user-agent header
 - update label of testItem on httpRegion name change (#315)
+- add missing definitions to codeLens property (#314)
 
 
 ## [6.14.0] ( 2024-06-01)

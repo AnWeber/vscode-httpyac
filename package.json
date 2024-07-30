@@ -873,53 +873,69 @@
             "testResult": true
           },
           "properties": {
-            "pickEnvironment": {
-              "type": "boolean",
-              "default": false
+            "clearHistory": {
+              "default": false,
+              "type": "boolean"
             },
-            "resetEnvironment": {
-              "type": "boolean",
-              "default": false
+            "generateCode": {
+              "default": false,
+              "type": "boolean"
+            },
+            "generateCodeSelectLanguage": {
+              "default": false,
+              "type": "boolean"
             },
             "logoutUserSession": {
-              "type": "boolean",
-              "default": false
+              "default": false,
+              "type": "boolean"
             },
-            "send": {
-              "type": "boolean",
-              "default": false
+            "pickEnvironment": {
+              "default": false,
+              "type": "boolean"
             },
-            "sendRepeat": {
-              "type": "boolean",
-              "default": false
-            },
-            "sendAll": {
-              "type": "boolean",
-              "default": false
-            },
-            "sendSelected": {
-              "type": "boolean",
-              "default": false
-            },
-            "testResult": {
-              "type": "boolean",
-              "default": false
-            },
-            "clearHistory": {
-              "type": "boolean",
-              "default": false
-            },
-            "showResponse": {
-              "type": "boolean",
-              "default": false
+            "resetEnvironment": {
+              "default": false,
+              "type": "boolean"
             },
             "saveResponse": {
-              "type": "boolean",
-              "default": false
+              "default": false,
+              "type": "boolean"
+            },
+            "send": {
+              "default": false,
+              "type": "boolean"
+            },
+            "sendAll": {
+              "default": false,
+              "type": "boolean"
+            },
+            "sendRepeat": {
+              "default": false,
+              "type": "boolean"
+            },
+            "sendSelected": {
+              "default": false,
+              "type": "boolean"
+            },
+            "showResponse": {
+              "default": false,
+              "type": "boolean"
             },
             "showResponseHeaders": {
-              "type": "boolean",
-              "default": false
+              "default": false,
+              "type": "boolean"
+            },
+            "showVariables": {
+              "default": false,
+              "type": "boolean"
+            },
+            "validateVariables": {
+              "default": false,
+              "type": "boolean"
+            },
+            "testResult": {
+              "default": false,
+              "type": "boolean"
             }
           },
           "additionalProperties": false,
