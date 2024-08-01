@@ -1,72 +1,82 @@
 import { APP_NAME } from '../config';
-import { io, LogLevel, HttpResponse, StreamResponse, utils } from 'httpyac';
+import { io, LogLevel, utils } from 'httpyac';
 import * as vscode from 'vscode';
+import { getConfigSetting } from '../config';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
 
-export function getOutputChannel(channel: string, languageId: string | undefined = undefined): vscode.OutputChannel {
+export enum LogChannel {
+  Log = 'Log',
+  Console = 'Console',
+}
+
+export function getOutputChannel(channel: string, options: string): vscode.OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, languageId);
+    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, options);
     outputChannels[channel] = outputChannel;
   }
   return outputChannel;
 }
 
-export async function logStream(type: string, response: HttpResponse & StreamResponse): Promise<void> {
-  const outputChannel = getOutputChannel(response.protocol);
-  outputChannel.show(true);
-
-  appendToOutputChannel(
-    outputChannel,
-    [response.message || response.body],
-    `${new Date().toLocaleTimeString()} - ${type}: `
-  );
+function getLogOutputChannel(channel: string): vscode.LogOutputChannel {
+  let outputChannel = outputChannels[channel];
+  if (!outputChannel) {
+    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, { log: true });
+    outputChannels[channel] = outputChannel;
+  }
+  return outputChannel as vscode.LogOutputChannel;
 }
 
-export function logToOutputChannelFactory(channel: string): (level: LogLevel, ...messages: Array<unknown>) => void {
+export function logToOutputChannelFactory(
+  ...channels: Array<LogChannel>
+): (level: LogLevel, ...messages: Array<unknown>) => void {
   return function logToOutputChannel(level: LogLevel, ...messages: Array<unknown>) {
-    const outputChannel = getOutputChannel(channel);
-    outputChannel.append(`${toLevelString(level).toUpperCase()}: `);
-    appendToOutputChannel(outputChannel, messages);
+    const outputChannels = channels.map(c => getLogOutputChannel(c));
+
+    const strings = messages.map(m => {
+      if (utils.isError(m)) {
+        return [m.message, m.stack].filter(m => !!m).join('\n');
+      }
+      return utils.toString(m);
+    });
+
+    const message = strings.shift();
+    if (!message) {
+      return;
+    }
+    const method = logForLevel(level);
+    outputChannels.forEach(c => method(c)(message, ...strings));
   };
 }
 
-function toLevelString(level: LogLevel) {
+function logForLevel(level: LogLevel) {
   switch (level) {
     case LogLevel.trace:
-      return 'TRACE';
+      return (c: vscode.LogOutputChannel) => c.trace.bind(c);
     case LogLevel.debug:
-      return 'DEBUG';
+      return (c: vscode.LogOutputChannel) => c.debug.bind(c);
     case LogLevel.warn:
-      return 'WARN';
+      return (c: vscode.LogOutputChannel) => c.warn.bind(c);
     case LogLevel.error:
-      return 'ERROR';
+      return (c: vscode.LogOutputChannel) => c.error.bind(c);
     default:
-      return 'INFO';
+      return (c: vscode.LogOutputChannel) => c.info.bind(c);
   }
 }
 
-function appendToOutputChannel(outputChannel: vscode.OutputChannel, messages: unknown[], prefix?: string) {
-  for (const param of messages) {
-    if (param !== undefined) {
-      if (prefix) {
-        outputChannel.append(prefix);
-      }
-      if (utils.isError(param)) {
-        outputChannel.appendLine(`${param.name} - ${param.message}`);
-        if (param.stack) {
-          outputChannel.appendLine(param.stack);
-        }
-      } else {
-        outputChannel.appendLine(utils.toString(param) || `${param}`);
-      }
-    }
+export function resetOutputChannel() {
+  const config = getConfigSetting();
+  if (!config.logResetOutputchannel) {
+    return;
+  }
+  for (const c of Object.values(outputChannels)) {
+    c.clear();
   }
 }
 
 export function initLog() {
-  io.log.options.logMethod = logToOutputChannelFactory('Log');
+  io.log.options.logMethod = logToOutputChannelFactory(LogChannel.Log);
 }
 
 export function initUserInteractionProvider(): vscode.Disposable {

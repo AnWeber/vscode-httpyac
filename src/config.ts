@@ -44,7 +44,6 @@ export interface ResourceConfig {
   environmentVariables?: Record<string, httpyac.Variables>;
   envDirName?: string;
   rootDir?: string;
-  logLevel?: string;
   logOutputChannelOptions?: httpyac.RequestLoggerFactoryOptions;
   logRequest?: boolean;
   useRegionScopedVariables?: boolean;
@@ -112,6 +111,7 @@ export interface AppConfig {
   testResetEnvBeforeRun?: boolean;
   testRunAlwaysUseEnv?: Array<string>;
   testRunRepeatTimes?: number;
+  logResetOutputchannel?: boolean;
 }
 
 export function getConfigSetting(): AppConfig {
@@ -127,21 +127,6 @@ export function getResourceConfig(fileName: httpyac.PathLike): ResourceConfig {
   return result;
 }
 
-function toLogLevel(level: string | undefined): httpyac.LogLevel {
-  switch (level) {
-    case 'trace':
-      return httpyac.LogLevel.trace;
-    case 'debug':
-      return httpyac.LogLevel.debug;
-    case 'warn':
-      return httpyac.LogLevel.warn;
-    case 'error':
-      return httpyac.LogLevel.error;
-    default:
-      return httpyac.LogLevel.info;
-  }
-}
-
 export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<httpyac.EnvironmentConfig> {
   const config = getResourceConfig(fileName);
   const httpOptions = vscode.workspace.getConfiguration('http');
@@ -149,7 +134,7 @@ export async function getEnvironmentConfig(fileName: httpyac.PathLike): Promise<
   const environmentConfig: httpyac.EnvironmentConfig = {
     environments: config.environmentVariables,
     log: {
-      level: toLogLevel(config.logLevel),
+      level: httpyac.LogLevel.trace, // let user decide on output channel
       supportAnsiColors: false,
     },
     cookieJarEnabled: getValueOrUndefined(config.cookieJarEnabled),

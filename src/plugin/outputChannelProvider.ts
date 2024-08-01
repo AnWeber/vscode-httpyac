@@ -1,6 +1,6 @@
 import * as httpyac from 'httpyac';
 import { ResourceConfig, getResourceConfig } from '../config';
-import { getOutputChannel, logStream } from '../io';
+import { getOutputChannel } from '../io';
 
 export async function provideOutputChannelLogger(
   _env: string[] | undefined,
@@ -18,7 +18,7 @@ export async function provideOutputChannelLogger(
       );
       const logContextStream = context.logStream;
       context.logStream = async (type, message) => {
-        await logStream(type, message);
+        context.scriptConsole?.info(type, message);
         if (logContextStream) {
           await logContextStream?.(type, message);
         }

@@ -31,8 +31,8 @@ export function errorHandlerWrapper(
   };
 }
 
-async function handleError(_target: unknown, _propertyKey: string | symbol, err: unknown) {
-  io.log.error(err);
+async function handleError(_target: unknown, propertyKey: string | symbol, err: unknown) {
+  io.log.error(`error on property ${String(propertyKey)} call`, err);
 
   if (getConfigSetting().showNotificationPopup) {
     if (utils.isError(err)) {

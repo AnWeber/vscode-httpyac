@@ -688,18 +688,11 @@
           "default": ".httpyac",
           "description": "path to store response files"
         },
-        "httpyac.logLevel": {
-          "type": "string",
-          "default": "warn",
-          "scope": "resource",
-          "enum": [
-            "trace",
-            "debug",
-            "warn",
-            "error",
-            "info"
-          ],
-          "description": "log level of output channel"
+        "httpyac.logResetOutputchannel": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "reset output channel before runs"
         },
         "httpyac.logRequest": {
           "type": "boolean",
@@ -1556,23 +1549,23 @@
   },
   "devDependencies": {
     "@types/har-format": "1.2.15",
-    "@types/lodash": "^4.17.0",
+    "@types/lodash": "^4.17.7",
     "@types/mime-types": "^2.1.4",
-    "@types/node": "^20.12.7",
-    "@types/uuid": "^9.0.8",
-    "@types/vscode": "1.68.0",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.8.0",
-    "esbuild": "^0.20.2",
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "@types/vscode": "1.91.0",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-simple-import-sort": "^12.1.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "lockfile-lint": "^4.13.2",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.7",
+    "lockfile-lint": "^4.14.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "filesize": "^10.1.4",

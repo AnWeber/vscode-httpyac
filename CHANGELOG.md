@@ -1,6 +1,9 @@
 ## [unreleased]
 ### Features
 - add contextMenu Entry in explorer view (#313)
+- use vscode.LogOutputChannel for better Output Highlighting (#316)
+  - config setting httpyac.LogLevel is removed in favor for setting loglevel on OutputChannel
+  - allow resetting OutputChannel before runs
 
 ### Fix
 - variables in gql Query body are replaced (AnWeber/vscode-httpyac#303)
