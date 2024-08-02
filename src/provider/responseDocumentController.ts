@@ -40,7 +40,7 @@ export class ResponseDocumentController
 
       if (cacheItem?.testResults) {
         lenses.push(
-          `TestResults ${cacheItem.testResults.filter(obj => obj.result).length}/${cacheItem.testResults.length}`
+          `TestResults ${cacheItem.testResults.filter(obj => obj.status === httpyac.TestResultStatus.SUCCESS).length}/${cacheItem.testResults.length}`
         );
       }
       const headers = getConfigSetting().responseViewHeader;
@@ -66,10 +66,10 @@ export class ResponseDocumentController
                 const prop = headerName.slice(metaProperty.length);
                 const testResults = cacheItem.testResults;
                 if (prop === 'failed') {
-                  return `${prop}: ${testResults.filter(obj => !obj.result).length}`;
+                  return `${prop}: ${testResults.filter(obj => [httpyac.TestResultStatus.ERROR, httpyac.TestResultStatus.FAILED].includes(obj.status)).length}`;
                 }
                 if (prop === 'success') {
-                  return `${prop}: ${testResults.filter(obj => obj.result).length}`;
+                  return `${prop}: ${testResults.filter(obj => obj.status === httpyac.TestResultStatus.SUCCESS).length}`;
                 }
                 if (prop === 'total') {
                   return `${prop}: ${testResults.length}`;

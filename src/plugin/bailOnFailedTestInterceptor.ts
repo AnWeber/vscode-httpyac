@@ -1,11 +1,13 @@
-import { ProcessorContext } from 'httpyac';
+import { ProcessorContext, TestResultStatus } from 'httpyac';
 import { getConfigSetting } from '../config';
 
 export const bailOnFailedTestInterceptor = {
   id: 'bailOnFailedTests',
   afterLoop: async function bail(hookContext: { args: [ProcessorContext] }) {
     const [context] = hookContext.args;
-    const failedTest = context.httpRegion.testResults?.find?.(obj => !obj.result);
+    const failedTest = context.httpRegion.testResults?.find?.(obj =>
+      [TestResultStatus.ERROR, TestResultStatus.FAILED].includes(obj.status)
+    );
     if (failedTest) {
       const bailOnFailedTest = getConfigSetting().testBailOnFailedTest;
       if (bailOnFailedTest === 'error') {

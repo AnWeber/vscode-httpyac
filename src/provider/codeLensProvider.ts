@@ -120,7 +120,7 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
             result.push(
               new vscode.CodeLens(range, {
                 arguments: [httpRegion],
-                title: `TestResults ${httpRegion.testResults.filter(obj => obj.result).length}/${
+                title: `TestResults ${httpRegion.testResults.filter(obj => obj.status === httpyac.TestResultStatus.SUCCESS).length}/${
                   httpRegion.testResults.length
                 }`,
                 command: commands.viewHeader,
