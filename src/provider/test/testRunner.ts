@@ -99,17 +99,20 @@ export class TestRunner {
         await tmpLogResponse?.(response, httpRegion);
       };
       try {
-        const cancelled = !(await this.documentStore.send(sendContext));
+        await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
-        if (sendContext.httpRegion.metaData.disabled || cancelled) {
+        if (testResults?.some(t => t.status === httpyac.TestResultStatus.ERROR)) {
+          const testResult = testResults?.find(t => t.status === httpyac.TestResultStatus.ERROR);
+          testRunContext.testRun.errored(testItem, new vscode.TestMessage(testResult?.message || ''), duration());
+        } else if (testResults?.some(t => t.status === httpyac.TestResultStatus.SKIPPED)) {
           testRunContext.testRun.skipped(testItem);
-        } else if (!testResults || testResults.every(obj => !obj.error)) {
+        } else if (!testResults || testResults.every(t => t.status === httpyac.TestResultStatus.SUCCESS)) {
           testRunContext.testRun.passed(testItem, duration());
         } else {
           testRunContext.testRun.failed(
             testItem,
             testResults.reduce((prev, obj) => {
-              if (!obj.result) {
+              if (obj.status !== httpyac.TestResultStatus.SUCCESS) {
                 prev.push(new vscode.TestMessage(obj.message));
                 if (obj.error) {
                   prev.push(new vscode.TestMessage(obj.error.displayMessage));
