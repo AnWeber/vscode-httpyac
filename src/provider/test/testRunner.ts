@@ -94,10 +94,6 @@ export class TestRunner {
       !sendContext.httpRegion.metaData.disabled &&
       !sendContext.httpRegion.metaData.testDisabled
     ) {
-      const tmpLogResponse = sendContext.logResponse;
-      sendContext.logResponse = async (response, httpRegion) => {
-        await tmpLogResponse?.(response, httpRegion);
-      };
       try {
         await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
@@ -164,23 +160,56 @@ export class TestRunner {
           return () => dispose.dispose();
         },
       };
-      if (testRunContext.testItems.indexOf(testItem) >= 0) {
+
+      context.scriptConsole = new httpyac.io.Logger({
+        level: httpyac.LogLevel.trace,
+        logMethod(level, ...params: unknown[]) {
+          testRunContext.testRun.appendOutput(
+            `${toLevelString(level)} ${params.map(p => httpyac.utils.toString(p)).join(' ')}`,
+            undefined,
+            testItem
+          );
+        },
+      });
+      const hasOnlyOneTestItem = testRunContext.testItems.indexOf(testItem) >= 0;
+
+      const testRunContextLogResponse = httpyac.utils.requestLoggerFactory(
+        (arg: string) => {
+          testRunContext.testRun.appendOutput('\r\n');
+          testRunContext.testRun.appendOutput(arg, undefined, testItem);
+        },
+        { useShort: true }
+      );
+      context.logResponse = async (response, httpRegion) => {
+        testRunContextLogResponse(response, httpRegion);
+        if (response && hasOnlyOneTestItem) {
+          await this.responseStore.add(response, httpRegion);
+        }
+      };
+      if (hasOnlyOneTestItem) {
         context.logStream = async (_type, response) => {
           if (config.addStreamingResponsesToHistory) {
             await this.responseStore.add(response, undefined, false);
           }
         };
-        context.logResponse = async (response, httpRegion) => {
-          context.progress?.report?.({
-            message: 'show view',
-          });
-          if (response) {
-            await this.responseStore.add(response, httpRegion);
-          }
-        };
       }
+
       return context;
     }
     return undefined;
+  }
+}
+function toLevelString(level: httpyac.LogLevel) {
+  switch (level) {
+    case httpyac.LogLevel.trace:
+      return 'TRACE';
+    case httpyac.LogLevel.debug:
+      return 'DEBUG';
+    case httpyac.LogLevel.warn:
+      return 'WARN';
+    case httpyac.LogLevel.error:
+      return 'ERROR';
+    default:
+      return 'INFO';
   }
 }
