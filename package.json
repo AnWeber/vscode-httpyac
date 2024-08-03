@@ -1049,7 +1049,7 @@
           "scope": "window",
           "description": "prevents test runner from executing more than the specified amount of tests at the same time."
         },
-        "httpyac.testResetEnvBeforeRun ": {
+        "httpyac.testResetEnvBeforeRun": {
           "type": "boolean",
           "default": false,
           "scope": "window",
