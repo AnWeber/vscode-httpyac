@@ -8,6 +8,7 @@ import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
 import { ResponseStore } from '../responseStore';
 import { ResponseItem } from '../view';
+import { resetBail } from '../plugin';
 
 export class RequestCommandsController extends DisposeProvider {
   constructor(
@@ -150,6 +151,7 @@ export class RequestCommandsController extends DisposeProvider {
             }
           };
           await this.documentStore.send(context);
+          resetBail();
         }
       );
     }

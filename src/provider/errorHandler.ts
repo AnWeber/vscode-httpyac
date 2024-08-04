@@ -1,5 +1,4 @@
 /* eslint-disable no-invalid-this */
-import { getConfigSetting } from '../config';
 import { io, utils } from 'httpyac';
 import { window } from 'vscode';
 
@@ -34,17 +33,15 @@ export function errorHandlerWrapper(
 async function handleError(_target: unknown, propertyKey: string | symbol, err: unknown) {
   io.log.error(`error on property ${String(propertyKey)} call`, err);
 
-  if (getConfigSetting().showNotificationPopup) {
-    if (utils.isError(err)) {
-      let message = err.stack || `${err.name} - ${err.message}`;
-      const quickFix = getErrorQuickFix(err);
-      if (quickFix) {
-        message = `${err.name} - ${err.message} => ${quickFix}`;
-      }
-      await window.showErrorMessage(message);
-    } else {
-      await window.showErrorMessage(utils.toString(err) || `${err}`);
+  if (utils.isError(err)) {
+    let message = err.stack || `${err.name} - ${err.message}`;
+    const quickFix = getErrorQuickFix(err);
+    if (quickFix) {
+      message = `${err.name} - ${err.message} => ${quickFix}`;
     }
+    await window.showErrorMessage(message);
+  } else {
+    await window.showErrorMessage(utils.toString(err) || `${err}`);
   }
 }
 

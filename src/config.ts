@@ -76,7 +76,6 @@ export interface AppConfig {
   maxHistoryItems?: number;
   decorationActiveRegion?: vscode.DecorationRenderOptions;
   decorationInactiveRegion?: vscode.DecorationRenderOptions;
-  showNotificationPopup?: boolean;
   useCodeLensInNotebook?: boolean;
   generateCodeDefaultLanguage?: {
     target: string;
@@ -106,7 +105,7 @@ export interface AppConfig {
   testControllerEnabled?: boolean;
   testItemExtensions?: Array<string>;
   testHiearchy?: 'filesystem' | 'flattened' | 'flat';
-  testBailOnFailedTest?: 'no_bail' | 'error' | 'silent';
+  testBailOnFailedTest?: boolean;
   testMaxConcurrency?: number;
   testResetEnvBeforeRun?: boolean;
   testRunAlwaysUseEnv?: Array<string>;

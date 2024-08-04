@@ -95,7 +95,6 @@ keybindings are only active in files with language http
 | Name                              | Description                                             | Default |
 | --------------------------------- | ------------------------------------------------------- | ------- |
 | `httpyac.showGutterIcon`          | show gutter icon to highlight request lines             | `true`  |
-| `httpyac.showNotificationPopup`   | show information, warning and error notifiation message | `true`  |
 | `httpyac.useMethodInSendCodeLens` | use request method in send code lens                    | `false` |
 | `httpyac.logLevel`                | log level of output channel                             | `warn`  |
 | `httpyac.maxHistoryItems`         | number of max history items                             | `50`    |

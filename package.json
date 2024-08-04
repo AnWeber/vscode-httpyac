@@ -798,12 +798,6 @@
           "scope": "window",
           "description": "decoration for inactive region (colors starting with theme. use vscode color)"
         },
-        "httpyac.showNotificationPopup": {
-          "type": "boolean",
-          "default": true,
-          "scope": "window",
-          "description": "show information, warning and error notification message"
-        },
         "httpyac.addStreamingResponsesToHistory": {
           "type": "boolean",
           "default": true,
@@ -1028,18 +1022,8 @@
           "description": "hierarchy used for tests"
         },
         "httpyac.testBailOnFailedTest": {
-          "type": "string",
-          "enum": [
-            "no_bail",
-            "error",
-            "silent"
-          ],
-          "markdownEnumDescriptions": [
-            "no bail",
-            "throw error on test result error",
-            "cancel execution on test result error"
-          ],
-          "default": "no_bail",
+          "type": "boolean",
+          "default": false,
           "scope": "window",
           "description": "bail on failed test results"
         },

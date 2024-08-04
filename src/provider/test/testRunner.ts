@@ -7,6 +7,7 @@ import { TestItemResolver } from './testItemResolver';
 import { StoreController } from '../storeController';
 import { logTestRun } from './testRunOutput';
 import { isHttpFileItem, isHttpRegionTestItem } from './testItemKind';
+import { resetBail } from '../../plugin';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -50,6 +51,7 @@ export class TestRunner {
     }
     logTestRun(processedHttpRegions);
     testRun.end();
+    resetBail();
   }
 
   private async resetEnvironmentIfNeeded() {
@@ -97,10 +99,14 @@ export class TestRunner {
       try {
         await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
+
+        const skippedTestResult = testResults?.find(t => t.status === httpyac.TestResultStatus.SKIPPED);
+
         if (testResults?.some(t => t.status === httpyac.TestResultStatus.ERROR)) {
           const testResult = testResults?.find(t => t.status === httpyac.TestResultStatus.ERROR);
           testRunContext.testRun.errored(testItem, new vscode.TestMessage(testResult?.message || ''), duration());
-        } else if (testResults?.some(t => t.status === httpyac.TestResultStatus.SKIPPED)) {
+        } else if (skippedTestResult) {
+          testRunContext.testRun.appendOutput(skippedTestResult.message, undefined, testItem);
           testRunContext.testRun.skipped(testItem);
         } else if (!testResults || testResults.every(t => t.status === httpyac.TestResultStatus.SUCCESS)) {
           testRunContext.testRun.passed(testItem, duration());
@@ -175,7 +181,7 @@ export class TestRunner {
 
       const testRunContextLogResponse = httpyac.utils.requestLoggerFactory(
         (arg: string) => {
-          testRunContext.testRun.appendOutput('\r\n');
+          testRunContext.testRun.appendOutput('\r\n', undefined, testItem);
           testRunContext.testRun.appendOutput(arg, undefined, testItem);
         },
         { useShort: true }
