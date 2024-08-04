@@ -1,13 +1,18 @@
-## [unreleased]
+## [6.15.0] ( 2024-08-04)
 ### Features
+- add support to define timeout per request using `request.timeout` or setting variable `request_timeout`
 - add contextMenu Entry in explorer view (#313)
 - use vscode.LogOutputChannel for better Output Highlighting (#316)
   - config setting httpyac.LogLevel is removed in favor for setting loglevel on OutputChannel
   - allow resetting OutputChannel before runs
 
 ### Fix
-- variables in gql Query body are replaced (AnWeber/vscode-httpyac#303)
+- variables in gql Query body are replaced (#303)
 - allow defaultHeaders to overwrite accept or user-agent header
+- only try loading grpc reflection if no other protodefinition file is imported or it is explicitly triggerd using grpcReflection (Anweber/httpyac#757)
+- add better handling for disabled and error tests (#297, Anweber/httpyac#760)
+- support empty passwords for Basic auth  (#751)
+- error do not bail test runs and instead just set error for this httpRegion (Anweber/httpyac#708)
 - update label of testItem on httpRegion name change (#315)
 - add missing definitions to codeLens property (#314)
 
