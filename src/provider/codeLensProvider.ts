@@ -113,20 +113,20 @@ export class CodeLensProvider extends DisposeProvider implements vscode.CodeLens
             );
           }
         }
+        if (httpRegion.testResults && config?.codelens?.testResult) {
+          result.push(
+            new vscode.CodeLens(range, {
+              arguments: [httpRegion],
+              title: `TestResults ${httpRegion.testResults.filter(obj => obj.status === httpyac.TestResultStatus.SUCCESS).length}/${
+                httpRegion.testResults.length
+              }`,
+              command: commands.viewHeader,
+            })
+          );
+        }
 
         const responseItem = await this.responseStore.findResponseByHttpRegion(httpRegion);
         if (responseItem) {
-          if (httpRegion.testResults && config?.codelens?.testResult) {
-            result.push(
-              new vscode.CodeLens(range, {
-                arguments: [httpRegion],
-                title: `TestResults ${httpRegion.testResults.filter(obj => obj.status === httpyac.TestResultStatus.SUCCESS).length}/${
-                  httpRegion.testResults.length
-                }`,
-                command: commands.viewHeader,
-              })
-            );
-          }
           if (config?.codelens?.showResponse) {
             result.push(
               new vscode.CodeLens(range, {
