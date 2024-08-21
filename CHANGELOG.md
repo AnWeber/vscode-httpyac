@@ -8,6 +8,7 @@
 - copy header for aws signing (AnWeber/httpyac#769)
 - add skip test result if `@ref` is skipped (#297)
 - support Test Runner in VScode Environemnts without open Workspace (#320)
+- always add responses from test run to history (#317)
 
 ## [6.15.0] ( 2024-08-04)
 ### Features

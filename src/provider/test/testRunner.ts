@@ -188,8 +188,8 @@ export class TestRunner {
       );
       context.logResponse = async (response, httpRegion) => {
         testRunContextLogResponse(response, httpRegion);
-        if (response && hasOnlyOneTestItem) {
-          await this.responseStore.add(response, httpRegion);
+        if (response) {
+          await this.responseStore.add(response, httpRegion, hasOnlyOneTestItem);
         }
       };
       if (hasOnlyOneTestItem) {
