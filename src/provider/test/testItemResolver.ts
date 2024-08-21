@@ -120,21 +120,15 @@ export class TestItemResolver extends DisposeProvider {
     try {
       if (testItem) {
         await this.resolveTestItemChildren(testItem);
-      } else {
+      } else if (vscode.workspace.workspaceFolders?.length) {
         const files = await vscode.workspace.findFiles(`**/*.{${this.getTestItemExtensions().join(',')}}`, undefined);
-        this.testController.items.replace([]);
-        this.items.length = 0;
-
-        const promises = [];
-        for (const uri of files) {
-          const testItem = this.createFileTestItem(uri);
-
-          if (testItem.children.size === 0) {
-            promises.push(this.loadTagsForHttpFile(testItem));
-          }
-        }
-        this.checkForFlattendFileSystem();
-        await Promise.all(promises);
+        await this.resolveTestItemsFromFiles(files);
+      } else {
+        const extensions = this.getTestItemExtensions();
+        const files = vscode.window.visibleTextEditors
+          .filter(e => extensions.some(ext => e.document.fileName.endsWith(ext)))
+          .map(e => e.document.uri);
+        await this.resolveTestItemsFromFiles(files);
       }
     } catch (err) {
       httpyac.io.log.error(err);
@@ -142,6 +136,22 @@ export class TestItemResolver extends DisposeProvider {
         testItem.error = httpyac.utils.toString(err);
       }
     }
+  }
+
+  private async resolveTestItemsFromFiles(files: vscode.Uri[]) {
+    this.testController.items.replace([]);
+    this.items.length = 0;
+
+    const promises = [];
+    for (const uri of files) {
+      const testItem = this.createFileTestItem(uri);
+
+      if (testItem.children.size === 0) {
+        promises.push(this.loadTagsForHttpFile(testItem));
+      }
+    }
+    this.checkForFlattendFileSystem();
+    await Promise.all(promises);
   }
 
   public async loadTagsForHttpFile(testItem: vscode.TestItem) {
@@ -169,7 +179,10 @@ export class TestItemResolver extends DisposeProvider {
   }
 
   private createFileTestItem(file: vscode.Uri): vscode.TestItem {
-    const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || { name: 'httpyac Tests', uri: file };
+    const workspaceRoot = vscode.workspace.getWorkspaceFolder(file) || {
+      name: 'httpyac Tests',
+      uri: vscode.Uri.joinPath(file, '..'),
+    };
     const workspaceTestItem = this.createTestItem(
       TestItemKind.workspace,
       `${workspaceRoot.name} (httpYac)`,

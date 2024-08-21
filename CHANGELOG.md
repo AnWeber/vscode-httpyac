@@ -1,3 +1,14 @@
+## [unreleased]
+### Features
+- prefix output with name as fallback for title (318)
+
+### Fix
+
+- ensure valid names of parsed symbols (#297)
+- copy header for aws signing (AnWeber/httpyac#769)
+- add skip test result if `@ref` is skipped (#297)
+- support Test Runner in VScode Environemnts without open Workspace (#320)
+
 ## [6.15.0] ( 2024-08-04)
 ### Features
 - add support to define timeout per request using `request.timeout` or setting variable `request_timeout`
