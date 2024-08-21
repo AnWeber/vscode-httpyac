@@ -94,8 +94,12 @@ export class StorageProvider extends DisposeProvider {
   public async clear(): Promise<void> {
     const config = getConfigSetting();
 
+    const visibleUris = vscode.window.visibleTextEditors
+      .map(e => e.document.uri)
+      .filter(uri => this.cachedUris.some(u => u.toString() === uri.toString()));
+
     for (const uri of this.cachedUris) {
-      if (await this.fileExists(uri)) {
+      if ((await this.fileExists(uri)) && visibleUris.every(u => u.toString() !== uri.toString())) {
         try {
           await vscode.workspace.fs.delete(uri, { useTrash: false });
         } catch (err) {
@@ -103,8 +107,8 @@ export class StorageProvider extends DisposeProvider {
         }
       }
     }
-    this.cachedUris = [];
-    if (config.responseStorage !== 'none') {
+    this.cachedUris = [...visibleUris];
+    if (config.responseStorage !== 'none' && visibleUris.length === 0) {
       const baseUri = this.baseStoragePath(config);
       try {
         if (baseUri && (await this.fileExists(baseUri))) {
