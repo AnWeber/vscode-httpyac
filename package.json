@@ -926,7 +926,7 @@
             }
           },
           "additionalProperties": false,
-          "markdownDescription": "Specifies which codelens should be suppressed",
+          "markdownDescription": "enable codelens commands",
           "scope": "window"
         },
         "httpyac.environmentShowStatusBarItem": {
