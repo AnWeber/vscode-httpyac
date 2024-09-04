@@ -1552,7 +1552,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "filesize": "^10.1.4",
+    "filesize": "^10.1.5",
     "httpsnippet": "^3.0.1",
     "httpyac": "^6.15.1",
     "lodash": "^4.17.21",
