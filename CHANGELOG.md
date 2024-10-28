@@ -1,3 +1,12 @@
+## [6.16.0] ( 2024-10-28)
+### Features
+- support client certificates on OAuth2 Requests (AnWeber/httpyac#802)
+- update tough-cookie to remove punycode deprecation warning (AnWeber/httpyac#813)
+- support $env intellij environment variables access (AnWeber/httpyac#811)
+- failed tests in reference skips request (#335)
+- support `http_proxy` environment variable
+- remove `unexpected-response` listener to support abortHandshake in ws (AnWeber/httpyac#816)
+
 ## [6.15.1] ( 2024-08-22)
 ### Features
 - prefix output with name as fallback for title (318)
