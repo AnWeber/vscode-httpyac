@@ -100,13 +100,10 @@ export class TestRunner {
         await this.documentStore.send(sendContext);
         const testResults = sendContext.httpRegion?.testResults;
 
-        const skippedTestResult = testResults?.find(t => t.status === httpyac.TestResultStatus.SKIPPED);
-
         if (testResults?.some(t => t.status === httpyac.TestResultStatus.ERROR)) {
           const testResult = testResults?.find(t => t.status === httpyac.TestResultStatus.ERROR);
           testRunContext.testRun.errored(testItem, new vscode.TestMessage(testResult?.message || ''), duration());
-        } else if (skippedTestResult) {
-          testRunContext.testRun.appendOutput(skippedTestResult.message, undefined, testItem);
+        } else if (testResults?.find(t => t.status === httpyac.TestResultStatus.SKIPPED)) {
           testRunContext.testRun.skipped(testItem);
         } else if (!testResults || testResults.every(t => t.status === httpyac.TestResultStatus.SUCCESS)) {
           testRunContext.testRun.passed(testItem, duration());
