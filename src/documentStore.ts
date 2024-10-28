@@ -10,7 +10,7 @@ import { logToOutputChannelFactory, LogChannel, resetOutputChannel } from './io'
 import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
-import { registerVscodePlugins } from './plugin';
+import { HttpRegionExecutedEvent, registerVscodePluginsFactory } from './plugin';
 
 export enum HttpFileChangedEventType {
   CHANGED,
@@ -46,12 +46,20 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
 
   documentStoreChangedEmitter: vscode.EventEmitter<void>;
   private httpFileChangedEmitter: vscode.EventEmitter<HttpFileChangedEvent>;
+  private httpRegionExecutedEmitter: vscode.EventEmitter<HttpRegionExecutedEvent>;
+
+  public get httpRegionExecuted(): vscode.Event<HttpRegionExecutedEvent> {
+    return this.httpRegionExecutedEmitter.event;
+  }
 
   constructor() {
     super();
     this.documentStoreChangedEmitter = new vscode.EventEmitter<void>();
+    this.httpRegionExecutedEmitter = new vscode.EventEmitter<HttpRegionExecutedEvent>();
     this.httpFileChangedEmitter = new vscode.EventEmitter<HttpFileChangedEvent>();
-    this.httpFileStore = new httpyac.store.HttpFileStore({ vscode: registerVscodePlugins });
+    this.httpFileStore = new httpyac.store.HttpFileStore({
+      vscode: registerVscodePluginsFactory(this.httpRegionExecutedEmitter),
+    });
     this.getDocumentPathLike = document => document.uri;
     this.activeEnvironment = getConfigSetting().environmentSelectedOnStart;
 

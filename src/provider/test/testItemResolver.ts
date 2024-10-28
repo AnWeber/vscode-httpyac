@@ -258,13 +258,17 @@ export class TestItemResolver extends DisposeProvider {
     return getConfigSetting().testHiearchy === 'flattened';
   }
 
+  public getTestItemForHttpRegion(httpRegion: httpyac.HttpRegion, fileUri: vscode.Uri) {
+    return this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri, httpRegion.id);
+  }
+
   private createHttpFileTestItem(httpFile: httpyac.HttpFile, parent: vscode.TestItem) {
     const fileUri = toUri(httpFile.fileName);
     if (fileUri) {
       const items: Array<vscode.TestItem> = [];
       for (const httpRegion of httpFile.httpRegions) {
         if (!httpRegion.isGlobal()) {
-          const testItem = this.createTestItem(TestItemKind.httpRegion, httpRegion.symbol.name, fileUri, httpRegion.id);
+          const testItem = this.getTestItemForHttpRegion(httpRegion, fileUri);
           const requestLine =
             httpRegion.symbol.children?.find(obj => obj.kind === httpyac.HttpSymbolKind.requestLine)?.startLine ||
             httpRegion.symbol.startLine;

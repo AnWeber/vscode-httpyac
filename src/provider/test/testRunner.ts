@@ -8,6 +8,7 @@ import { StoreController } from '../storeController';
 import { logTestRun } from './testRunOutput';
 import { isHttpFileItem, isHttpRegionTestItem } from './testItemKind';
 import { resetBail } from '../../plugin';
+import { toUri } from '../../io';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -29,29 +30,51 @@ export class TestRunner {
     const testRun = this.testController.createTestRun(request);
     const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
 
-    await this.resetEnvironmentIfNeeded();
-    const processedHttpRegions: Array<httpyac.ProcessedHttpRegion> = [];
-    const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
-      for (const item of items) {
-        if (!token.isCancellationRequested && isHttpRegionTestItem(item)) {
-          await this.runTestItem(item, {
-            testRun,
-            testItems,
-            token,
-            processedHttpRegions,
-          });
-        } else {
-          testRun.skipped(item);
-        }
+    const testStartTime = Date.now();
+    const duration = () => Date.now() - testStartTime;
+    const disposeHttpRegionExecuted = this.documentStore.httpRegionExecuted(({ httpRegion, httpFile }) => {
+      const fileUri = toUri(httpFile.fileName);
+      if (fileUri) {
+        this.setTestResult(
+          httpRegion,
+          testRun,
+          this.testItemResolver.getTestItemForHttpRegion(httpRegion, fileUri),
+          duration
+        );
       }
     });
-    const repeatTimes = getConfigSetting().testRunRepeatTimes || 1;
-    for (let index = 0; index < repeatTimes; index++) {
-      await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
+
+    try {
+      await this.resetEnvironmentIfNeeded();
+      const processedHttpRegions: Array<httpyac.ProcessedHttpRegion> = [];
+      const testFuncs = (await this.enqueuedTestItems(testItems, testRun)).map(items => async () => {
+        for (const item of items) {
+          if (!token.isCancellationRequested && isHttpRegionTestItem(item)) {
+            await this.runTestItem(
+              item,
+              {
+                testRun,
+                testItems,
+                token,
+                processedHttpRegions,
+              },
+              duration
+            );
+          } else {
+            testRun.skipped(item);
+          }
+        }
+      });
+      const repeatTimes = getConfigSetting().testRunRepeatTimes || 1;
+      for (let index = 0; index < repeatTimes; index++) {
+        await httpyac.utils.promiseQueue(getConfigSetting().testMaxConcurrency || 1, ...testFuncs);
+      }
+      logTestRun(processedHttpRegions);
+      testRun.end();
+      resetBail();
+    } finally {
+      disposeHttpRegionExecuted.dispose();
     }
-    logTestRun(processedHttpRegions);
-    testRun.end();
-    resetBail();
   }
 
   private async resetEnvironmentIfNeeded() {
@@ -85,9 +108,11 @@ export class TestRunner {
     return result;
   }
 
-  private async runTestItem(testItem: vscode.TestItem, testRunContext: TestRunContext): Promise<void> {
-    const testStartTime = Date.now();
-    const duration = () => Date.now() - testStartTime;
+  private async runTestItem(
+    testItem: vscode.TestItem,
+    testRunContext: TestRunContext,
+    duration: () => number
+  ): Promise<void> {
     testRunContext.testRun.started(testItem);
     const sendContext = await this.getSendContext(testItem, testRunContext);
     if (
@@ -98,30 +123,6 @@ export class TestRunner {
     ) {
       try {
         await this.documentStore.send(sendContext);
-        const testResults = sendContext.httpRegion?.testResults;
-
-        if (testResults?.some(t => t.status === httpyac.TestResultStatus.ERROR)) {
-          const testResult = testResults?.find(t => t.status === httpyac.TestResultStatus.ERROR);
-          testRunContext.testRun.errored(testItem, new vscode.TestMessage(testResult?.message || ''), duration());
-        } else if (testResults?.find(t => t.status === httpyac.TestResultStatus.SKIPPED)) {
-          testRunContext.testRun.skipped(testItem);
-        } else if (!testResults || testResults.every(t => t.status === httpyac.TestResultStatus.SUCCESS)) {
-          testRunContext.testRun.passed(testItem, duration());
-        } else {
-          testRunContext.testRun.failed(
-            testItem,
-            testResults.reduce((prev, obj) => {
-              if (obj.status !== httpyac.TestResultStatus.SUCCESS) {
-                prev.push(new vscode.TestMessage(obj.message));
-                if (obj.error) {
-                  prev.push(new vscode.TestMessage(obj.error.displayMessage));
-                }
-              }
-              return prev;
-            }, [] as Array<vscode.TestMessage>),
-            duration()
-          );
-        }
       } catch (err) {
         httpyac.io.log.error(err);
         testRunContext.testRun.errored(
@@ -132,6 +133,38 @@ export class TestRunner {
       }
     } else {
       testRunContext.testRun.skipped(testItem);
+    }
+  }
+
+  private setTestResult(
+    httpRegion: httpyac.HttpRegion,
+    testRun: vscode.TestRun,
+    testItem: vscode.TestItem,
+    duration: () => number
+  ) {
+    const testResults = httpRegion?.testResults;
+
+    if (testResults?.some(t => t.status === httpyac.TestResultStatus.ERROR)) {
+      const testResult = testResults?.find(t => t.status === httpyac.TestResultStatus.ERROR);
+      testRun.errored(testItem, new vscode.TestMessage(testResult?.message || ''), duration());
+    } else if (testResults?.find(t => t.status === httpyac.TestResultStatus.SKIPPED)) {
+      testRun.skipped(testItem);
+    } else if (!testResults || testResults.every(t => t.status === httpyac.TestResultStatus.SUCCESS)) {
+      testRun.passed(testItem, duration());
+    } else {
+      testRun.failed(
+        testItem,
+        testResults.reduce((prev, obj) => {
+          if (obj.status !== httpyac.TestResultStatus.SUCCESS) {
+            prev.push(new vscode.TestMessage(obj.message));
+            if (obj.error) {
+              prev.push(new vscode.TestMessage(obj.error.displayMessage));
+            }
+          }
+          return prev;
+        }, [] as Array<vscode.TestMessage>),
+        duration()
+      );
     }
   }
 
