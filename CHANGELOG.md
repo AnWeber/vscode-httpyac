@@ -1,15 +1,20 @@
-## [unreleased]
+## [6.16.4] (2024-11-03)
+
+### Features
+- add support for better Buffer JSON stringify (AnWeber/httpyac#796)
 
 ### Fix
 - handle dom parser exception for invalid xml (AnWeber/httpyac#821)
 - do not log stack on assertions error (#338)
+- only clear output channel for test runs (#337)
+- add skipped test result on user cancellation (#323)
 - only clear output channel for test runs (#337)
 
 ## [6.16.3] (2024-10-30)
 
 ### Fix
 - revert: named response is only set, if all testResults are valid
-- changed behaviour from `@ref` (AnWeber/vscode-httpyac#336)
+- changed behaviour from `@ref` (#336)
   - negative test results from reference does not stop dependent request
   - errored reference is not executed multiple times if it is referenced multiple times
 
