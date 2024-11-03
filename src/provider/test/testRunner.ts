@@ -8,7 +8,7 @@ import { StoreController } from '../storeController';
 import { logTestRun } from './testRunOutput';
 import { isHttpFileItem, isHttpRegionTestItem } from './testItemKind';
 import { resetBail } from '../../plugin';
-import { toUri } from '../../io';
+import { resetOutputChannel, toUri } from '../../io';
 
 interface TestRunContext {
   testRun: vscode.TestRun;
@@ -27,6 +27,7 @@ export class TestRunner {
   ) {}
 
   public async run(request: vscode.TestRunRequest, token: vscode.CancellationToken): Promise<void> {
+    resetOutputChannel();
     const testRun = this.testController.createTestRun(request);
     const testItems: Array<vscode.TestItem> = await this.testItemResolver.resolveTestItemsForRequest(request);
 

@@ -6,7 +6,7 @@ import {
   watchConfigSettings,
 } from './config';
 import { DocumentStore as IDocumentStore } from './extensionApi';
-import { logToOutputChannelFactory, LogChannel, resetOutputChannel } from './io';
+import { logToOutputChannelFactory, LogChannel } from './io';
 import * as utils from './utils';
 import * as httpyac from 'httpyac';
 import * as vscode from 'vscode';
@@ -229,7 +229,6 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
 
   async send(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined): Promise<boolean> {
     try {
-      resetOutputChannel();
       if (context) {
         const config = await getEnvironmentConfig(context.httpFile.fileName);
 

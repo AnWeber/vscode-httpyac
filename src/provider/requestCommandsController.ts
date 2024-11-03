@@ -3,7 +3,7 @@ import * as httpyac from 'httpyac';
 import { commands, getEnvironmentConfig, getConfigSetting } from '../config';
 import { errorHandler } from './errorHandler';
 import * as utils from '../utils';
-import { StorageProvider } from '../io';
+import { resetOutputChannel, StorageProvider } from '../io';
 import { DocumentStore } from '../documentStore';
 import { DisposeProvider } from '../utils';
 import { ResponseStore } from '../responseStore';
@@ -29,6 +29,7 @@ export class RequestCommandsController extends DisposeProvider {
       vscode.commands.registerCommand(commands.save, this.save, this),
       vscode.commands.registerCommand(commands.viewHeader, this.viewHeader, this),
       vscode.commands.registerCommand(commands.new, this.newHttpFile, this),
+      vscode.commands.registerCommand(commands.resetOutputChannel, resetOutputChannel),
     ];
   }
 
@@ -116,6 +117,7 @@ export class RequestCommandsController extends DisposeProvider {
   }
 
   private async sendRequest(context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext | undefined) {
+    resetOutputChannel();
     if (context) {
       const config = getConfigSetting();
       await vscode.window.withProgress(

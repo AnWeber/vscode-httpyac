@@ -1,3 +1,10 @@
+## [unreleased]
+
+### Fix
+- handle dom parser exception for invalid xml (AnWeber/httpyac#821)
+- do not log stack on assertions error (#338)
+- only clear output channel for test runs (#337)
+
 ## [6.16.3] (2024-10-30)
 
 ### Fix

@@ -23,6 +23,7 @@ export const commands = {
   removeHistory: `${APP_NAME}.removeHistory`,
   showHistoryResponse: `${APP_NAME}.showHistoryResponse`,
   pruneStorage: `${APP_NAME}.pruneStorage`,
+  resetOutputChannel: `${APP_NAME}.resetOutputChannel`,
 };
 
 export type ResponseViewContent = 'body' | 'headers' | 'full' | 'exchange';

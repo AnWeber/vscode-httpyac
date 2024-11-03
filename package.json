@@ -42,12 +42,8 @@
     "rapidapi"
   ],
   "activationEvents": [
-    "onCommand:httpyac.new",
-    "onCommand:httpyac.showHistory",
-    "onLanguage:http",
     "onLanguage:markdown",
     "onLanguage:asciidoc",
-    "onView:httpyacHistory",
     "workspaceContains:**/*.http",
     "workspaceContains:**/*.rest",
     "workspaceContains:.httpyac.js",
@@ -1188,6 +1184,12 @@
         "title": "Copy Value",
         "category": "httpYac",
         "icon": "$(clippy)"
+      },
+      {
+        "command": "httpyac.resetOutputChannel",
+        "title": "clears all output channel",
+        "category": "httpYac",
+        "icon": "$(clear-all)"
       }
     ],
     "menus": {
