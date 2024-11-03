@@ -191,9 +191,9 @@ export class TestRunner {
       };
       context.progress = {
         divider: 1,
-        isCanceled: () => testRunContext.token.isCancellationRequested,
+        isCanceled: () => testRunContext.testRun.token.isCancellationRequested,
         register: (event: () => void) => {
-          const dispose = testRunContext.token.onCancellationRequested(event);
+          const dispose = testRunContext.testRun.token.onCancellationRequested(event);
           return () => dispose.dispose();
         },
       };
