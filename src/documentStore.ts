@@ -232,12 +232,7 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
       if (context) {
         const config = await getEnvironmentConfig(context.httpFile.fileName);
 
-        if (!context.scriptConsole) {
-          context.scriptConsole = new httpyac.io.Logger({
-            level: config.log?.level,
-            logMethod: logToOutputChannelFactory(LogChannel.Console, LogChannel.Log),
-          });
-        }
+        this.setScriptConsole(context, config);
         if (!context.config) {
           context.config = config;
         }
@@ -250,6 +245,19 @@ export class DocumentStore extends utils.DisposeProvider implements IDocumentSto
     } finally {
       this.documentStoreChangedEmitter.fire();
     }
+  }
+
+  private setScriptConsole(
+    context: httpyac.HttpRegionSendContext | httpyac.HttpFileSendContext,
+    config: httpyac.EnvironmentConfig
+  ) {
+    context.scriptConsole = new httpyac.io.Logger(
+      {
+        level: config.log?.level,
+        logMethod: logToOutputChannelFactory(LogChannel.Console, LogChannel.Log),
+      },
+      context.scriptConsole
+    );
   }
 
   public clear() {

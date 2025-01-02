@@ -201,6 +201,7 @@ export class TestRunner {
       context.scriptConsole = new httpyac.io.Logger({
         level: httpyac.LogLevel.trace,
         logMethod(level, ...params: unknown[]) {
+          testRunContext.testRun.appendOutput('\r\n', undefined, testItem);
           testRunContext.testRun.appendOutput(
             `${toLevelString(level)} ${params.map(p => httpyac.utils.toString(p)).join(' ')}`,
             undefined,
