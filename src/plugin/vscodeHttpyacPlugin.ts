@@ -10,7 +10,12 @@ export function registerVscodePluginsFactory(httpRegionExecutedEmitter: vscode.E
     api.hooks.execute.addInterceptor(bailOnFailedTestInterceptor);
     api.hooks.execute.addInterceptor({
       id: 'httpRegionExecuted',
-      afterTrigger: async function bail(hookContext: { args: [ProcessorContext] }) {
+      afterLoop: async function bail(hookContext: { args: [ProcessorContext] }) {
+        const context = hookContext.args[0];
+        httpRegionExecutedEmitter.fire(context);
+        return true;
+      },
+      onError: async function bail(_err: Error, hookContext: { args: [ProcessorContext] }) {
         const context = hookContext.args[0];
         httpRegionExecutedEmitter.fire(context);
         return true;
