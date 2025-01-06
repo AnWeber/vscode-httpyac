@@ -1,9 +1,10 @@
-## [unreleased]
+## [6.16.5] (2025-01-06)
 
 ### Fix
 - errored or skipped referenced httpregion also skips current http region (AnWeber/httpyac#842, #339)
 - failed requests did not update test runner indicator (#348)
 - override of script console in test runner does not prevent logging in output channel (#347)
+- update Intellij d.ts Stubs and add Window.btoa/atob (#839)
 
 ## [6.16.4] (2024-11-03)
 
