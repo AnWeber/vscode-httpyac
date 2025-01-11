@@ -1,3 +1,8 @@
+## [6.16.6] (2025-01-11)
+
+### Fix
+- allow proxy for oauth2 using `oauth2_proxy` (AnWeber/httpyac#841)
+
 ## [6.16.5] (2025-01-06)
 
 ### Fix
