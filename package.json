@@ -1558,7 +1558,7 @@
     "httpsnippet": "^3.0.1",
     "httpyac": "^6.16.7",
     "lodash": "^4.17.21",
-    "mime-types": "^2.1.35",
+    "mime-types": "^3.0.1",
     "uuid": "11.1.0"
   }
 }
