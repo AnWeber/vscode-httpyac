@@ -1,4 +1,9 @@
 
+## [unreleased]
+
+### Features
+- auto focus OutputChannel `Request` if responseViewMode None and no Test Run (#360)
+
 ## [6.16.7] (2025-03-30)
 
 ### Fix

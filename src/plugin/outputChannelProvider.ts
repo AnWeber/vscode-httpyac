@@ -1,5 +1,5 @@
 import * as httpyac from 'httpyac';
-import { ResourceConfig, getResourceConfig } from '../config';
+import { ResourceConfig, getResourceConfig, getConfigSetting } from '../config';
 import { getOutputChannel } from '../io';
 
 export async function provideOutputChannelLogger(
@@ -7,12 +7,17 @@ export async function provideOutputChannelLogger(
   context: httpyac.VariableProviderContext
 ): Promise<httpyac.Variables> {
   if (context.config && isProcessorContext(context)) {
+    const appConfig = getConfigSetting();
     const resourceConfig = getResourceConfig(context.httpFile.fileName);
     if (resourceConfig.logRequest) {
       const outputChannelLogResponse = httpyac.utils.requestLoggerFactory(
         (arg: string) => {
           const requestChannel = getOutputChannel('Request', 'http');
           requestChannel.appendLine(arg);
+
+          if (appConfig.responseViewMode === 'none' && !context.variables.TEST_RUNNER) {
+            requestChannel.show(true);
+          }
         },
         getRequestLoggerOptions(resourceConfig, context.config)
       );

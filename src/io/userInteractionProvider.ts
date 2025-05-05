@@ -10,10 +10,10 @@ export enum LogChannel {
   Console = 'Console',
 }
 
-export function getOutputChannel(channel: string, options: string): vscode.OutputChannel {
+export function getOutputChannel(channel: string, languageId: string): vscode.OutputChannel {
   let outputChannel = outputChannels[channel];
   if (!outputChannel) {
-    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, options);
+    outputChannel = vscode.window.createOutputChannel(`${APP_NAME} - ${channel}`, languageId);
     outputChannels[channel] = outputChannel;
   }
   return outputChannel;
