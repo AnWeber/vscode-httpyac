@@ -1536,7 +1536,7 @@
   "devDependencies": {
     "@types/har-format": "1.2.15",
     "@types/lodash": "^4.17.7",
-    "@types/mime-types": "^2.1.4",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^22.5.0",
     "@types/uuid": "^10.0.0",
     "@types/vscode": "1.91.0",
@@ -1558,7 +1558,7 @@
     "httpsnippet": "^3.0.1",
     "httpyac": "^6.16.7",
     "lodash": "^4.17.21",
-    "mime-types": "^2.1.35",
+    "mime-types": "^3.0.2",
     "uuid": "11.1.0"
   }
 }
